@@ -1,0 +1,41 @@
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: ${DB_NAME:-patientvault}
+      POSTGRES_USER: ${DB_USER:-patientvault}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-patientvault}
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-patientvault} -d ${DB_NAME:-patientvault}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  couchdb:
+    build: ./docker/couchdb
+    environment:
+      COUCHDB_USER: ${COUCHDB_USER:-admin}
+      COUCHDB_PASSWORD: ${COUCHDB_PASSWORD:-admin-dev-password}
+    ports:
+      - "127.0.0.1:5984:5984"
+    volumes:
+      - couchdata:/opt/couchdb/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS -u $${COUCHDB_USER}:$${COUCHDB_PASSWORD} http://localhost:5984/_up || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "127.0.0.1:1025:1025"
+      - "127.0.0.1:8025:8025"
+
+volumes:
+  pgdata:
+  couchdata:

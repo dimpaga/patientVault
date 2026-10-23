@@ -1,0 +1,7 @@
+spring:
+  datasource:
+    password: ${DB_PASSWORD:patientvault}
+
+logging:
+  level:
+    com.example.patientvault: debug

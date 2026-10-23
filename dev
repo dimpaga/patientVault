@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Local development shortcuts: ./dev up | down | logs | run | reset
+set -euo pipefail
+cd "$(dirname "$0")"
+
+case "${1:-}" in
+  up)    docker compose up -d --build --wait postgres couchdb mailpit ;;
+  down)  docker compose down ;;
+  logs)  docker compose logs -f ;;
+  run)   SPRING_PROFILES_ACTIVE=local ./mvnw spring-boot:run ;;
+  reset) docker compose down -v ;;
+  *)     echo "usage: ./dev {up|down|logs|run|reset}"; exit 1 ;;
+esac

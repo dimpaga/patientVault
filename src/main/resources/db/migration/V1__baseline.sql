@@ -1,0 +1,2 @@
+-- Baseline migration. Schema objects are added by the migration of the step that owns them:
+--   identity/audit (V2+), patient, search, records, appointment.
