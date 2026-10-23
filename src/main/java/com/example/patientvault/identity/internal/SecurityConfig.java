@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.header.writers.CrossOriginOpenerPolicyHeaderWriter.CrossOriginOpenerPolicy;
 import org.springframework.security.web.header.writers.CrossOriginResourcePolicyHeaderWriter.CrossOriginResourcePolicy;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy;
@@ -28,8 +29,8 @@ class SecurityConfig {
             + "publickey-credentials-get=(), usb=(), interest-cohort=()";
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http, AuditService audit, UserAccountService accounts)
-            throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http, AuditService audit, UserAccountService accounts,
+                                            RateLimitProperties rateLimit) throws Exception {
 
         HttpSessionRequestCache requestCache = new HttpSessionRequestCache();
         requestCache.setMatchingRequestParameterName(null);
@@ -39,6 +40,7 @@ class SecurityConfig {
                 && !request.getRequestURI().startsWith("/actuator"));
 
         http
+            .addFilterBefore(new AuthRateLimitFilter(rateLimit, audit), UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login", "/error").permitAll()
                 .requestMatchers("/css/**", "/js/**", "/icons/**", "/webjars/**", "/manifest.webmanifest").permitAll()

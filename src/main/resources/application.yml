@@ -81,6 +81,12 @@ app:
     session:
       idle-timeout: 15m
       absolute-timeout: 8h
+    lockout:
+      max-attempts: 5
+      duration: 15m
+    rate-limit:
+      attempts: 10
+      window: 1m
   bootstrap:
     username: ${APP_BOOTSTRAP_USERNAME:}
     password: ${APP_BOOTSTRAP_PASSWORD:}

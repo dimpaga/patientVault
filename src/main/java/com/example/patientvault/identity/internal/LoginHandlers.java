@@ -3,6 +3,7 @@ package com.example.patientvault.identity.internal;
 import java.io.IOException;
 
 import org.springframework.security.core.Authentication;
+import org.springframework.security.authentication.LockedException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
@@ -45,7 +46,8 @@ final class LoginHandlers {
     static AuthenticationFailureHandler failure(AuditService audit) {
         return (request, response, exception) -> {
             // The attempted username is never recorded: users sometimes type their password into that field.
-            audit.record(AuditEvent.failure(AuditAction.LOGIN_FAILURE).byActor("ANONYMOUS"));
+            audit.record(AuditEvent.failure(AuditAction.LOGIN_FAILURE).byActor("ANONYMOUS")
+                    .withDetail("reason", exception instanceof LockedException ? "locked" : "bad_credentials"));
             response.sendRedirect(request.getContextPath() + "/login?error");
         };
     }
