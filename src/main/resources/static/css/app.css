@@ -155,6 +155,7 @@ main:focus { outline: none; }
 .pv-auth-logo { font-size: 2.5rem; }
 
 .pv-qr { width: 12rem; height: 12rem; background: #fff; border-radius: 0.5rem; padding: 0.25rem; }
+.pv-form-card { max-width: 32rem; }
 .pv-secret { font-size: 1rem; letter-spacing: 0.08em; user-select: all; overflow-wrap: anywhere; }
 .pv-recovery-codes { columns: 2; column-gap: 2rem; font-size: 1.1rem; line-height: 2; }
 

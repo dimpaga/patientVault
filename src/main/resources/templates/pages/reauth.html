@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html th:replace="~{layout/base :: page(~{::title}, ~{::main}, 'settings')}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="#{reauth.title} + ' · ' + #{app.name}">Confirm your identity · PatientVault</title>
+</head>
+<body>
+<main>
+    <h1 class="h3 mb-2" th:text="#{reauth.heading}">Confirm your identity</h1>
+    <p class="text-body-secondary" th:text="#{reauth.hint}">This action needs a fresh confirmation.</p>
+
+    <div class="alert alert-danger" role="alert" th:if="${param.error}" th:text="#{reauth.error}">Could not confirm</div>
+
+    <div class="card pv-card pv-form-card">
+        <div class="card-body">
+            <form method="post" th:action="@{/reauth}" hx-boost="false">
+                <input type="hidden" name="next" th:value="${next}">
+                <div class="mb-3">
+                    <label for="password" class="form-label" th:text="#{login.password}">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" required
+                           autocomplete="current-password" autofocus data-pv-focus>
+                </div>
+                <div class="mb-3" th:if="${needsCode}">
+                    <label for="code" class="form-label" th:text="#{mfa.verify.label}">Verification code</label>
+                    <input type="text" class="form-control" id="code" name="code" required maxlength="14"
+                           autocomplete="one-time-code" autocapitalize="characters" spellcheck="false">
+                </div>
+                <button type="submit" class="btn btn-primary" th:text="#{reauth.submit}">Confirm</button>
+                <a class="btn btn-link" th:href="@{/}" th:text="#{common.cancel}">Cancel</a>
+            </form>
+        </div>
+    </div>
+</main>
+</body>
+</html>

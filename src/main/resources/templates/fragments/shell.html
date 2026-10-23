@@ -27,6 +27,13 @@
             <span th:text="#{nav.dashboard}">Dashboard</span>
         </a>
     </li>
+    <li class="nav-item">
+        <a class="nav-link" th:href="@{/settings}" th:classappend="${active == 'settings'} ? 'active'"
+           th:attr="aria-current=${active == 'settings'} ? 'page'">
+            <i class="bi bi-gear" aria-hidden="true"></i>
+            <span th:text="#{nav.settings}">Settings</span>
+        </a>
+    </li>
 </ul>
 
 </body>

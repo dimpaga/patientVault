@@ -87,23 +87,10 @@ public class MfaService {
     @Transactional
     public Outcome verifyLogin(UUID userId, String rawCode) {
         DoctorUser user = users.findById(userId).orElseThrow();
-        Instant now = clock.instant();
-        if (user.getLockedUntil() != null && user.getLockedUntil().isAfter(now)) {
-            return Outcome.LOCKED;
+        Outcome outcome = check(user, rawCode, clock.instant());
+        if (outcome == Outcome.LOCKED) {
+            return outcome;
         }
-        String code = clean(rawCode);
-        Outcome outcome = Outcome.INVALID;
-        if (TotpService.looksLikeTotp(code) && user.isTotpEnabled() && user.getTotpSecretEnc() != null) {
-            String secret = crypto.decryptSecretText(secretContext(userId), user.getTotpSecretEnc());
-            long step = totp.verify(secret, code, now, user.getTotpLastStep());
-            if (step >= 0) {
-                user.setTotpLastStep(step);
-                outcome = Outcome.TOTP_OK;
-            }
-        } else if (!TotpService.looksLikeTotp(code) && recoveryCodes.consume(userId, code)) {
-            outcome = Outcome.RECOVERY_OK;
-        }
-
         AuditEvent event = outcome == Outcome.INVALID
                 ? AuditEvent.failure(AuditAction.MFA_FAILURE) : AuditEvent.success(AuditAction.MFA_SUCCESS);
         audit.record(event.byActor(user.getUsername()).onEntity("USER", userId)
@@ -112,6 +99,49 @@ public class MfaService {
             accounts.recordFailedLogin(user.getUsername());
         }
         return outcome;
+    }
+
+    /**
+     * Checks a TOTP code (replay-protected) or consumes a recovery code. Does not audit and does not
+     * count failures; callers decide how to account for the result.
+     */
+    Outcome check(DoctorUser user, String rawCode, Instant now) {
+        if (user.getLockedUntil() != null && user.getLockedUntil().isAfter(now)) {
+            return Outcome.LOCKED;
+        }
+        String code = clean(rawCode);
+        if (TotpService.looksLikeTotp(code)) {
+            if (!user.isTotpEnabled() || user.getTotpSecretEnc() == null) {
+                return Outcome.INVALID;
+            }
+            String secret = crypto.decryptSecretText(secretContext(user.getId()), user.getTotpSecretEnc());
+            long step = totp.verify(secret, code, now, user.getTotpLastStep());
+            if (step < 0) {
+                return Outcome.INVALID;
+            }
+            user.setTotpLastStep(step);
+            return Outcome.TOTP_OK;
+        }
+        return recoveryCodes.consume(user.getId(), code) ? Outcome.RECOVERY_OK : Outcome.INVALID;
+    }
+
+    public record Status(boolean enabled, int unusedRecoveryCodes) {
+    }
+
+    @Transactional(readOnly = true)
+    public Status status(UUID userId) {
+        DoctorUser user = users.findById(userId).orElseThrow();
+        return new Status(user.isTotpEnabled(), recoveryCodes.remaining(userId));
+    }
+
+    /** Replaces all recovery codes (callers must have required recent re-authentication). */
+    @Transactional
+    public List<String> regenerateRecoveryCodes(UUID userId) {
+        DoctorUser user = users.findById(userId).orElseThrow();
+        List<String> codes = recoveryCodes.regenerate(userId);
+        audit.record(AuditEvent.success(AuditAction.RECOVERY_CODES_REGENERATED).byActor(user.getUsername())
+                .onEntity("USER", userId));
+        return codes;
     }
 
     private static String clean(String code) {

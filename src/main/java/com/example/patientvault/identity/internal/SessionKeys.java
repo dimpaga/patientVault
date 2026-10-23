@@ -8,6 +8,7 @@ public final class SessionKeys {
     public static final String LOGIN_AT = "pv.loginAt";
     public static final String REAUTH_AT = "pv.reauthAt";
     public static final String RECOVERY_CODES = "pv.recoveryCodes";
+    public static final String MUST_CHANGE_PASSWORD = "pv.mustChangePassword";
 
     private SessionKeys() {
     }

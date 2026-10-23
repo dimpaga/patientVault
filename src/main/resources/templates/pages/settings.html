@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html th:replace="~{layout/base :: page(~{::title}, ~{::main}, 'settings')}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="#{settings.title} + ' · ' + #{app.name}">Settings · PatientVault</title>
+</head>
+<body>
+<main>
+    <h1 class="h3 mb-3" th:text="#{settings.heading}">Settings</h1>
+
+    <div class="alert alert-success" role="status" th:if="${flashSuccess != null}" th:text="#{${flashSuccess}}">Saved</div>
+
+    <div class="row g-3">
+        <section class="col-12 col-xl-6" aria-labelledby="set-password">
+            <div class="card pv-card h-100">
+                <div class="card-body">
+                    <h2 class="h5" id="set-password">
+                        <i class="bi bi-key me-2 pv-accent" aria-hidden="true"></i>
+                        <span th:text="#{settings.password}">Password</span>
+                    </h2>
+                    <p class="text-body-secondary" th:text="#{settings.password.hint}">Use a long, unique password.</p>
+                    <a class="btn btn-outline-primary" th:href="@{/settings/password}" th:text="#{settings.password.change}">Change password</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="col-12 col-xl-6" aria-labelledby="set-mfa">
+            <div class="card pv-card h-100">
+                <div class="card-body">
+                    <h2 class="h5" id="set-mfa">
+                        <i class="bi bi-shield-lock me-2 pv-accent" aria-hidden="true"></i>
+                        <span th:text="#{settings.mfa}">Two-step verification</span>
+                    </h2>
+                    <p class="mb-2">
+                        <span class="badge text-bg-success" th:if="${mfaStatus.enabled}" th:text="#{settings.mfa.on}">Enabled</span>
+                        <span class="badge text-bg-warning" th:unless="${mfaStatus.enabled}" th:text="#{settings.mfa.off}">Not enabled</span>
+                    </p>
+                    <p class="text-body-secondary" th:if="${mfaStatus.enabled}"
+                       th:text="#{settings.mfa.codes(${mfaStatus.unusedRecoveryCodes})}">9 recovery codes left</p>
+                    <form method="post" th:action="@{/settings/recovery-codes}" th:if="${mfaStatus.enabled}">
+                        <button type="submit" class="btn btn-outline-primary" th:text="#{settings.mfa.regenerate}">Generate new recovery codes</button>
+                        <div class="form-text" th:text="#{settings.mfa.regenerate.hint}">Replaces all existing recovery codes.</div>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+</body>
+</html>

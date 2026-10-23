@@ -1,7 +1,9 @@
 package com.example.patientvault.identity.internal;
 
 import java.time.Clock;
+import java.time.Duration;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -10,6 +12,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
+import org.springframework.security.web.context.SecurityContextHolderFilter;
 import org.springframework.security.web.header.writers.CrossOriginOpenerPolicyHeaderWriter.CrossOriginOpenerPolicy;
 import org.springframework.security.web.header.writers.CrossOriginResourcePolicyHeaderWriter.CrossOriginResourcePolicy;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy;
@@ -45,9 +49,14 @@ class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, AuditService audit, RateLimitProperties rateLimit,
                                             MfaProperties mfa, LoginCompletion loginCompletion, Clock clock,
-                                            RequestCache requestCache) throws Exception {
+                                            RequestCache requestCache,
+                                            @Value("${app.security.session.absolute-timeout}") Duration absoluteTimeout)
+            throws Exception {
         http
             .addFilterBefore(new AuthRateLimitFilter(rateLimit, audit), UsernamePasswordAuthenticationFilter.class)
+            .addFilterAfter(new AbsoluteSessionTimeoutFilter(absoluteTimeout, clock, audit),
+                    SecurityContextHolderFilter.class)
+            .addFilterAfter(new MustChangePasswordFilter(), AnonymousAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login", "/login/mfa", "/login/mfa/**", "/error").permitAll()
                 .requestMatchers("/css/**", "/js/**", "/icons/**", "/webjars/**", "/manifest.webmanifest").permitAll()

@@ -68,6 +68,7 @@ public class LoginCompletion {
         session.removeAttribute(SessionKeys.ENROL_SECRET);
         session.setAttribute(SessionKeys.LOGIN_AT, clock.instant());
         session.setAttribute(SessionKeys.REAUTH_AT, clock.instant());
+        session.setAttribute(SessionKeys.MUST_CHANGE_PASSWORD, user.isMustChangePassword());
 
         accounts.recordLoginSuccess(userId);
         audit.record(AuditEvent.success(AuditAction.LOGIN_SUCCESS).byActor(principal.getUsername())
