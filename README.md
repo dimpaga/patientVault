@@ -10,8 +10,8 @@ before it reaches PostgreSQL or CouchDB. The full design and requirements are in
 
 ## Status
 
-Implementation follows spec section 14. Done so far: step 0 (foundation), step 1 (crypto kernel).
-Automated tests are deferred.
+Implementation follows spec section 14. Done so far: step 0 (foundation), step 1 (crypto kernel) and
+step 2 (identity and UI shell). Automated tests are deferred.
 
 ## Prerequisites
 
@@ -41,7 +41,12 @@ See spec section 15. Local defaults live in `application.yml` / `application-loc
 
 The application **will not start** without a key ring: set `APP_MASTER_KEYS` (`v1:<base64 256-bit key>`)
 and `APP_ACTIVE_KEY_ID`. `./dev genkey` prints a new key; `./dev run` creates local development keys
-automatically. See [docs/SECURITY.md](docs/SECURITY.md).
+and a local doctor account automatically (the initial password is printed once and kept in the
+git-ignored `.dev-secrets.env`). See [docs/SECURITY.md](docs/SECURITY.md).
+
+First login: sign in with the initial password, scan the QR code with an authenticator app, save the
+recovery codes, then choose a new password. In production set `APP_BOOTSTRAP_USERNAME` and
+`APP_BOOTSTRAP_PASSWORD` (used only when no user exists).
 
 ## Module layout
 
