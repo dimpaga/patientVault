@@ -38,7 +38,7 @@ import com.example.patientvault.crypto.CryptoService;
 import com.example.patientvault.crypto.DataKey;
 import com.example.patientvault.crypto.IntegrityFailureException;
 import com.example.patientvault.records.FolderListing;
-import com.example.patientvault.records.PatientAccess;
+import com.example.patientvault.shared.PatientAccess;
 import com.example.patientvault.records.RecordsApi;
 import com.example.patientvault.records.blob.BlobMeta;
 import com.example.patientvault.records.blob.BlobNotFoundException;

@@ -1,6 +1,10 @@
 package com.example.patientvault.patient.internal;
 
+import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -18,10 +22,12 @@ class DefaultPatientApi implements PatientApi {
 
     private final PatientRepository patients;
     private final PatientCodec codec;
+    private final PatientService service;
 
-    DefaultPatientApi(PatientRepository patients, PatientCodec codec) {
+    DefaultPatientApi(PatientRepository patients, PatientCodec codec, PatientService service) {
         this.patients = patients;
         this.codec = codec;
+        this.service = service;
     }
 
     @Override
@@ -35,6 +41,22 @@ class DefaultPatientApi implements PatientApi {
     @Transactional(readOnly = true)
     public Optional<PatientSummary> findActive(UUID patientId) {
         return patients.findByIdAndStatus(patientId, PatientEntity.ACTIVE).map(this::summary);
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('" + Permissions.PATIENT_READ + "')")
+    @Transactional(readOnly = true)
+    public Map<UUID, PatientSummary> findActive(Collection<UUID> patientIds) {
+        if (patientIds.isEmpty()) {
+            return Map.of();
+        }
+        return patients.findAllById(patientIds).stream().filter(p -> PatientEntity.ACTIVE.equals(p.getStatus()))
+                .collect(Collectors.toMap(PatientEntity::getId, this::summary));
+    }
+
+    @Override
+    public UUID addVisit(UUID patientId, LocalDate date, String description) {
+        return service.addVisit(patientId, new VisitData(date, description, null, null));
     }
 
     @Override

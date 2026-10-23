@@ -105,6 +105,16 @@ app:
     min-prefix-length: 3
     max-prefix-length: 15
     max-candidates: 2000
+  reminders:
+    lead-times: P1D,PT1H
+    privacy-mode: FULL_NAME
+    max-attempts: 5
+    retry-base-delay: 1m
+    locale: en
+    public-base-url: ${APP_PUBLIC_BASE_URL:http://localhost:8080}
+    daily-digest:
+      enabled: true
+      at: "07:30"
   uploads:
     max-file-size: 100MB
     max-folder-depth: 12

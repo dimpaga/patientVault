@@ -1,4 +1,4 @@
-package com.example.patientvault.records;
+package com.example.patientvault.shared;
 
 import java.util.UUID;
 

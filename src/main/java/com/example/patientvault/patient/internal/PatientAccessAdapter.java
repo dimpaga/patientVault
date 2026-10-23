@@ -6,7 +6,7 @@ import org.springframework.stereotype.Component;
 
 import com.example.patientvault.crypto.CryptoService;
 import com.example.patientvault.crypto.DataKey;
-import com.example.patientvault.records.PatientAccess;
+import com.example.patientvault.shared.PatientAccess;
 
 /** Gives the records module what it needs from patients without exposing entities or repositories. */
 @Component
