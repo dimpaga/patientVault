@@ -1,0 +1,168 @@
+/* PatientVault UI. No inline styles are used anywhere (strict CSP), so everything lives here. */
+
+:root {
+    --pv-accent: #0b6b6b;
+    --pv-accent-hover: #095757;
+    --pv-sidebar-w: 15rem;
+    --pv-touch: 44px;
+    --pv-radius: 0.9rem;
+    --bs-primary: var(--pv-accent);
+    --bs-primary-rgb: 11, 107, 107;
+    --bs-link-color: var(--pv-accent);
+    --bs-link-hover-color: var(--pv-accent-hover);
+    --bs-link-color-rgb: 11, 107, 107;
+    --bs-link-hover-color-rgb: 9, 87, 87;
+}
+
+[data-bs-theme="dark"] {
+    --pv-accent: #3dd6c4;
+    --pv-accent-hover: #6fe3d5;
+    --bs-primary-rgb: 61, 214, 196;
+    --bs-link-color-rgb: 61, 214, 196;
+    --bs-link-hover-color-rgb: 111, 227, 213;
+}
+
+.btn-primary {
+    --bs-btn-bg: var(--pv-accent);
+    --bs-btn-border-color: var(--pv-accent);
+    --bs-btn-hover-bg: var(--pv-accent-hover);
+    --bs-btn-hover-border-color: var(--pv-accent-hover);
+    --bs-btn-active-bg: var(--pv-accent-hover);
+    --bs-btn-active-border-color: var(--pv-accent-hover);
+    --bs-btn-disabled-bg: var(--pv-accent);
+    --bs-btn-disabled-border-color: var(--pv-accent);
+    --bs-btn-color: #fff;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-active-color: #fff;
+}
+
+[data-bs-theme="dark"] .btn-primary {
+    --bs-btn-color: #04201c;
+    --bs-btn-hover-color: #04201c;
+    --bs-btn-active-color: #04201c;
+}
+
+.btn-outline-primary {
+    --bs-btn-color: var(--pv-accent);
+    --bs-btn-border-color: var(--pv-accent);
+    --bs-btn-hover-bg: var(--pv-accent);
+    --bs-btn-hover-border-color: var(--pv-accent);
+    --bs-btn-active-bg: var(--pv-accent);
+    --bs-btn-active-border-color: var(--pv-accent);
+}
+
+.pv-accent { color: var(--pv-accent); }
+
+/* Touch targets of at least 44px */
+.btn, .form-control, .form-select { min-height: var(--pv-touch); }
+.btn { display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem; }
+.form-check-input { width: 1.25rem; height: 1.25rem; }
+
+.pv-icon-btn {
+    min-width: var(--pv-touch);
+    padding-inline: 0.5rem;
+}
+
+:focus-visible {
+    outline: 3px solid var(--pv-accent);
+    outline-offset: 2px;
+}
+main:focus { outline: none; }
+
+.pv-body { background: var(--bs-tertiary-bg); min-height: 100vh; }
+
+.pv-card {
+    border-radius: var(--pv-radius);
+    border-color: var(--bs-border-color-translucent);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), 0 6px 18px rgba(0, 0, 0, 0.04);
+}
+
+/* App shell: top bar, collapsible sidebar (laptop), bottom tab bar (phone) */
+.pv-frame { display: flex; min-height: calc(100vh - 4rem); }
+
+.pv-sidebar {
+    flex: none;
+    width: var(--pv-sidebar-w);
+    padding: 1rem;
+    background: var(--bs-body-bg);
+    border-right: 1px solid var(--bs-border-color);
+}
+
+.pv-sidebar-collapsed .pv-sidebar { display: none !important; }
+
+.pv-content {
+    flex: 1;
+    min-width: 0;
+    max-width: 80rem;
+    margin-inline: auto;
+}
+
+.pv-nav { gap: 0.25rem; }
+
+.pv-sidebar .pv-nav { flex-direction: column; }
+
+.pv-nav .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    min-height: var(--pv-touch);
+    border-radius: 0.65rem;
+    color: var(--bs-body-color);
+}
+
+.pv-nav .nav-link:hover { background: var(--bs-secondary-bg); }
+
+.pv-nav .nav-link.active {
+    background: color-mix(in srgb, var(--pv-accent) 14%, transparent);
+    color: var(--pv-accent);
+    font-weight: 600;
+}
+
+.pv-bottom-nav {
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 1030;
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+.pv-bottom-nav .pv-nav { flex-wrap: nowrap; justify-content: space-around; gap: 0; }
+
+.pv-bottom-nav .nav-link {
+    flex-direction: column;
+    gap: 0.1rem;
+    padding: 0.4rem 0.75rem;
+    min-height: 3.5rem;
+    font-size: 0.75rem;
+    border-radius: 0;
+}
+
+.pv-bottom-nav .nav-link .bi { font-size: 1.25rem; }
+
+@media (max-width: 991.98px) {
+    .pv-body { padding-bottom: 4.5rem; }
+    .pv-frame { min-height: auto; }
+}
+
+/* Pages shown before login */
+.pv-auth-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem;
+}
+.pv-auth-prefs { align-self: flex-end; }
+.pv-auth-main { width: 100%; max-width: 26rem; margin: auto; padding-block: 1.5rem; }
+.pv-auth-logo { font-size: 2.5rem; }
+
+/* htmx loading indicators (the library's built-in indicator styles are disabled for CSP) */
+.htmx-indicator { opacity: 0; transition: opacity 200ms ease-in; }
+.htmx-request .htmx-indicator, .htmx-request.htmx-indicator { opacity: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

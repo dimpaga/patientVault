@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<section th:fragment="card(titleKey, textKey)" class="card pv-card text-center">
+    <div class="card-body p-4">
+        <h1 class="h4" th:text="#{${titleKey}}">Error</h1>
+        <p class="text-body-secondary" th:text="#{${textKey}}">Something went wrong.</p>
+        <p class="small text-body-secondary" th:if="${requestId != null}">
+            <span th:text="#{error.reference}">Reference</span>:
+            <code th:text="${requestId}">abc123</code>
+        </p>
+        <a class="btn btn-primary" th:href="@{/}" th:text="#{error.home}">Back to the dashboard</a>
+    </div>
+</section>
+</body>
+</html>

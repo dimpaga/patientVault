@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html th:replace="~{layout/base :: page(~{::title}, ~{::main}, 'dashboard')}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="#{dashboard.title} + ' · ' + #{app.name}">Dashboard · PatientVault</title>
+</head>
+<body>
+<main>
+    <h1 class="h3 mb-1" th:text="#{dashboard.heading}">Welcome</h1>
+    <p class="text-body-secondary mb-4" th:text="#{dashboard.subtitle}">Your patient records at a glance.</p>
+
+    <div class="row g-3">
+        <section class="col-12 col-xl-6" aria-labelledby="dash-appointments">
+            <div class="card pv-card h-100">
+                <div class="card-body">
+                    <h2 class="h5" id="dash-appointments">
+                        <i class="bi bi-calendar-event me-2 pv-accent" aria-hidden="true"></i>
+                        <span th:text="#{dashboard.appointments}">Today's appointments</span>
+                    </h2>
+                    <p class="text-body-secondary mb-0" th:text="#{dashboard.appointments.empty}">No appointments.</p>
+                </div>
+            </div>
+        </section>
+        <section class="col-12 col-xl-6" aria-labelledby="dash-recent">
+            <div class="card pv-card h-100">
+                <div class="card-body">
+                    <h2 class="h5" id="dash-recent">
+                        <i class="bi bi-people me-2 pv-accent" aria-hidden="true"></i>
+                        <span th:text="#{dashboard.recent}">Recent patients</span>
+                    </h2>
+                    <p class="text-body-secondary mb-0" th:text="#{dashboard.recent.empty}">No patients yet.</p>
+                </div>
+            </div>
+        </section>
+        <section class="col-12" aria-labelledby="dash-alerts">
+            <div class="card pv-card">
+                <div class="card-body">
+                    <h2 class="h5" id="dash-alerts">
+                        <i class="bi bi-bell me-2 pv-accent" aria-hidden="true"></i>
+                        <span th:text="#{dashboard.alerts}">Alerts</span>
+                    </h2>
+                    <p class="text-body-secondary mb-0" th:text="#{dashboard.alerts.empty}">Nothing needs attention.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+</main>
+</body>
+</html>

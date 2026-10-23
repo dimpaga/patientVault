@@ -1,0 +1,5 @@
+<!DOCTYPE html>
+<html th:replace="~{layout/auth :: page(~{::title}, ~{::section})}" xmlns:th="http://www.thymeleaf.org">
+<head><title th:text="#{error.403.title} + ' · ' + #{app.name}">Access denied</title></head>
+<body><section th:replace="~{fragments/error :: card('error.403.title', 'error.403.text')}"></section></body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<!--
+  Authenticated application shell. Pages use:
+  <html th:replace="~{layout/base :: page(~{::title}, ~{::main}, 'navKey')}"> ... <title>..</title> <main>..</main>
+-->
+<html lang="en" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org"
+      th:fragment="page(title, content, nav)">
+<head th:replace="~{fragments/head :: head(${title})}"></head>
+<body class="pv-body">
+<a class="visually-hidden-focusable pv-skip" href="#pv-main" th:text="#{nav.skip}">Skip to main content</a>
+
+<div id="pv-app" hx-boost="true">
+    <header class="pv-topbar navbar bg-body border-bottom sticky-top">
+        <div class="container-fluid gap-2">
+            <button type="button" class="btn btn-outline-secondary btn-sm pv-icon-btn d-none d-lg-inline-flex"
+                    data-pv-sidebar-toggle th:aria-label="#{topbar.sidebar}" th:title="#{topbar.sidebar}">
+                <i class="bi bi-layout-sidebar" aria-hidden="true"></i>
+            </button>
+            <a class="navbar-brand fw-semibold d-flex align-items-center gap-2 me-auto" th:href="@{/}"
+               th:aria-label="#{topbar.home}">
+                <i class="bi bi-shield-plus pv-accent" aria-hidden="true"></i>
+                <span th:text="#{app.name}">PatientVault</span>
+            </a>
+            <div th:replace="~{fragments/shell :: preferences}"></div>
+        </div>
+    </header>
+
+    <div class="pv-frame">
+        <nav class="pv-sidebar d-none d-lg-block" th:aria-label="#{nav.main}">
+            <div th:replace="~{fragments/shell :: items(${nav})}"></div>
+        </nav>
+
+        <main id="pv-main" class="pv-content container-fluid py-4" tabindex="-1" th:insert="${content}">
+            <!-- page content -->
+        </main>
+    </div>
+
+    <nav class="pv-bottom-nav d-lg-none border-top bg-body" th:aria-label="#{nav.main}">
+        <div th:replace="~{fragments/shell :: items(${nav})}"></div>
+    </nav>
+
+    <div class="toast-container position-fixed top-0 end-0 p-3" id="pv-toasts"
+         th:attr="data-pv-error=#{toast.error},data-pv-close=#{common.close}"></div>
+    <div id="pv-live" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
+</div>
+</body>
+</html>

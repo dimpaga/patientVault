@@ -1,0 +1,5 @@
+<!DOCTYPE html>
+<html th:replace="~{layout/auth :: page(~{::title}, ~{::section})}" xmlns:th="http://www.thymeleaf.org">
+<head><title th:text="#{error.generic.title} + ' · ' + #{app.name}">Something went wrong</title></head>
+<body><section th:replace="~{fragments/error :: card('error.generic.title', 'error.generic.text')}"></section></body>
+</html>

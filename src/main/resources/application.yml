@@ -1,6 +1,20 @@
 spring:
   application:
     name: patientvault
+  messages:
+    basename: messages
+    fallback-to-system-locale: false
+  web:
+    resources:
+      chain:
+        strategy:
+          content:
+            enabled: true
+            paths: /**
+      cache:
+        cachecontrol:
+          max-age: 365d
+          cache-public: true
   jpa:
     open-in-view: false
     hibernate:

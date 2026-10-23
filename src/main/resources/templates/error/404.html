@@ -1,0 +1,5 @@
+<!DOCTYPE html>
+<html th:replace="~{layout/auth :: page(~{::title}, ~{::section})}" xmlns:th="http://www.thymeleaf.org">
+<head><title th:text="#{error.404.title} + ' · ' + #{app.name}">Page not found</title></head>
+<body><section th:replace="~{fragments/error :: card('error.404.title', 'error.404.text')}"></section></body>
+</html>

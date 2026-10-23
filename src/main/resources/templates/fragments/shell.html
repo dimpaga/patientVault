@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- Language switch and theme toggle, shared by the app shell and the public (login/error) pages. -->
+<div th:fragment="preferences" class="d-flex align-items-center gap-2">
+    <div class="btn-group btn-group-sm" role="group" th:aria-label="#{topbar.language}">
+        <a class="btn btn-outline-secondary" lang="en" hreflang="en" href="?lang=en"
+           th:classappend="${#locale.language == 'en'} ? 'active'"
+           th:attr="aria-current=${#locale.language == 'en'} ? 'true'" hx-boost="false">EN</a>
+        <a class="btn btn-outline-secondary" lang="el" hreflang="el" href="?lang=el"
+           th:classappend="${#locale.language == 'el'} ? 'active'"
+           th:attr="aria-current=${#locale.language == 'el'} ? 'true'" hx-boost="false">ΕΛ</a>
+    </div>
+    <button type="button" class="btn btn-outline-secondary btn-sm pv-icon-btn" data-pv-theme-toggle
+            th:aria-label="#{topbar.theme}" th:title="#{topbar.theme}">
+        <i class="bi bi-circle-half" aria-hidden="true"></i>
+    </button>
+</div>
+
+<!-- Navigation entries; rendered in the sidebar and in the phone bottom bar. -->
+<ul th:fragment="items(active)" class="nav pv-nav">
+    <li class="nav-item">
+        <a class="nav-link" th:href="@{/}" th:classappend="${active == 'dashboard'} ? 'active'"
+           th:attr="aria-current=${active == 'dashboard'} ? 'page'">
+            <i class="bi bi-speedometer2" aria-hidden="true"></i>
+            <span th:text="#{nav.dashboard}">Dashboard</span>
+        </a>
+    </li>
+</ul>
+
+</body>
+</html>
