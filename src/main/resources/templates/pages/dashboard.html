@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html th:replace="~{layout/base :: page(~{::title}, ~{::main}, 'dashboard')}" xmlns:th="http://www.thymeleaf.org">
+<html th:replace="~{layout/base :: page(~{::title}, ~{::#pv-page}, 'dashboard')}" xmlns:th="http://www.thymeleaf.org">
 <head>
     <title th:text="#{dashboard.title} + ' · ' + #{app.name}">Dashboard · PatientVault</title>
 </head>
 <body>
-<main>
+<div id="pv-page">
     <h1 class="h3 mb-1" th:text="#{dashboard.heading}">Welcome</h1>
     <p class="text-body-secondary mb-4" th:text="#{dashboard.subtitle}">Your patient records at a glance.</p>
 
@@ -43,6 +43,6 @@
             </div>
         </section>
     </div>
-</main>
+</div>
 </body>
 </html>

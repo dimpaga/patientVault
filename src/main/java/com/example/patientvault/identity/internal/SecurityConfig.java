@@ -35,15 +35,20 @@ class SecurityConfig {
             + "geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), "
             + "publickey-credentials-get=(), usb=(), interest-cohort=()";
 
-    /** Remembers the page a user wanted before login. Only plain page navigations, never htmx partials or non-GET. */
+    /** Remembers the page a user wanted before login. Only HTML page navigations: never htmx partials, assets, favicons or non-GET. */
     @Bean
     RequestCache requestCache() {
         HttpSessionRequestCache requestCache = new HttpSessionRequestCache();
         requestCache.setMatchingRequestParameterName(null);
         requestCache.setRequestMatcher(request -> HttpMethod.GET.matches(request.getMethod())
                 && !LoginRedirects.isHtmx(request)
+                && acceptsHtml(request.getHeader("Accept"))
                 && !request.getRequestURI().startsWith("/actuator"));
         return requestCache;
+    }
+
+    private static boolean acceptsHtml(String accept) {
+        return accept != null && accept.contains("text/html");
     }
 
     @Bean

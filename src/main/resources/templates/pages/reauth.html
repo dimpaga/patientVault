@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html th:replace="~{layout/base :: page(~{::title}, ~{::main}, 'settings')}" xmlns:th="http://www.thymeleaf.org">
+<html th:replace="~{layout/base :: page(~{::title}, ~{::#pv-page}, 'settings')}" xmlns:th="http://www.thymeleaf.org">
 <head>
     <title th:text="#{reauth.title} + ' · ' + #{app.name}">Confirm your identity · PatientVault</title>
 </head>
 <body>
-<main>
+<div id="pv-page">
     <h1 class="h3 mb-2" th:text="#{reauth.heading}">Confirm your identity</h1>
     <p class="text-body-secondary" th:text="#{reauth.hint}">This action needs a fresh confirmation.</p>
 
@@ -29,6 +29,6 @@
             </form>
         </div>
     </div>
-</main>
+</div>
 </body>
 </html>

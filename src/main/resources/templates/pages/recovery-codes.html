@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html th:replace="~{layout/base :: page(~{::title}, ~{::main}, 'settings')}" xmlns:th="http://www.thymeleaf.org">
+<html th:replace="~{layout/base :: page(~{::title}, ~{::#pv-page}, 'settings')}" xmlns:th="http://www.thymeleaf.org">
 <head>
     <title th:text="#{recovery.title} + ' · ' + #{app.name}">Recovery codes · PatientVault</title>
 </head>
 <body>
-<main>
+<div id="pv-page">
     <h1 class="h3 mb-3" th:text="#{recovery.heading}">Your recovery codes</h1>
     <div class="alert alert-warning" role="alert" th:text="#{recovery.warning}">Save these codes now.</div>
 
@@ -23,6 +23,6 @@
         </button>
         <a class="btn btn-primary" th:href="@{/}" th:text="#{recovery.continue}">I have saved them, continue</a>
     </div>
-</main>
+</div>
 </body>
 </html>

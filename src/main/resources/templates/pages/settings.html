@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html th:replace="~{layout/base :: page(~{::title}, ~{::main}, 'settings')}" xmlns:th="http://www.thymeleaf.org">
+<html th:replace="~{layout/base :: page(~{::title}, ~{::#pv-page}, 'settings')}" xmlns:th="http://www.thymeleaf.org">
 <head>
     <title th:text="#{settings.title} + ' · ' + #{app.name}">Settings · PatientVault</title>
 </head>
 <body>
-<main>
+<div id="pv-page">
     <h1 class="h3 mb-3" th:text="#{settings.heading}">Settings</h1>
 
     <div class="alert alert-success" role="status" th:if="${flashSuccess != null}" th:text="#{${flashSuccess}}">Saved</div>
@@ -44,6 +44,6 @@
             </div>
         </section>
     </div>
-</main>
+</div>
 </body>
 </html>

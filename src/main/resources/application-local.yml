@@ -1,4 +1,6 @@
 spring:
+  thymeleaf:
+    cache: false
   datasource:
     password: ${DB_PASSWORD:patientvault}
 

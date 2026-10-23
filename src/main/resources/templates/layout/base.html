@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
   Authenticated application shell. Pages use:
-  <html th:replace="~{layout/base :: page(~{::title}, ~{::main}, 'navKey')}"> ... <title>..</title> <main>..</main>
+  <html th:replace="~{layout/base :: page(~{::title}, ~{::#pv-page}, 'navKey')}"> ... <title>..</title> <div id="pv-page">..</div>
 -->
 <html lang="en" th:lang="${#locale.language}" xmlns:th="http://www.thymeleaf.org"
       th:fragment="page(title, content, nav)">
@@ -47,8 +47,8 @@
             <div th:replace="~{fragments/shell :: items(${nav})}"></div>
         </nav>
 
-        <main id="pv-main" class="pv-content container-fluid py-4" tabindex="-1" th:insert="${content}">
-            <!-- page content -->
+        <main id="pv-main" class="pv-content container-fluid py-4" tabindex="-1">
+            <div th:replace="${content}">page content</div>
         </main>
     </div>
 
