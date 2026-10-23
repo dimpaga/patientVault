@@ -93,7 +93,26 @@ Per patient: random 256-bit DEK, stored only wrapped by the KEK
 - **Not yet done:** sanitising exception messages in error logs and the automated log-hygiene test
   (hardening step); both matter once patient data exists.
 
-## 4. Secrets handling
+## 4. Patient data (implemented: step 4)
+
+- **At rest:** `patient` and `visit` rows hold only ciphertext (`*_enc`) plus the wrapped data key; names,
+  e-mail, phone, AMKA, referral source, notes, descriptions, diagnoses and treatments are encrypted per
+  field by `PatientCodec` (the only class that sees both forms). Verified by dumping the tables and
+  searching for sentinel values (plain and hex): none found.
+- **Search tokens:** `patient_search_token` holds HMAC-SHA256 tokens only (AMKA, e-mail, mobile, name
+  prefixes 3..15). A unique index on AMKA tokens enforces one patient per AMKA without the database
+  knowing the number. Tokens are rebuilt in the same transaction when a searchable field changes.
+- **Validation:** server-side and authoritative (e-mail syntax, libphonenumber E.164 for mobiles, 11-digit
+  Luhn-valid AMKA, length limits, no future visit dates). Messages never echo the typed value.
+- **Authorisation and IDOR:** every service method requires `PATIENT_READ` / `PATIENT_WRITE`; patients must
+  be `ACTIVE`; a visit is only reachable through its own patient (404 otherwise).
+- **Concurrency:** optimistic locking (`version`) on patients and visits; a stale save shows a conflict
+  message and keeps the user's input.
+- **Audit/logging:** `PATIENT_CREATED/VIEWED/UPDATED` and `VISIT_*` record ids and the *names* of changed
+  fields only. Entities and records that hold personal data override `toString()`. Checked: none of the
+  sentinel values appear in any log.
+
+## 5. Secrets handling
 
 - Secrets only via environment variables; `.env`, `.dev-secrets.env` are git-ignored.
 - `./dev run` generates local development keys and a local doctor account into `.dev-secrets.env`
