@@ -70,7 +70,7 @@ class PatientPage {
         model.addAttribute("updatedAt", local(patient.updatedAt()));
         model.addAttribute("consentAt", patient.consentRecordedAt() == null ? null : local(patient.consentRecordedAt()));
         model.addAttribute("nav", "patients");
-        String selected = "visits".equals(tab) ? "visits" : "overview";
+        String selected = "visits".equals(tab) ? "visits" : "files".equals(tab) ? "files" : "overview";
         model.addAttribute("tab", selected);
         if ("visits".equals(selected)) {
             model.addAttribute("visits", patients.visits(patient.id()));

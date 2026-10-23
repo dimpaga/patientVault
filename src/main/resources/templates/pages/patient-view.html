@@ -36,8 +36,19 @@
                     <i class="bi bi-clipboard2-pulse" aria-hidden="true"></i><span th:text="#{patient.tab.visits}">Visits</span>
                 </a>
             </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" th:classappend="${tab == 'files'} ? 'active'" role="tab"
+                   th:aria-selected="${tab == 'files'}" th:href="@{/patients/{id}/files(id=${patient.id})}"
+                   th:hx-get="@{/patients/{id}/files(id=${patient.id})}"
+                   hx-target="#pv-tabs" hx-swap="outerHTML" hx-push-url="true" hx-boost="false">
+                    <i class="bi bi-folder2-open" aria-hidden="true"></i><span th:text="#{patient.tab.files}">Files</span>
+                </a>
+            </li>
         </ul>
         <div id="pv-tab-content" role="tabpanel" th:switch="${tab}">
+            <th:block th:case="'files'">
+                <th:block th:replace="~{pages/patient-view :: filesTab}"></th:block>
+            </th:block>
             <th:block th:case="'visits'">
                 <th:block th:replace="~{patients/visits :: visitsTab}"></th:block>
             </th:block>
@@ -86,6 +97,16 @@
                     <dt class="col-sm-4 col-lg-3" th:text="#{patient.meta.updated}">Last changed</dt>
                     <dd class="col-sm-8 col-lg-9 text-body-secondary mb-0" th:text="${#temporals.format(updatedAt, 'dd/MM/yyyy HH:mm')}">date</dd>
                 </dl>
+            </div>
+        </div>
+    </th:block>
+
+    <th:block th:fragment="filesTab">
+        <div class="card pv-card">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-folder2-open display-6 text-body-secondary" aria-hidden="true"></i>
+                <p class="mt-3 mb-1 fw-semibold" th:text="#{files.empty}">No files yet.</p>
+                <p class="text-body-secondary mb-0" th:text="#{files.empty.hint}">Photos, PDFs and DICOM files will be listed here.</p>
             </div>
         </div>
     </th:block>

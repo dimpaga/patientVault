@@ -12,7 +12,7 @@ before it reaches PostgreSQL or CouchDB. The full design and requirements are in
 
 Implementation follows spec section 14. Done so far: step 0 (foundation), step 1 (crypto kernel),
 step 2 (identity and UI shell), a light step 3 (request ids, structured logs, access log; the audit
-table and page are still open) and step 4 (patients and visits: create, edit, view, visits tab).
+table and page are still open) step 4 (patients and visits: create, edit, view, visits tab) and step 5 (search).
 Automated tests are deferred.
 
 ## Prerequisites

@@ -111,6 +111,18 @@ class PatientController {
                 @RequestParam(name = "edit", required = false) UUID editVisit,
                 @RequestHeader(name = "HX-Request", required = false) String htmx,
                 @RequestHeader(name = "HX-Boosted", required = false) String boosted, Model model) {
+        return render(id, tab, editVisit, htmx, boosted, model);
+    }
+
+    /** "View medical data": the patient's page opened on the Files tab. */
+    @GetMapping("/{id}/files")
+    @PreAuthorize("hasAuthority('" + Permissions.PATIENT_READ + "')")
+    String files(@PathVariable UUID id, @RequestHeader(name = "HX-Request", required = false) String htmx,
+                 @RequestHeader(name = "HX-Boosted", required = false) String boosted, Model model) {
+        return render(id, "files", null, htmx, boosted, model);
+    }
+
+    private String render(UUID id, String tab, UUID editVisit, String htmx, String boosted, Model model) {
         PatientView patient = page.load(id);
         PatientPage.VisitState state = page.stateForEdit(patient.id(), editVisit);
         page.fill(model, patient, tab, state);

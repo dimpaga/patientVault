@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- Search results (also the htmx response body). Needs model attributes "q" and "result". -->
+<div id="results" th:fragment="results" aria-live="polite">
+
+    <div class="alert alert-info" role="status" th:if="${result.messageKey != null}"
+         th:text="#{${result.messageKey}(${result.messageArg})}">Type at least 3 letters.</div>
+
+    <div class="alert alert-warning" role="status" th:if="${result.truncated}" th:text="#{search.truncated}">
+        More patients match than can be listed. Add more letters to narrow the search.</div>
+
+    <th:block th:if="${result.messageKey == null}">
+        <p class="text-body-secondary small mb-2" th:if="${result.total > 0}"
+           th:text="${result.type.name() == 'EMPTY'} ? #{search.recent(${result.total})} : #{search.count(${result.total})}">3 patients found</p>
+
+        <div class="card pv-card" th:if="${result.total == 0}">
+            <div class="card-body text-center py-5">
+                <i class="bi bi-search display-6 text-body-secondary" aria-hidden="true"></i>
+                <p class="mt-3 mb-1 fw-semibold"
+                   th:text="${result.type.name() == 'EMPTY'} ? #{search.none} : #{search.empty}">No patients match your search.</p>
+                <p class="text-body-secondary mb-3" th:unless="${result.type.name() == 'EMPTY'}" th:text="#{search.empty.hint}">Check the spelling or try another detail.</p>
+                <a class="btn btn-primary" th:href="@{/patients/new}">
+                    <i class="bi bi-person-plus" aria-hidden="true"></i><span th:text="#{nav.newPatient}">New patient</span>
+                </a>
+            </div>
+        </div>
+    </th:block>
+
+    <div class="row g-3" th:if="${!result.cards.isEmpty()}">
+        <div class="col-12 col-xl-6" th:each="c : ${result.cards}">
+            <article class="card pv-card h-100" th:aria-labelledby="'pn-' + ${c.id}">
+                <div class="card-body">
+                    <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
+                        <h2 class="h5 mb-0" th:id="'pn-' + ${c.id}">
+                            <a class="text-decoration-none" th:href="@{/patients/{id}(id=${c.id})}" th:text="${c.fullName}">Name</a>
+                        </h2>
+                        <span class="badge text-bg-success flex-shrink-0" th:if="${c.consentGiven}">
+                            <i class="bi bi-check-circle me-1" aria-hidden="true"></i><span th:text="#{patient.consent.given}">Consent given</span>
+                        </span>
+                        <span class="badge text-bg-secondary flex-shrink-0" th:unless="${c.consentGiven}" th:text="#{patient.consent.notGiven}">No consent recorded</span>
+                    </div>
+                    <ul class="list-unstyled pv-contact mb-2">
+                        <li><i class="bi bi-envelope" aria-hidden="true"></i>
+                            <a th:href="'mailto:' + ${c.email}" th:text="${c.email}">email</a></li>
+                        <li><i class="bi bi-telephone" aria-hidden="true"></i>
+                            <a th:href="'tel:' + ${c.mobile}" th:text="${c.mobile}">phone</a></li>
+                        <li><i class="bi bi-card-text" aria-hidden="true"></i>
+                            <span class="visually-hidden" th:text="#{patient.field.amka}">AMKA</span>
+                            <span th:text="${c.amka}">amka</span></li>
+                        <li th:if="${c.referralSource != null}"><i class="bi bi-signpost-split" aria-hidden="true"></i>
+                            <span th:text="${c.referralSource}">source</span></li>
+                    </ul>
+                    <p class="small mb-0 text-body-secondary" th:if="${c.latestVisitDate != null}">
+                        <i class="bi bi-clipboard2-pulse" aria-hidden="true"></i>
+                        <span th:text="#{search.lastVisit(${#temporals.format(c.latestVisitDate, 'dd/MM/yyyy')})}">Last visit: 01/10/2026</span>
+                    </p>
+                    <p class="small mb-0 pv-snippet" th:if="${c.latestDiagnosis != null}" th:text="${c.latestDiagnosis}">diagnosis</p>
+                </div>
+                <div class="card-footer bg-transparent d-flex flex-wrap gap-2">
+                    <a class="btn btn-primary btn-sm" th:href="@{/patients/{id}/files(id=${c.id})}">
+                        <i class="bi bi-folder2-open" aria-hidden="true"></i><span th:text="#{search.viewMedical}">View medical data</span>
+                    </a>
+                    <a class="btn btn-outline-secondary btn-sm" th:href="@{/patients/{id}(id=${c.id})}">
+                        <i class="bi bi-person-vcard" aria-hidden="true"></i><span th:text="#{search.open}">Open patient</span>
+                    </a>
+                </div>
+            </article>
+        </div>
+    </div>
+
+    <nav class="mt-4" th:if="${result.totalPages > 1}" th:aria-label="#{search.pagination}">
+        <ul class="pagination justify-content-center flex-wrap mb-0">
+            <li class="page-item" th:classappend="${!result.hasPrevious} ? 'disabled'">
+                <a class="page-link" th:href="@{/patients(q=${q},page=${result.page - 1},size=${result.size})}"
+                   th:hx-get="@{/patients(q=${q},page=${result.page - 1},size=${result.size})}"
+                   hx-target="#results" hx-swap="outerHTML" hx-push-url="true" hx-boost="false"
+                   th:attr="aria-disabled=${!result.hasPrevious} ? 'true'" th:text="#{pagination.previous}">Previous</a>
+            </li>
+            <li class="page-item" th:each="n : ${#numbers.sequence(T(java.lang.Math).max(1, result.page - 2), T(java.lang.Math).min(result.totalPages, result.page + 2))}"
+                th:classappend="${n == result.page} ? 'active'">
+                <a class="page-link" th:href="@{/patients(q=${q},page=${n},size=${result.size})}"
+                   th:hx-get="@{/patients(q=${q},page=${n},size=${result.size})}"
+                   hx-target="#results" hx-swap="outerHTML" hx-push-url="true" hx-boost="false"
+                   th:attr="aria-current=${n == result.page} ? 'page'" th:text="${n}">1</a>
+            </li>
+            <li class="page-item" th:classappend="${!result.hasNext} ? 'disabled'">
+                <a class="page-link" th:href="@{/patients(q=${q},page=${result.page + 1},size=${result.size})}"
+                   th:hx-get="@{/patients(q=${q},page=${result.page + 1},size=${result.size})}"
+                   hx-target="#results" hx-swap="outerHTML" hx-push-url="true" hx-boost="false"
+                   th:attr="aria-disabled=${!result.hasNext} ? 'true'" th:text="#{pagination.next}">Next</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+</body>
+</html>

@@ -81,6 +81,11 @@ public class PatientCodec {
                 text(key, visitField(visit, "treatment"), visit.getTreatmentEnc()));
     }
 
+    /** Only the diagnosis of a visit, for result cards. */
+    String decodeDiagnosis(VisitEntity visit, PatientEntity patient) {
+        return text(key(patient), visitField(visit, "diagnosis"), visit.getDiagnosisEnc());
+    }
+
     private DataKey key(PatientEntity entity) {
         return crypto.unwrapDataKey(entity.getId(), entity.getDekWrapped());
     }

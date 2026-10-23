@@ -21,6 +21,16 @@
                 <i class="bi bi-shield-plus pv-accent" aria-hidden="true"></i>
                 <span th:text="#{app.name}">PatientVault</span>
             </a>
+            <form class="pv-topsearch" role="search" method="get" th:action="@{/patients}" th:unless="${nav == 'search'}">
+                <label for="pv-topq" class="visually-hidden" th:text="#{search.label}">Search patients</label>
+                <div class="input-group">
+                    <input id="pv-topq" name="q" type="search" class="form-control" th:placeholder="#{search.placeholder}"
+                           autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="100">
+                    <button class="btn btn-outline-secondary" type="submit" th:aria-label="#{search.submit}" th:title="#{search.submit}">
+                        <i class="bi bi-search" aria-hidden="true"></i>
+                    </button>
+                </div>
+            </form>
             <div th:replace="~{fragments/shell :: preferences}"></div>
             <div class="dropdown" th:if="${currentUsername != null}">
                 <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button"

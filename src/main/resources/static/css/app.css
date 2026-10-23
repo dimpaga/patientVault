@@ -162,6 +162,17 @@ main:focus { outline: none; }
 .pv-patient-form { max-width: 56rem; }
 .nav-tabs .nav-link { display: inline-flex; align-items: center; gap: 0.4rem; min-height: var(--pv-touch); }
 .btn i + span { margin-left: 0; }
+/* Search: top-bar box (full row on phones), contact lines and diagnosis snippet on result cards */
+.pv-topsearch { order: 3; flex: 1 1 100%; }
+@media (min-width: 768px) {
+    .pv-topsearch { order: 0; flex: 1 1 auto; max-width: 26rem; margin-inline: auto; }
+}
+.pv-searchbox { max-width: 48rem; }
+.pv-contact li { display: flex; align-items: baseline; gap: 0.5rem; overflow-wrap: anywhere; }
+.pv-contact .bi { color: var(--bs-secondary-color); }
+.pv-snippet { border-left: 3px solid var(--pv-accent); padding-left: 0.6rem; margin-top: 0.4rem; }
+.pagination .page-link { min-height: var(--pv-touch); min-width: var(--pv-touch); display: inline-flex; align-items: center; justify-content: center; }
+
 /* toasts sit below the top bar so they never cover its buttons */
 .pv-toasts { top: 3.75rem !important; }
 .pv-secret { font-size: 1rem; letter-spacing: 0.08em; user-select: all; overflow-wrap: anywhere; }

@@ -112,7 +112,20 @@ Per patient: random 256-bit DEK, stored only wrapped by the KEK
   fields only. Entities and records that hold personal data override `toString()`. Checked: none of the
   sentinel values appear in any log.
 
-## 5. Secrets handling
+## 5. Search (implemented: step 5)
+
+- One search box; the query is classified (11 digits -> AMKA, "@" -> e-mail, mostly digits -> mobile via
+  libphonenumber, otherwise name words) and matched against HMAC blind-index tokens only. The database
+  never sees the typed text.
+- **Never logged:** the query text. The access log records the route template without the query string and
+  `PATIENT_SEARCHED` records only the query type and the number of results. Verified by searching for
+  distinctive values and grepping the logs.
+- Known limits (also shown in the UI help text): exact AMKA/e-mail/mobile only, name words need at least
+  3 letters, blind indexes reveal equality and prefix patterns to someone with database access but not the
+  values.
+- Only ACTIVE patients are returned; results are decrypted in memory, one page at a time.
+
+## 6. Secrets handling
 
 - Secrets only via environment variables; `.env`, `.dev-secrets.env` are git-ignored.
 - `./dev run` generates local development keys and a local doctor account into `.dev-secrets.env`

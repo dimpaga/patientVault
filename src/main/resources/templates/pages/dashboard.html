@@ -8,6 +8,17 @@
     <h1 class="h3 mb-1" th:text="#{dashboard.heading}">Welcome</h1>
     <p class="text-body-secondary mb-4" th:text="#{dashboard.subtitle}">Your patient records at a glance.</p>
 
+    <form role="search" method="get" th:action="@{/patients}" class="pv-searchbox mb-4">
+        <label for="dash-q" class="form-label visually-hidden" th:text="#{search.label}">Search patients</label>
+        <div class="input-group input-group-lg">
+            <span class="input-group-text" aria-hidden="true"><i class="bi bi-search"></i></span>
+            <input id="dash-q" name="q" type="search" class="form-control" th:placeholder="#{search.placeholder}"
+                   autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="100" aria-describedby="dash-search-help">
+            <button class="btn btn-primary" type="submit" th:text="#{search.submit}">Search</button>
+        </div>
+        <div id="dash-search-help" class="form-text" th:text="#{search.help}">Search by name, email, phone or AMKA.</div>
+    </form>
+
     <div class="row g-3">
         <section class="col-12 col-xl-6" aria-labelledby="dash-appointments">
             <div class="card pv-card h-100">
