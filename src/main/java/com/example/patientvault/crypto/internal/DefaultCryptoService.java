@@ -104,6 +104,21 @@ class DefaultCryptoService implements CryptoService {
         return streamCipher.encryptedSize(plaintextSize);
     }
 
+    @Override
+    public byte[] encryptSecret(String context, byte[] plaintext) {
+        String keyId = keyRing.activeKeyId();
+        try {
+            return Envelope.seal(keyId, keyRing.userSecretKey(keyId), plaintext, Aad.forSecret(context));
+        } catch (GeneralSecurityException e) {
+            throw new CryptoException("Encryption failed", e);
+        }
+    }
+
+    @Override
+    public byte[] decryptSecret(String context, byte[] ciphertext) {
+        return Envelope.open(ciphertext, keyRing::userSecretKey, Aad.forSecret(context));
+    }
+
     private WrappedDataKey wrap(UUID ownerId, byte[] raw) {
         String keyId = keyRing.activeKeyId();
         try {

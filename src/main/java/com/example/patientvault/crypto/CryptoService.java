@@ -56,4 +56,20 @@ public interface CryptoService {
 
     /** Exact size in bytes of the encrypted stream for a plaintext of the given size. */
     long encryptedSize(long plaintextSize);
+
+    /**
+     * Encrypts a doctor-level secret (TOTP secret, notification email) with the user-secret key derived
+     * from the active master key. {@code context} (e.g. {@code "totp:" + userId}) is bound as AAD.
+     */
+    byte[] encryptSecret(String context, byte[] plaintext);
+
+    byte[] decryptSecret(String context, byte[] ciphertext);
+
+    default byte[] encryptSecretText(String context, String plaintext) {
+        return encryptSecret(context, plaintext.getBytes(StandardCharsets.UTF_8));
+    }
+
+    default String decryptSecretText(String context, byte[] ciphertext) {
+        return new String(decryptSecret(context, ciphertext), StandardCharsets.UTF_8);
+    }
 }
