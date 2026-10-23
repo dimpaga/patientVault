@@ -156,6 +156,10 @@ main:focus { outline: none; }
 
 .pv-qr { width: 12rem; height: 12rem; background: #fff; border-radius: 0.5rem; padding: 0.25rem; }
 .pv-form-card { max-width: 32rem; }
+.pv-prewrap { white-space: pre-wrap; overflow-wrap: anywhere; }
+.pv-details dt { color: var(--bs-secondary-color); font-weight: 500; }
+.pv-more > summary { cursor: pointer; min-height: var(--pv-touch); }
+.pv-patient-form { max-width: 56rem; }
 .pv-secret { font-size: 1rem; letter-spacing: 0.08em; user-select: all; overflow-wrap: anywhere; }
 .pv-recovery-codes { columns: 2; column-gap: 2rem; font-size: 1.1rem; line-height: 2; }
 

@@ -45,7 +45,8 @@ class LoggingAuditService implements AuditService {
                     .addKeyValue("entityType", event.entityType())
                     .addKeyValue("entityId", event.entityId())
                     .addKeyValue("details", event.details())
-                    .log("{} {}", event.action(), event.outcome());
+                    .log("{} {} actor={} entity={}:{} details={}", event.action(), event.outcome(), actor(event),
+                            event.entityType(), event.entityId(), event.details());
         } finally {
             MDC.remove(LogContext.ACTION);
             MDC.remove(LogContext.MODULE);

@@ -1,6 +1,9 @@
 spring:
   application:
     name: patientvault
+  mvc:
+    format:
+      date: iso
   messages:
     basename: messages
     fallback-to-system-locale: false

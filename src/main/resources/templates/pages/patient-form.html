@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html th:replace="~{layout/base :: page(~{::title}, ~{::#pv-page}, ${nav})}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="(${patientId == null} ? #{patient.new.title} : #{patient.edit.title}) + ' · ' + #{app.name}">New patient · PatientVault</title>
+</head>
+<body>
+<div id="pv-page">
+    <h1 class="h3 mb-3" th:text="${patientId == null} ? #{patient.new.title} : #{patient.edit.title}">New patient</h1>
+
+    <div class="alert alert-danger" role="alert" th:if="${conflict}">
+        <h2 class="h6 mb-1" th:text="#{patient.conflict.title}">This record changed</h2>
+        <p class="mb-2" th:text="#{patient.conflict.text}">Someone else saved changes after you opened this form.</p>
+        <a class="btn btn-outline-danger btn-sm" th:href="@{/patients/{id}/edit(id=${patientId})}"
+           th:text="#{patient.conflict.reload}" hx-boost="false">Reload the latest version</a>
+    </div>
+    <div class="alert alert-danger" role="alert" th:if="${!errors.isEmpty() and !conflict}" th:text="#{patient.error.summary}">Please correct the highlighted fields.</div>
+
+    <form method="post" novalidate th:action="${patientId == null} ? @{/patients} : @{/patients/{id}(id=${patientId})}"
+          class="pv-patient-form">
+        <input type="hidden" name="patientId" th:value="${patientId}">
+        <input type="hidden" name="version" th:if="${form.version != null}" th:value="${form.version}">
+
+        <div class="card pv-card mb-3">
+            <div class="card-body">
+                <p class="text-body-secondary small" th:text="#{patient.required.hint}">Fields marked * are required.</p>
+                <div class="row">
+                    <div class="col-12 col-md-6"
+                         th:replace="~{fragments/patient :: field('firstName', 'patient.field.firstName', 'text', 'text', 'off', ${form.firstName}, true)}"></div>
+                    <div class="col-12 col-md-6"
+                         th:replace="~{fragments/patient :: field('lastName', 'patient.field.lastName', 'text', 'text', 'off', ${form.lastName}, true)}"></div>
+                    <div class="col-12 col-md-6"
+                         th:replace="~{fragments/patient :: field('email', 'patient.field.email', 'email', 'email', 'off', ${form.email}, true)}"></div>
+                    <div class="col-12 col-md-6"
+                         th:replace="~{fragments/patient :: field('mobile', 'patient.field.mobile', 'tel', 'tel', 'off', ${form.mobile}, true)}"></div>
+                    <div class="col-12 col-md-6"
+                         th:replace="~{fragments/patient :: field('amka', 'patient.field.amka', 'text', 'numeric', 'off', ${form.amka}, true)}"></div>
+                </div>
+            </div>
+        </div>
+
+        <details class="card pv-card mb-3 pv-more" th:attr="open=${moreOpen} ? 'open'">
+            <summary class="card-body fw-semibold" th:text="#{patient.more}">More details (optional)</summary>
+            <div class="card-body pt-0">
+                <div class="mb-3">
+                    <label for="referralSource" class="form-label" th:text="#{patient.field.referralSource}">How did the patient find you?</label>
+                    <input type="text" class="form-control" id="referralSource" name="referralSource" maxlength="500"
+                           th:value="${form.referralSource}" th:classappend="${errors['referralSource'] != null} ? 'is-invalid'">
+                    <div class="invalid-feedback" th:if="${errors['referralSource'] != null}"
+                         th:text="#{${errors['referralSource'].key}(${errors['referralSource'].arg})}"></div>
+                </div>
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="consentGiven" name="consentGiven" value="true"
+                           th:checked="${form.consentGiven}" aria-describedby="consent-help">
+                    <label class="form-check-label" for="consentGiven" th:text="#{patient.field.consent}">Consent given</label>
+                    <div id="consent-help" class="form-text" th:text="#{patient.field.consent.help}">Informational only.</div>
+                </div>
+                <div class="mb-3">
+                    <label for="notes" class="form-label" th:text="#{patient.field.notes}">Notes</label>
+                    <textarea class="form-control" id="notes" name="notes" rows="4"
+                              th:classappend="${errors['notes'] != null} ? 'is-invalid'" th:text="${form.notes}"></textarea>
+                    <div class="invalid-feedback" th:if="${errors['notes'] != null}"
+                         th:text="#{${errors['notes'].key}(${errors['notes'].arg})}"></div>
+                </div>
+
+                <th:block th:if="${patientId == null}">
+                    <hr>
+                    <h2 class="h6" th:text="#{patient.firstVisit}">First visit</h2>
+                    <p class="text-body-secondary small" th:text="#{patient.firstVisit.hint}">Optional.</p>
+                    <div class="mb-3">
+                        <label for="visitDate" class="form-label" th:text="#{patient.visit.date}">Visit date</label>
+                        <input type="date" class="form-control" id="visitDate" name="visitDate"
+                               th:value="${form.visitDate}" th:classappend="${errors['visitDate'] != null} ? 'is-invalid'">
+                        <div class="invalid-feedback" th:if="${errors['visitDate'] != null}"
+                             th:text="#{${errors['visitDate'].key}(${errors['visitDate'].arg})}"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="visitDescription" class="form-label" th:text="#{patient.visit.description}">Description</label>
+                        <textarea class="form-control" id="visitDescription" name="visitDescription" rows="3"
+                                  th:classappend="${errors['visitDescription'] != null} ? 'is-invalid'" th:text="${form.visitDescription}"></textarea>
+                        <div class="invalid-feedback" th:if="${errors['visitDescription'] != null}"
+                             th:text="#{${errors['visitDescription'].key}(${errors['visitDescription'].arg})}"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="visitDiagnosis" class="form-label" th:text="#{patient.visit.diagnosis}">Diagnosis</label>
+                        <textarea class="form-control" id="visitDiagnosis" name="visitDiagnosis" rows="3"
+                                  th:classappend="${errors['visitDiagnosis'] != null} ? 'is-invalid'" th:text="${form.visitDiagnosis}"></textarea>
+                        <div class="invalid-feedback" th:if="${errors['visitDiagnosis'] != null}"
+                             th:text="#{${errors['visitDiagnosis'].key}(${errors['visitDiagnosis'].arg})}"></div>
+                    </div>
+                    <div class="mb-0">
+                        <label for="visitTreatment" class="form-label" th:text="#{patient.visit.treatment}">Treatment</label>
+                        <textarea class="form-control" id="visitTreatment" name="visitTreatment" rows="3"
+                                  th:classappend="${errors['visitTreatment'] != null} ? 'is-invalid'" th:text="${form.visitTreatment}"></textarea>
+                        <div class="invalid-feedback" th:if="${errors['visitTreatment'] != null}"
+                             th:text="#{${errors['visitTreatment'].key}(${errors['visitTreatment'].arg})}"></div>
+                    </div>
+                </th:block>
+            </div>
+        </details>
+
+        <div class="d-flex flex-wrap gap-2">
+            <button type="submit" class="btn btn-primary" th:text="#{patient.save}">Save patient</button>
+            <a class="btn btn-outline-secondary" th:href="${patientId == null} ? @{/} : @{/patients/{id}(id=${patientId})}"
+               th:text="#{common.cancel}">Cancel</a>
+        </div>
+    </form>
+</div>
+</body>
+</html>

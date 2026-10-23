@@ -27,7 +27,18 @@
                         <i class="bi bi-people me-2 pv-accent" aria-hidden="true"></i>
                         <span th:text="#{dashboard.recent}">Recent patients</span>
                     </h2>
-                    <p class="text-body-secondary mb-0" th:text="#{dashboard.recent.empty}">No patients yet.</p>
+                    <p class="text-body-secondary mb-0" th:if="${#lists.isEmpty(recentPatients)}" th:text="#{dashboard.recent.empty}">No patients yet.</p>
+                    <ul class="list-unstyled mb-0" th:unless="${#lists.isEmpty(recentPatients)}">
+                        <li th:each="p : ${recentPatients}">
+                            <a class="d-flex align-items-center gap-2 py-2 text-decoration-none" th:href="@{/patients/{id}(id=${p.id})}">
+                                <i class="bi bi-person-circle pv-accent" aria-hidden="true"></i>
+                                <span th:text="${p.fullName}">Name</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <a class="btn btn-outline-primary mt-2" th:href="@{/patients/new}">
+                        <i class="bi bi-person-plus" aria-hidden="true"></i><span th:text="#{nav.newPatient}">New patient</span>
+                    </a>
                 </div>
             </div>
         </section>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html th:replace="~{layout/base :: page(~{::title}, ~{::#pv-page}, ${nav})}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${patient.data.firstName} + ' ' + ${patient.data.lastName} + ' · ' + #{app.name}">Patient · PatientVault</title>
+</head>
+<body>
+<div id="pv-page">
+    <div class="d-flex flex-wrap align-items-start justify-content-between gap-2 mb-3">
+        <div>
+            <h1 class="h3 mb-1" th:text="${patient.data.firstName} + ' ' + ${patient.data.lastName}">Name</h1>
+            <span class="badge text-bg-success" th:if="${patient.data.consentGiven}">
+                <i class="bi bi-check-circle me-1" aria-hidden="true"></i><span th:text="#{patient.consent.given}">Consent given</span>
+            </span>
+            <span class="badge text-bg-secondary" th:unless="${patient.data.consentGiven}" th:text="#{patient.consent.notGiven}">No consent recorded</span>
+        </div>
+        <a class="btn btn-outline-primary" th:href="@{/patients/{id}/edit(id=${patient.id})}">
+            <i class="bi bi-pencil" aria-hidden="true"></i><span th:text="#{patient.edit.action}">Edit</span>
+        </a>
+    </div>
+
+    <div id="pv-tab-content" th:fragment="tab-overview">
+        <div class="card pv-card">
+            <div class="card-body">
+                <dl class="row mb-0 pv-details">
+                    <dt class="col-sm-4 col-lg-3" th:text="#{patient.field.email}">Email</dt>
+                    <dd class="col-sm-8 col-lg-9"><a th:href="'mailto:' + ${patient.data.email}" th:text="${patient.data.email}">email</a></dd>
+
+                    <dt class="col-sm-4 col-lg-3" th:text="#{patient.field.mobile}">Mobile</dt>
+                    <dd class="col-sm-8 col-lg-9"><a th:href="'tel:' + ${patient.data.mobile}" th:text="${patient.data.mobile}">phone</a></dd>
+
+                    <dt class="col-sm-4 col-lg-3" th:text="#{patient.field.amka}">AMKA</dt>
+                    <dd class="col-sm-8 col-lg-9" th:text="${patient.data.amka}">amka</dd>
+
+                    <dt class="col-sm-4 col-lg-3" th:text="#{patient.field.referralSource}">Referral</dt>
+                    <dd class="col-sm-8 col-lg-9">
+                        <span th:if="${patient.data.referralSource != null}" th:text="${patient.data.referralSource}">source</span>
+                        <span class="text-body-secondary" th:unless="${patient.data.referralSource != null}" th:text="#{common.notProvided}">Not provided</span>
+                    </dd>
+
+                    <dt class="col-sm-4 col-lg-3" th:text="#{patient.consent.label}">Consent</dt>
+                    <dd class="col-sm-8 col-lg-9">
+                        <span th:if="${patient.data.consentGiven}"
+                              th:text="${consentAt != null} ? #{patient.consent.recorded(${#temporals.format(consentAt, 'dd/MM/yyyy HH:mm')})} : #{patient.consent.given}">Consent</span>
+                        <span class="text-body-secondary" th:unless="${patient.data.consentGiven}" th:text="#{patient.consent.notGiven}">No consent</span>
+                    </dd>
+
+                    <dt class="col-sm-4 col-lg-3" th:text="#{patient.field.notes}">Notes</dt>
+                    <dd class="col-sm-8 col-lg-9">
+                        <span class="pv-prewrap" th:if="${patient.data.notes != null}" th:text="${patient.data.notes}">notes</span>
+                        <span class="text-body-secondary" th:unless="${patient.data.notes != null}" th:text="#{common.notProvided}">Not provided</span>
+                    </dd>
+
+                    <dt class="col-sm-4 col-lg-3" th:text="#{patient.meta.created}">Created</dt>
+                    <dd class="col-sm-8 col-lg-9 text-body-secondary" th:text="${#temporals.format(createdAt, 'dd/MM/yyyy HH:mm')}">date</dd>
+                    <dt class="col-sm-4 col-lg-3" th:text="#{patient.meta.updated}">Last changed</dt>
+                    <dd class="col-sm-8 col-lg-9 text-body-secondary mb-0" th:text="${#temporals.format(updatedAt, 'dd/MM/yyyy HH:mm')}">date</dd>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

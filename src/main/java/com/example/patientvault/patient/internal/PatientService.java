@@ -124,6 +124,32 @@ public class PatientService {
         return new SaveResult(id, entity.getVersion(), warnings);
     }
 
+    /** What a uniqueness lookup found for an inline-validated field. */
+    public record Uniqueness(FieldMessage error, FieldMessage warning, UUID existingPatientId) {
+        static final Uniqueness NONE = new Uniqueness(null, null, null);
+    }
+
+    /**
+     * Inline check while typing: a taken AMKA is an error (with the owner for a link), a repeated e-mail or
+     * mobile is only a warning. {@code self} is the patient being edited, if any.
+     */
+    @PreAuthorize("hasAuthority('" + Permissions.PATIENT_WRITE + "')")
+    @Transactional(readOnly = true)
+    public Uniqueness checkUniqueness(String field, String rawValue, UUID self) {
+        return switch (field) {
+            case "amka" -> search.findByAmka(Amka.normalize(rawValue)).filter(other -> !other.equals(self))
+                    .map(other -> new Uniqueness(FieldMessage.of("patient.error.amka.duplicate"), null, other))
+                    .orElse(Uniqueness.NONE);
+            case "email" -> search.findByEmail(rawValue).stream().anyMatch(other -> !other.equals(self))
+                    ? new Uniqueness(null, FieldMessage.of("patient.warning.email.duplicate"), null) : Uniqueness.NONE;
+            case "mobile" -> PhoneNumbers.toE164(rawValue)
+                    .filter(e164 -> search.findByMobile(e164).stream().anyMatch(other -> !other.equals(self)))
+                    .map(e164 -> new Uniqueness(null, FieldMessage.of("patient.warning.mobile.duplicate"), null))
+                    .orElse(Uniqueness.NONE);
+            default -> Uniqueness.NONE;
+        };
+    }
+
     // ---- visits -------------------------------------------------------------------------------
 
     @PreAuthorize("hasAuthority('" + Permissions.PATIENT_READ + "')")

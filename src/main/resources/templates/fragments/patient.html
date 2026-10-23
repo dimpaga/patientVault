@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- Error / warning text for one field. Also the response body of the inline (on-blur) validation. -->
+<th:block th:fragment="feedbackContent(error, warning, duplicateOf)">
+    <div class="invalid-feedback d-block" th:if="${error != null}">
+        <span th:text="#{${error.key}(${error.arg})}">Invalid</span>
+        <a th:if="${duplicateOf != null}" th:href="@{/patients/{id}(id=${duplicateOf})}"
+           th:text="#{patient.error.amka.duplicate.link}">Open the existing patient</a>
+    </div>
+    <div class="form-text text-warning-emphasis" th:if="${error == null and warning != null}">
+        <i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i>
+        <span th:text="#{${warning.key}(${warning.arg})}">Warning</span>
+    </div>
+</th:block>
+
+<!--
+  One labelled text input. Needs the model attributes "errors", "warnings" and "duplicateOf".
+  inline=true adds htmx on-blur validation (hx-post /patients/validate); the response replaces #fb-{name}.
+-->
+<div th:fragment="field(name, labelKey, type, inputmode, autocomplete, value, inline)" class="mb-3">
+    <label th:for="${name}" class="form-label">
+        <span th:text="#{${labelKey}}">Label</span>
+        <span class="text-danger" aria-hidden="true" th:if="${inline}">*</span>
+    </label>
+    <input th:id="${name}" th:name="${name}" th:type="${type}" class="form-control"
+           th:classappend="${errors.get(name) != null} ? 'is-invalid' : (${warnings.get(name) != null} ? 'border-warning')"
+           th:value="${value}" th:required="${inline}" maxlength="254"
+           th:attr="inputmode=${inputmode},autocomplete=${autocomplete},aria-describedby='fb-' + ${name}"
+           th:aria-invalid="${errors.get(name) != null} ? 'true'"
+           th:hx-post="${inline} ? @{/patients/validate}" th:hx-trigger="${inline} ? 'blur'"
+           th:hx-target="${inline} ? '#fb-' + ${name}" th:hx-swap="${inline} ? 'innerHTML'"
+           th:hx-include="${inline} ? '[name=patientId]'" hx-boost="false">
+    <div th:id="'fb-' + ${name}" aria-live="polite">
+        <th:block th:replace="~{fragments/patient :: feedbackContent(${errors.get(name)}, ${warnings.get(name)}, ${name == 'amka'} ? ${duplicateOf} : null)}"></th:block>
+    </div>
+</div>
+
+</body>
+</html>
