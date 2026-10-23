@@ -142,7 +142,26 @@ Per patient: random 256-bit DEK, stored only wrapped by the KEK
 - **Availability:** if CouchDB is down, uploads and downloads answer 503, nothing half-written remains, the
   listing still works (it comes from PostgreSQL) and readiness reports DOWN until CouchDB returns.
 
-## 7. Secrets handling
+## 7. Appointments and e-mail reminders (implemented: step 8)
+
+- **What an e-mail contains:** the date and time, the patient name (or initials with `privacy-mode: INITIALS`)
+  and a link that needs a login. Never AMKA, phone, e-mail, diagnosis, notes, the appointment reason or file
+  names: the composer only receives the name, the time and the id, so nothing else can leak into a mail.
+  The `.ics` attachment holds the same data. Verified against Mailpit.
+- **Reason at rest:** the appointment reason is an encrypted field bound to the patient and the appointment.
+  Audit entries and logs contain ids only.
+- **Transport:** SMTP with STARTTLS required (`mail.smtp.starttls.required=true`); only the local profile turns it
+  off, for the Mailpit sink. Credentials come from `SMTP_*` environment variables. Connection and read timeouts
+  are 5 and 10 seconds. Failures keep only the exception class (the message could contain the address).
+- **Recipient:** the doctor's notification address is stored encrypted in `app_user.notification_email_enc`.
+  Changing it needs a recent login (it redirects patient names to a new mailbox) and is audited; the address is
+  validated against header injection.
+- **Scheduler:** one transaction per reminder with `FOR UPDATE SKIP LOCKED`, so no reminder is sent twice by
+  concurrent runs or instances. Jobs run as actor `SYSTEM` with only `PATIENT_READ`. Delivery is at-least-once:
+  a crash between the SMTP hand-over and the commit sends that one reminder again after the restart.
+- **Deep link:** `/appointments/{id}` is a normal authenticated route; the e-mail itself carries no session or token.
+
+## 8. Secrets handling
 
 - Secrets only via environment variables; `.env`, `.dev-secrets.env` are git-ignored.
 - `./dev run` generates local development keys and a local doctor account into `.dev-secrets.env`

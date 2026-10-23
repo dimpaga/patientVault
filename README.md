@@ -12,8 +12,13 @@ before it reaches PostgreSQL or CouchDB. The full design and requirements are in
 
 Implementation follows spec section 14. Done so far: step 0 (foundation), step 1 (crypto kernel),
 step 2 (identity and UI shell), a light step 3 (request ids, structured logs, access log; the audit
-table and page are still open) step 4 (patients and visits: create, edit, view, visits tab), step 5 (search) and step 6
-(medical files and folders in CouchDB). Step 7 (erasure) is postponed. Automated tests are deferred.
+table and page are still open) step 4 (patients and visits: create, edit, view, visits tab), step 5 (search),
+step 6 (medical files and folders in CouchDB) and step 8 (appointments, e-mail reminders, daily agenda).
+Step 7 (erasure) is postponed. Automated tests are deferred.
+
+Reminder e-mails go through SMTP: set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USERNAME`, `SMTP_PASSWORD`, `MAIL_FROM`,
+`APP_PUBLIC_BASE_URL` and optionally `APP_DOCTOR_NOTIFICATION_EMAIL` in production. Locally, mails go to Mailpit
+(http://localhost:8025).
 
 ## Prerequisites
 
