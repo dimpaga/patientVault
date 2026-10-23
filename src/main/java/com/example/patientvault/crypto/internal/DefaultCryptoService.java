@@ -1,5 +1,7 @@
 package com.example.patientvault.crypto.internal;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.security.GeneralSecurityException;
 import java.time.Clock;
 import java.util.Arrays;
@@ -21,6 +23,7 @@ class DefaultCryptoService implements CryptoService {
 
     private final KeyRing keyRing;
     private final FieldCipher fieldCipher = new FieldCipher();
+    private final StreamCipher streamCipher = new StreamCipher();
     private final DekCache dekCache;
 
     DefaultCryptoService(KeyRing keyRing, Clock clock) {
@@ -83,6 +86,22 @@ class DefaultCryptoService implements CryptoService {
     @Override
     public byte[] decrypt(DataKey key, String fieldName, byte[] ciphertext) {
         return fieldCipher.decrypt(impl(key), fieldName, ciphertext);
+    }
+
+    @Override
+    public InputStream encryptStream(DataKey key, UUID fileId, String purpose, InputStream plaintext) {
+        return streamCipher.encrypt(impl(key), fileId, purpose, plaintext);
+    }
+
+    @Override
+    public InputStream decryptStream(DataKey key, UUID fileId, String purpose, InputStream ciphertext)
+            throws IOException {
+        return streamCipher.decrypt(impl(key), fileId, purpose, ciphertext);
+    }
+
+    @Override
+    public long encryptedSize(long plaintextSize) {
+        return streamCipher.encryptedSize(plaintextSize);
     }
 
     private WrappedDataKey wrap(UUID ownerId, byte[] raw) {

@@ -1,5 +1,7 @@
 package com.example.patientvault.crypto;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
@@ -34,4 +36,24 @@ public interface CryptoService {
     default String decryptText(DataKey key, String fieldName, byte[] ciphertext) {
         return new String(decrypt(key, fieldName, ciphertext), StandardCharsets.UTF_8);
     }
+
+    /** Stream purposes; each derives an independent key so a thumbnail can never be read as content. */
+    String PURPOSE_CONTENT = "content";
+    String PURPOSE_THUMBNAIL = "thumb";
+
+    /**
+     * Returns an input stream producing the encrypted form of {@code plaintext}
+     * (Tink {@code AES256_GCM_HKDF_1MB}, per-file key derived from the DEK and file id). Streams in
+     * bounded memory; closing it closes the source.
+     */
+    InputStream encryptStream(DataKey key, UUID fileId, String purpose, InputStream plaintext);
+
+    /**
+     * Returns an input stream producing the plaintext of an encrypted stream. A failed authentication
+     * while reading raises {@link IntegrityFailureException}; transport problems raise {@link IOException}.
+     */
+    InputStream decryptStream(DataKey key, UUID fileId, String purpose, InputStream ciphertext) throws IOException;
+
+    /** Exact size in bytes of the encrypted stream for a plaintext of the given size. */
+    long encryptedSize(long plaintextSize);
 }
