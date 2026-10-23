@@ -9,7 +9,7 @@ import java.util.Set;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
-import com.example.patientvault.identity.Permissions;
+import com.example.patientvault.shared.Permissions;
 
 /** Central role-to-permission map. Adding a restricted role later is a change to this map only. */
 final class RolePermissions {

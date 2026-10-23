@@ -11,8 +11,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import com.example.patientvault.identity.Permissions;
-import com.example.patientvault.identity.RequiresRecentAuth;
+import com.example.patientvault.shared.Permissions;
+import com.example.patientvault.shared.RequiresRecentAuth;
 import com.example.patientvault.identity.internal.AppUserPrincipal;
 import com.example.patientvault.identity.internal.MfaService;
 import com.example.patientvault.identity.internal.PasswordPolicy;

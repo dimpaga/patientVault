@@ -93,6 +93,9 @@ app:
   search:
     min-prefix-length: 3
     max-prefix-length: 15
+  validation:
+    amka:
+      strict-date: false
   bootstrap:
     username: ${APP_BOOTSTRAP_USERNAME:}
     password: ${APP_BOOTSTRAP_PASSWORD:}

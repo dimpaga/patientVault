@@ -1,4 +1,4 @@
-package com.example.patientvault.identity;
+package com.example.patientvault.shared;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

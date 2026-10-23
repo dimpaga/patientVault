@@ -1,4 +1,4 @@
-package com.example.patientvault.identity;
+package com.example.patientvault.shared;
 
 /**
  * Permission-style authorities used in {@code @PreAuthorize("hasAuthority(...)")}. Code is protected by

@@ -29,6 +29,7 @@
         <bucket4j.version>8.21.0</bucket4j.version>
         <java-otp.version>1.0.0</java-otp.version>
         <zxing.version>3.5.4</zxing.version>
+        <libphonenumber.version>9.0.42</libphonenumber.version>
     </properties>
 
     <dependencies>
@@ -83,6 +84,11 @@
             <groupId>com.google.zxing</groupId>
             <artifactId>core</artifactId>
             <version>${zxing.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.googlecode.libphonenumber</groupId>
+            <artifactId>libphonenumber</artifactId>
+            <version>${libphonenumber.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
