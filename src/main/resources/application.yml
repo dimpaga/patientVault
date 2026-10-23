@@ -71,6 +71,9 @@ management:
           include: readinessState,db,keyRing
 
 logging:
+  # Plain-text format (local development): level, request id and user id. Production switches to JSON (application-prod.yml).
+  pattern:
+    level: "%5p [%X{requestId:-},%X{userId:-}]"
   level:
     org.hibernate.SQL: warn
     org.hibernate.orm.jdbc.bind: warn

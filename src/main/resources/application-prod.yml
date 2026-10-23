@@ -1,0 +1,13 @@
+# Production profile (SPRING_PROFILES_ACTIVE=prod, set in render.yaml).
+logging:
+  structured:
+    format:
+      console: ecs
+    ecs:
+      service:
+        name: patientvault
+        environment: production
+  level:
+    root: info
+    org.hibernate.SQL: warn
+    org.hibernate.orm.jdbc.bind: warn

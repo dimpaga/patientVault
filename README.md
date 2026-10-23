@@ -10,8 +10,9 @@ before it reaches PostgreSQL or CouchDB. The full design and requirements are in
 
 ## Status
 
-Implementation follows spec section 14. Done so far: step 0 (foundation), step 1 (crypto kernel) and
-step 2 (identity and UI shell). Automated tests are deferred.
+Implementation follows spec section 14. Done so far: step 0 (foundation), step 1 (crypto kernel),
+step 2 (identity and UI shell) and a light step 3 (request ids, structured logs, access log; the audit
+table and page are still open). Automated tests are deferred.
 
 ## Prerequisites
 

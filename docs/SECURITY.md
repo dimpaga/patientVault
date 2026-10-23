@@ -72,7 +72,28 @@ Per patient: random 256-bit DEK, stored only wrapped by the KEK
 - **Privacy in logs:** audit events carry ids and non-personal context only; failed logins are recorded as
   `ANONYMOUS` without the attempted username.
 
-## 3. Secrets handling
+## 3. Logging (implemented: step 3, light version)
+
+- **Request id:** `RequestLoggingFilter` runs before Spring Security, assigns a UUID (or accepts a
+  client-supplied `X-Request-Id` that matches `[A-Za-z0-9._-]{8,64}`, so it cannot be used for log
+  injection), returns it in the `X-Request-Id` response header and shows it on the error pages as the
+  reference code.
+- **Context on every log line (MDC):** `requestId`, `remoteIp`, `userId` (the user's UUID, never the
+  name); audit lines add `action` and `module`.
+- **Access log** (logger `access`): one line per request with method, **route template** (for example
+  `/patients/{id}`), status, duration and response bytes (counted while streaming, nothing is buffered).
+  No query string, no bodies, no headers. Requests that never reached a handler are logged with their
+  path where UUID/number segments are masked as `{id}`; odd paths become `UNMAPPED`. Health probes are
+  logged at DEBUG only.
+- **Streams:** `access`, `security` (login, MFA, lockout, rate limit, CSRF, access denied, session
+  timeout, re-authentication) and `audit` (business actions). They are currently written to the log;
+  the append-only audit table and audit page are still to come.
+- **Format:** plain text locally (`level [requestId,userId] ...`), structured JSON (Elastic Common Schema)
+  with the `prod` profile (`SPRING_PROFILES_ACTIVE=prod`). Hibernate SQL and bind logging are off.
+- **Not yet done:** sanitising exception messages in error logs and the automated log-hygiene test
+  (hardening step); both matter once patient data exists.
+
+## 4. Secrets handling
 
 - Secrets only via environment variables; `.env`, `.dev-secrets.env` are git-ignored.
 - `./dev run` generates local development keys and a local doctor account into `.dev-secrets.env`

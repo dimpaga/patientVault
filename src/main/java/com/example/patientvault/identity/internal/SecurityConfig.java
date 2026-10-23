@@ -61,6 +61,7 @@ class SecurityConfig {
             .addFilterBefore(new AuthRateLimitFilter(rateLimit, audit), UsernamePasswordAuthenticationFilter.class)
             .addFilterAfter(new AbsoluteSessionTimeoutFilter(absoluteTimeout, clock, audit),
                     SecurityContextHolderFilter.class)
+            .addFilterAfter(new UserContextFilter(), SecurityContextHolderFilter.class)
             .addFilterAfter(new MustChangePasswordFilter(), AnonymousAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login", "/login/mfa", "/login/mfa/**", "/error").permitAll()

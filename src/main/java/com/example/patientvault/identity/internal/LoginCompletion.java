@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 import com.example.patientvault.audit.AuditAction;
 import com.example.patientvault.audit.AuditEvent;
 import com.example.patientvault.audit.AuditService;
+import com.example.patientvault.shared.LogContext;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -62,6 +63,7 @@ public class LoginCompletion {
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
         contextRepository.saveContext(context, request, response);
+        LogContext.userAuthenticated(request, userId);
 
         HttpSession session = request.getSession();
         session.removeAttribute(SessionKeys.PENDING_MFA);
