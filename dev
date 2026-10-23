@@ -19,6 +19,13 @@ ensure_dev_secrets() {
     } >> "$SECRETS_FILE"
     echo "Generated local development encryption keys in $SECRETS_FILE"
   fi
+  if ! grep -q '^export COUCHDB_APP_PASSWORD=' "$SECRETS_FILE"; then
+    {
+      echo "export COUCHDB_ADMIN_PASSWORD=${COUCHDB_PASSWORD:-admin-dev-password}   # matches docker-compose.yml"
+      echo "export COUCHDB_APP_PASSWORD=$(openssl rand -base64 18 | tr '+/' 'ab')"
+    } >> "$SECRETS_FILE"
+    echo "Added local CouchDB credentials to $SECRETS_FILE"
+  fi
   if ! grep -q '^export APP_BOOTSTRAP_PASSWORD=' "$SECRETS_FILE"; then
     local password
     password="$(openssl rand -base64 18 | tr '+/' 'ab')"

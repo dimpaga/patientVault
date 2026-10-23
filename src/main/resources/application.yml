@@ -71,7 +71,7 @@ management:
       show-details: never
       group:
         readiness:
-          include: readinessState,db,keyRing
+          include: readinessState,db,keyRing,couchDb
 
 logging:
   # Plain-text format (local development): level, request id and user id. Production switches to JSON (application-prod.yml).
@@ -97,6 +97,13 @@ app:
     min-prefix-length: 3
     max-prefix-length: 15
     max-candidates: 2000
+  couchdb:
+    url: ${COUCHDB_URL:http://${COUCHDB_HOSTPORT:localhost:5984}}
+    database: patient_files
+    admin-user: ${COUCHDB_ADMIN_USER:admin}
+    admin-password: ${COUCHDB_ADMIN_PASSWORD:}
+    app-user: patientvault_app
+    app-password: ${COUCHDB_APP_PASSWORD:}
   validation:
     amka:
       strict-date: false

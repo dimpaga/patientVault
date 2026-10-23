@@ -30,6 +30,8 @@
         <java-otp.version>1.0.0</java-otp.version>
         <zxing.version>3.5.4</zxing.version>
         <libphonenumber.version>9.0.42</libphonenumber.version>
+        <tika.version>3.3.3</tika.version>
+        <thumbnailator.version>0.4.21</thumbnailator.version>
     </properties>
 
     <dependencies>
@@ -89,6 +91,16 @@
             <groupId>com.googlecode.libphonenumber</groupId>
             <artifactId>libphonenumber</artifactId>
             <version>${libphonenumber.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.tika</groupId>
+            <artifactId>tika-core</artifactId>
+            <version>${tika.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.coobird</groupId>
+            <artifactId>thumbnailator</artifactId>
+            <version>${thumbnailator.version}</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
