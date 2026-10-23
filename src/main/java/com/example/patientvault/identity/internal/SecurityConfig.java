@@ -1,5 +1,7 @@
 package com.example.patientvault.identity.internal;
 
+import java.time.Clock;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -12,6 +14,7 @@ import org.springframework.security.web.header.writers.CrossOriginOpenerPolicyHe
 import org.springframework.security.web.header.writers.CrossOriginResourcePolicyHeaderWriter.CrossOriginResourcePolicy;
 import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy;
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache;
+import org.springframework.security.web.savedrequest.RequestCache;
 
 import com.example.patientvault.audit.AuditService;
 
@@ -28,21 +31,25 @@ class SecurityConfig {
             + "geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), "
             + "publickey-credentials-get=(), usb=(), interest-cohort=()";
 
+    /** Remembers the page a user wanted before login. Only plain page navigations, never htmx partials or non-GET. */
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http, AuditService audit, UserAccountService accounts,
-                                            RateLimitProperties rateLimit) throws Exception {
-
+    RequestCache requestCache() {
         HttpSessionRequestCache requestCache = new HttpSessionRequestCache();
         requestCache.setMatchingRequestParameterName(null);
-        // Only remember plain page navigations; never an htmx partial or a non-GET request.
         requestCache.setRequestMatcher(request -> HttpMethod.GET.matches(request.getMethod())
                 && !LoginRedirects.isHtmx(request)
                 && !request.getRequestURI().startsWith("/actuator"));
+        return requestCache;
+    }
 
+    @Bean
+    SecurityFilterChain securityFilterChain(HttpSecurity http, AuditService audit, RateLimitProperties rateLimit,
+                                            MfaProperties mfa, LoginCompletion loginCompletion, Clock clock,
+                                            RequestCache requestCache) throws Exception {
         http
             .addFilterBefore(new AuthRateLimitFilter(rateLimit, audit), UsernamePasswordAuthenticationFilter.class)
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login", "/error").permitAll()
+                .requestMatchers("/login", "/login/mfa", "/login/mfa/**", "/error").permitAll()
                 .requestMatchers("/css/**", "/js/**", "/icons/**", "/webjars/**", "/manifest.webmanifest").permitAll()
                 .requestMatchers("/actuator/health", "/actuator/health/**").permitAll()
                 .anyRequest().authenticated())
@@ -52,7 +59,7 @@ class SecurityConfig {
                 .loginProcessingUrl("/login")
                 .usernameParameter("username")
                 .passwordParameter("password")
-                .successHandler(new LoginHandlers.Success(accounts, audit))
+                .successHandler(new LoginHandlers.PasswordStep(mfa, loginCompletion, clock))
                 .failureHandler(LoginHandlers.failure(audit)))
             .logout(logout -> logout
                 .logoutUrl("/logout")

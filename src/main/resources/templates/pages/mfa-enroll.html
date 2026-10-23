@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html th:replace="~{layout/auth :: page(~{::title}, ~{::section})}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="#{mfa.enroll.title} + ' · ' + #{app.name}">Set up two-step verification · PatientVault</title>
+</head>
+<body>
+<section class="card pv-card">
+    <div class="card-body p-4">
+        <h1 class="h4 mb-2" th:text="#{mfa.enroll.heading}">Set up two-step verification</h1>
+        <p class="text-body-secondary" th:text="#{mfa.enroll.intro}">Scan the QR code with an authenticator app.</p>
+
+        <div class="alert alert-danger" role="alert" th:if="${param.error}" th:text="#{mfa.error}">Invalid code</div>
+        <div class="alert alert-warning" role="alert" th:if="${param.throttled}" th:text="#{login.throttled}">Throttled</div>
+
+        <div class="text-center mb-3">
+            <img class="pv-qr" th:src="@{/login/mfa/qr}" width="192" height="192" th:alt="#{mfa.enroll.qrAlt}" alt="QR code">
+        </div>
+        <p class="small mb-1" th:text="#{mfa.enroll.manual}">Or enter this key manually:</p>
+        <p class="mb-3"><code class="pv-secret" th:text="${secret}">ABCD EFGH</code></p>
+
+        <form method="post" th:action="@{/login/mfa}">
+            <div class="mb-3">
+                <label for="code" class="form-label" th:text="#{mfa.enroll.label}">Code from the app</label>
+                <input type="text" class="form-control form-control-lg text-center" id="code" name="code" required
+                       inputmode="numeric" pattern="[0-9 ]{6,7}" maxlength="7" autocomplete="one-time-code"
+                       spellcheck="false" autofocus data-pv-focus>
+            </div>
+            <button type="submit" class="btn btn-primary w-100" th:text="#{mfa.enroll.submit}">Verify and continue</button>
+        </form>
+        <a class="d-block text-center mt-3" th:href="@{/login}" th:text="#{mfa.back}">Back to sign in</a>
+    </div>
+</section>
+</body>
+</html>

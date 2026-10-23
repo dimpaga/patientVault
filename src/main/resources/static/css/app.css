@@ -154,6 +154,15 @@ main:focus { outline: none; }
 .pv-auth-main { width: 100%; max-width: 26rem; margin: auto; padding-block: 1.5rem; }
 .pv-auth-logo { font-size: 2.5rem; }
 
+.pv-qr { width: 12rem; height: 12rem; background: #fff; border-radius: 0.5rem; padding: 0.25rem; }
+.pv-secret { font-size: 1rem; letter-spacing: 0.08em; user-select: all; overflow-wrap: anywhere; }
+.pv-recovery-codes { columns: 2; column-gap: 2rem; font-size: 1.1rem; line-height: 2; }
+
+@media print {
+    .pv-topbar, .pv-sidebar, .pv-bottom-nav, .btn, .alert { display: none !important; }
+    .pv-body { background: #fff; padding: 0; }
+}
+
 /* htmx loading indicators (the library's built-in indicator styles are disabled for CSP) */
 .htmx-indicator { opacity: 0; transition: opacity 200ms ease-in; }
 .htmx-request .htmx-indicator, .htmx-request.htmx-indicator { opacity: 1; }

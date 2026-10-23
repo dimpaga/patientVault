@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html th:replace="~{layout/base :: page(~{::title}, ~{::main}, 'settings')}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="#{recovery.title} + ' · ' + #{app.name}">Recovery codes · PatientVault</title>
+</head>
+<body>
+<main>
+    <h1 class="h3 mb-3" th:text="#{recovery.heading}">Your recovery codes</h1>
+    <div class="alert alert-warning" role="alert" th:text="#{recovery.warning}">Save these codes now.</div>
+
+    <div class="card pv-card mb-3">
+        <div class="card-body">
+            <ul class="pv-recovery-codes list-unstyled mb-0">
+                <li th:each="code : ${codes}"><code th:text="${code}">ABCDE-FGHJK</code></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="d-flex flex-wrap gap-2">
+        <button type="button" class="btn btn-outline-secondary" data-pv-print>
+            <i class="bi bi-printer" aria-hidden="true"></i>
+            <span th:text="#{recovery.print}">Print</span>
+        </button>
+        <a class="btn btn-primary" th:href="@{/}" th:text="#{recovery.continue}">I have saved them, continue</a>
+    </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html th:replace="~{layout/auth :: page(~{::title}, ~{::section})}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="#{mfa.verify.title} + ' · ' + #{app.name}">Verification · PatientVault</title>
+</head>
+<body>
+<section class="card pv-card">
+    <div class="card-body p-4">
+        <h1 class="h4 mb-2" th:text="#{mfa.verify.heading}">Two-step verification</h1>
+        <p class="text-body-secondary" th:text="#{mfa.verify.hint}">Enter the code from your authenticator app.</p>
+
+        <div class="alert alert-danger" role="alert" th:if="${param.error}" th:text="#{mfa.error}">Invalid code</div>
+        <div class="alert alert-warning" role="alert" th:if="${param.throttled}" th:text="#{login.throttled}">Throttled</div>
+
+        <form method="post" th:action="@{/login/mfa}">
+            <div class="mb-3">
+                <label for="code" class="form-label" th:text="#{mfa.verify.label}">Code</label>
+                <input type="text" class="form-control form-control-lg text-center" id="code" name="code" required
+                       maxlength="14" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false"
+                       autofocus data-pv-focus aria-describedby="code-help">
+                <div id="code-help" class="form-text" th:text="#{mfa.verify.recoveryHint}">Lost your device? Enter a recovery code.</div>
+            </div>
+            <button type="submit" class="btn btn-primary w-100" th:text="#{mfa.verify.submit}">Verify</button>
+        </form>
+        <a class="d-block text-center mt-3" th:href="@{/login}" th:text="#{mfa.back}">Back to sign in</a>
+    </div>
+</section>
+</body>
+</html>

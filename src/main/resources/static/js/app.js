@@ -16,6 +16,10 @@
             store('pv-theme', next);
             return;
         }
+        if (event.target.closest('[data-pv-print]')) {
+            window.print();
+            return;
+        }
         if (event.target.closest('[data-pv-sidebar-toggle]')) {
             var collapsed = root.classList.toggle('pv-sidebar-collapsed');
             store('pv-sidebar', collapsed ? 'collapsed' : 'expanded');
