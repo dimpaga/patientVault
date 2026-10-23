@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,7 +75,7 @@ class DefaultSearchIndex implements SearchIndex {
         if (value == null || value.isBlank()) {
             return List.of();
         }
-        return tokens.findPatientIds(kind.name(), blindIndexer.token(kind.name(), value));
+        return tokens.findPatientIds(kind.name(), blindIndexer.token(kind.name(), value), PageRequest.of(0, 1000));
     }
 
     private void add(Set<SearchTokenId> target, UUID patientId, TokenKind kind, String value) {

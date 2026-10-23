@@ -12,6 +12,8 @@ import java.util.regex.Pattern;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.example.patientvault.shared.PhoneNumbers;
+
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
 

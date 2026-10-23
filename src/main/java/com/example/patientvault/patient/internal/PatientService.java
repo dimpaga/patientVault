@@ -19,6 +19,7 @@ import com.example.patientvault.audit.AuditService;
 import com.example.patientvault.shared.Permissions;
 import com.example.patientvault.search.IndexedFields;
 import com.example.patientvault.search.SearchIndex;
+import com.example.patientvault.shared.PhoneNumbers;
 import com.example.patientvault.shared.Ids;
 
 /**

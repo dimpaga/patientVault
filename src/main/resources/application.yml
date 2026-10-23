@@ -96,6 +96,7 @@ app:
   search:
     min-prefix-length: 3
     max-prefix-length: 15
+    max-candidates: 2000
   validation:
     amka:
       strict-date: false
