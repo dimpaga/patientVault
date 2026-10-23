@@ -3,6 +3,14 @@ spring:
     cache: false
   datasource:
     password: ${DB_PASSWORD:patientvault}
+  mail:
+    # Mailpit (docker compose) is a local sink without TLS or login
+    host: localhost
+    port: 1025
+    properties:
+      mail.smtp.auth: false
+      mail.smtp.starttls.enable: false
+      mail.smtp.starttls.required: false
 
 server:
   servlet:
