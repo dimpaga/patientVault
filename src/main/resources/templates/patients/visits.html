@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- Visits tab: add form, then the visits (newest first), each either as a card or as an inline edit form. -->
+<th:block th:fragment="visitsTab">
+    <div class="card pv-card mb-3">
+        <div class="card-body">
+            <h2 class="h6" th:text="#{visit.add}">Add a visit</h2>
+            <form method="post" th:action="@{/patients/{id}/visits(id=${patient.id})}"
+                  th:hx-post="@{/patients/{id}/visits(id=${patient.id})}" hx-target="#pv-tabs" hx-swap="outerHTML" novalidate>
+                <th:block th:replace="~{patients/visits :: visitFields(form=${addForm}, errors=${addErrors}, prefix='add')}"></th:block>
+                <button type="submit" class="btn btn-primary" th:text="#{visit.save}">Save visit</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="card pv-card" th:if="${#lists.isEmpty(visits)}">
+        <div class="card-body text-body-secondary" th:text="#{visit.empty}">No visits yet.</div>
+    </div>
+
+    <div th:each="v : ${visits}" th:id="'visit-' + ${v.id}" class="mb-3">
+        <th:block th:if="${editVisitId != null and editVisitId == v.id}">
+            <th:block th:replace="~{patients/visits :: visitEdit}"></th:block>
+        </th:block>
+        <th:block th:unless="${editVisitId != null and editVisitId == v.id}">
+            <th:block th:replace="~{patients/visits :: visitCard(v=${v})}"></th:block>
+        </th:block>
+    </div>
+</th:block>
+
+<!-- One visit, read-only. -->
+<div th:fragment="visitCard(v)" class="card pv-card">
+    <div class="card-body">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+            <h3 class="h6 mb-0">
+                <i class="bi bi-clipboard2-pulse me-1 pv-accent" aria-hidden="true"></i>
+                <span th:text="${#temporals.format(v.data.visitDate, 'dd/MM/yyyy')}">01/01/2026</span>
+            </h3>
+            <div class="d-flex gap-2">
+                <a class="btn btn-outline-secondary btn-sm" th:href="@{/patients/{p}(p=${patient.id},tab='visits',edit=${v.id})}"
+                   th:hx-get="@{/patients/{p}/visits/{v}/edit(p=${patient.id},v=${v.id})}"
+                   th:hx-target="'#visit-' + ${v.id}" hx-swap="innerHTML" hx-boost="false">
+                    <i class="bi bi-pencil" aria-hidden="true"></i><span th:text="#{common.edit}">Edit</span>
+                </a>
+                <form method="post" th:action="@{/patients/{p}/visits/{v}/delete(p=${patient.id},v=${v.id})}"
+                      th:hx-post="@{/patients/{p}/visits/{v}/delete(p=${patient.id},v=${v.id})}"
+                      hx-target="#pv-tabs" hx-swap="outerHTML" th:attr="hx-confirm=#{visit.delete.confirm}">
+                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                        <i class="bi bi-trash" aria-hidden="true"></i><span th:text="#{common.delete}">Delete</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+        <dl class="mb-0 pv-details">
+            <th:block th:if="${v.data.description != null}">
+                <dt th:text="#{patient.visit.description}">Description</dt>
+                <dd class="pv-prewrap" th:text="${v.data.description}">text</dd>
+            </th:block>
+            <th:block th:if="${v.data.diagnosis != null}">
+                <dt th:text="#{patient.visit.diagnosis}">Diagnosis</dt>
+                <dd class="pv-prewrap" th:text="${v.data.diagnosis}">text</dd>
+            </th:block>
+            <th:block th:if="${v.data.treatment != null}">
+                <dt th:text="#{patient.visit.treatment}">Treatment</dt>
+                <dd class="pv-prewrap" th:text="${v.data.treatment}">text</dd>
+            </th:block>
+            <dd class="text-body-secondary mb-0"
+                th:if="${v.data.description == null and v.data.diagnosis == null and v.data.treatment == null}"
+                th:text="#{visit.noDetails}">No details recorded.</dd>
+        </dl>
+    </div>
+</div>
+
+<!-- Inline edit form of the visit in model attribute "editForm" (id "editVisitId"). -->
+<div th:fragment="visitEdit" class="card pv-card border-primary">
+    <div class="card-body">
+        <div class="alert alert-danger" role="alert" th:if="${editConflict}">
+            <strong th:text="#{patient.conflict.title}">This record has changed</strong>
+            <span th:text="#{visit.conflict.text}">Reload the page and try again.</span>
+            <a th:href="@{/patients/{id}(id=${patient.id},tab='visits')}" th:text="#{patient.conflict.reload}" hx-boost="false">Reload</a>
+        </div>
+        <form method="post" th:action="@{/patients/{p}/visits/{v}(p=${patient.id},v=${editVisitId})}"
+              th:hx-post="@{/patients/{p}/visits/{v}(p=${patient.id},v=${editVisitId})}"
+              hx-target="#pv-tabs" hx-swap="outerHTML" novalidate>
+            <input type="hidden" name="version" th:value="${editForm.version}">
+            <th:block th:replace="~{patients/visits :: visitFields(form=${editForm}, errors=${editErrors}, prefix='edit')}"></th:block>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary" th:text="#{visit.save}">Save visit</button>
+                <a class="btn btn-outline-secondary" th:href="@{/patients/{id}(id=${patient.id},tab='visits')}"
+                   th:hx-get="@{/patients/{id}(id=${patient.id},tab='visits')}" hx-target="#pv-tabs" hx-swap="outerHTML"
+                   hx-boost="false" th:text="#{common.cancel}">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Date + three text areas. The prefix keeps element ids unique when several forms are on the page. -->
+<th:block th:fragment="visitFields(form, errors, prefix)">
+    <div class="mb-3">
+        <label th:for="${prefix} + '-date'" class="form-label" th:text="#{patient.visit.date}">Visit date</label>
+        <input type="date" class="form-control pv-date" th:id="${prefix} + '-date'" name="visitDate" required
+               th:value="${form.visitDate}" th:classappend="${errors.get('visitDate') != null} ? 'is-invalid'">
+        <div class="invalid-feedback" th:if="${errors.get('visitDate') != null}"
+             th:text="#{${errors.get('visitDate').key}(${errors.get('visitDate').arg})}"></div>
+    </div>
+    <div class="mb-3">
+        <label th:for="${prefix} + '-description'" class="form-label" th:text="#{patient.visit.description}">Description</label>
+        <textarea class="form-control" th:id="${prefix} + '-description'" name="description" rows="3"
+                  th:classappend="${errors.get('description') != null} ? 'is-invalid'" th:text="${form.description}"></textarea>
+        <div class="invalid-feedback" th:if="${errors.get('description') != null}"
+             th:text="#{${errors.get('description').key}(${errors.get('description').arg})}"></div>
+    </div>
+    <div class="mb-3">
+        <label th:for="${prefix} + '-diagnosis'" class="form-label" th:text="#{patient.visit.diagnosis}">Diagnosis</label>
+        <textarea class="form-control" th:id="${prefix} + '-diagnosis'" name="diagnosis" rows="3"
+                  th:classappend="${errors.get('diagnosis') != null} ? 'is-invalid'" th:text="${form.diagnosis}"></textarea>
+        <div class="invalid-feedback" th:if="${errors.get('diagnosis') != null}"
+             th:text="#{${errors.get('diagnosis').key}(${errors.get('diagnosis').arg})}"></div>
+    </div>
+    <div class="mb-3">
+        <label th:for="${prefix} + '-treatment'" class="form-label" th:text="#{patient.visit.treatment}">Treatment</label>
+        <textarea class="form-control" th:id="${prefix} + '-treatment'" name="treatment" rows="3"
+                  th:classappend="${errors.get('treatment') != null} ? 'is-invalid'" th:text="${form.treatment}"></textarea>
+        <div class="invalid-feedback" th:if="${errors.get('treatment') != null}"
+             th:text="#{${errors.get('treatment').key}(${errors.get('treatment').arg})}"></div>
+    </div>
+</th:block>
+
+</body>
+</html>

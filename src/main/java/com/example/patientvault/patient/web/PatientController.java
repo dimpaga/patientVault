@@ -1,13 +1,9 @@
 package com.example.patientvault.patient.web;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -40,13 +36,12 @@ class PatientController {
 
     private final PatientService patients;
     private final PatientValidator validator;
-    private final ZoneId zone;
+    private final PatientPage page;
 
-    PatientController(PatientService patients, PatientValidator validator,
-                      @Value("${app.timezone}") ZoneId zone) {
+    PatientController(PatientService patients, PatientValidator validator, PatientPage page) {
         this.patients = patients;
         this.validator = validator;
-        this.zone = zone;
+        this.page = page;
     }
 
     // ---- create -------------------------------------------------------------------------------
@@ -112,15 +107,16 @@ class PatientController {
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('" + Permissions.PATIENT_READ + "')")
-    String view(@PathVariable UUID id, Model model) {
-        PatientView patient = patients.get(id).orElseThrow(PatientNotFoundException::new);
-        model.addAttribute("patient", patient);
-        model.addAttribute("createdAt", local(patient.createdAt()));
-        model.addAttribute("updatedAt", local(patient.updatedAt()));
-        model.addAttribute("consentAt", patient.consentRecordedAt() == null ? null : local(patient.consentRecordedAt()));
-        model.addAttribute("tab", "overview");
-        model.addAttribute("nav", "patients");
-        return "pages/patient-view";
+    String view(@PathVariable UUID id, @RequestParam(name = "tab", required = false) String tab,
+                @RequestParam(name = "edit", required = false) UUID editVisit,
+                @RequestHeader(name = "HX-Request", required = false) String htmx,
+                @RequestHeader(name = "HX-Boosted", required = false) String boosted, Model model) {
+        PatientView patient = page.load(id);
+        PatientPage.VisitState state = page.stateForEdit(patient.id(), editVisit);
+        page.fill(model, patient, tab, state);
+        // htmx tab clicks swap only the tab bar and panel; boosted navigation and plain requests get the full page
+        boolean tabSwap = "true".equalsIgnoreCase(htmx) && !"true".equalsIgnoreCase(boosted);
+        return tabSwap ? "pages/patient-view :: tabs" : "pages/patient-view";
     }
 
     // ---- edit ---------------------------------------------------------------------------------
@@ -195,9 +191,5 @@ class PatientController {
 
     private static boolean notBlank(String value) {
         return value != null && !value.isBlank();
-    }
-
-    private LocalDateTime local(Instant instant) {
-        return LocalDateTime.ofInstant(instant, zone);
     }
 }

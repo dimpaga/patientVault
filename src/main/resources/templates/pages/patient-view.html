@@ -18,7 +18,38 @@
         </a>
     </div>
 
-    <div id="pv-tab-content" th:fragment="tab-overview">
+    <div id="pv-tabs" th:fragment="tabs">
+        <ul class="nav nav-tabs mb-3" role="tablist" th:aria-label="#{patient.tabs}">
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" th:classappend="${tab == 'overview'} ? 'active'" role="tab"
+                   th:aria-selected="${tab == 'overview'}" th:href="@{/patients/{id}(id=${patient.id})}"
+                   th:hx-get="@{/patients/{id}(id=${patient.id},tab='overview')}"
+                   hx-target="#pv-tabs" hx-swap="outerHTML" hx-push-url="true" hx-boost="false">
+                    <i class="bi bi-person-vcard" aria-hidden="true"></i><span th:text="#{patient.tab.overview}">Overview</span>
+                </a>
+            </li>
+            <li class="nav-item" role="presentation">
+                <a class="nav-link" th:classappend="${tab == 'visits'} ? 'active'" role="tab"
+                   th:aria-selected="${tab == 'visits'}" th:href="@{/patients/{id}(id=${patient.id},tab='visits')}"
+                   th:hx-get="@{/patients/{id}(id=${patient.id},tab='visits')}"
+                   hx-target="#pv-tabs" hx-swap="outerHTML" hx-push-url="true" hx-boost="false">
+                    <i class="bi bi-clipboard2-pulse" aria-hidden="true"></i><span th:text="#{patient.tab.visits}">Visits</span>
+                </a>
+            </li>
+        </ul>
+        <div id="pv-tab-content" role="tabpanel" th:switch="${tab}">
+            <th:block th:case="'visits'">
+                <th:block th:replace="~{patients/visits :: visitsTab}"></th:block>
+            </th:block>
+            <th:block th:case="*">
+                <th:block th:replace="~{pages/patient-view :: overviewTab}"></th:block>
+            </th:block>
+        </div>
+    </div>
+
+</div>
+
+    <th:block th:fragment="overviewTab">
         <div class="card pv-card">
             <div class="card-body">
                 <dl class="row mb-0 pv-details">
@@ -57,7 +88,6 @@
                 </dl>
             </div>
         </div>
-    </div>
-</div>
+    </th:block>
 </body>
 </html>

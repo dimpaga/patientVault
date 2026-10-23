@@ -160,6 +160,10 @@ main:focus { outline: none; }
 .pv-details dt { color: var(--bs-secondary-color); font-weight: 500; }
 .pv-more > summary { cursor: pointer; min-height: var(--pv-touch); }
 .pv-patient-form { max-width: 56rem; }
+.nav-tabs .nav-link { display: inline-flex; align-items: center; gap: 0.4rem; min-height: var(--pv-touch); }
+.btn i + span { margin-left: 0; }
+/* toasts sit below the top bar so they never cover its buttons */
+.pv-toasts { top: 3.75rem !important; }
 .pv-secret { font-size: 1rem; letter-spacing: 0.08em; user-select: all; overflow-wrap: anywhere; }
 .pv-recovery-codes { columns: 2; column-gap: 2rem; font-size: 1.1rem; line-height: 2; }
 

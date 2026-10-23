@@ -58,7 +58,7 @@
         <div th:replace="~{fragments/shell :: items(${nav})}"></div>
     </nav>
 
-    <div class="toast-container position-fixed top-0 end-0 p-3" id="pv-toasts"
+    <div class="toast-container pv-toasts position-fixed end-0 p-3" id="pv-toasts"
          th:attr="data-pv-error=#{toast.error},data-pv-close=#{common.close}"></div>
     <div id="pv-live" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
 </div>
