@@ -2,6 +2,13 @@ spring:
   datasource:
     password: ${DB_PASSWORD:patientvault}
 
+server:
+  servlet:
+    session:
+      cookie:
+        # plain http://localhost during development; production keeps Secure cookies
+        secure: false
+
 logging:
   level:
     com.example.patientvault: debug

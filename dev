@@ -3,20 +3,30 @@
 set -euo pipefail
 cd "$(dirname "$0")"
 
-SECRETS_FILE=.dev-secrets.env   # git-ignored; local development keys only, never reuse in production
+SECRETS_FILE=.dev-secrets.env   # git-ignored; local development secrets only, never reuse in production
 
 genkey() {
   openssl rand -base64 32
 }
 
 ensure_dev_secrets() {
-  if [[ ! -f "$SECRETS_FILE" ]]; then
-    umask 077
+  touch "$SECRETS_FILE"
+  chmod 600 "$SECRETS_FILE"
+  if ! grep -q '^export APP_MASTER_KEYS=' "$SECRETS_FILE"; then
     {
       echo "export APP_MASTER_KEYS=v1:$(genkey)"
       echo "export APP_ACTIVE_KEY_ID=v1"
-    } > "$SECRETS_FILE"
-    echo "Generated local development keys in $SECRETS_FILE"
+    } >> "$SECRETS_FILE"
+    echo "Generated local development encryption keys in $SECRETS_FILE"
+  fi
+  if ! grep -q '^export APP_BOOTSTRAP_PASSWORD=' "$SECRETS_FILE"; then
+    local password
+    password="$(openssl rand -base64 18 | tr '+/' 'ab')"
+    {
+      echo "export APP_BOOTSTRAP_USERNAME=doctor"
+      echo "export APP_BOOTSTRAP_PASSWORD=$password"
+    } >> "$SECRETS_FILE"
+    echo "Local doctor account: username 'doctor', initial password '$password' (change required at first login)"
   fi
 }
 
@@ -28,7 +38,7 @@ case "${1:-}" in
           # shellcheck disable=SC1090
           source "$SECRETS_FILE"
           SPRING_PROFILES_ACTIVE=local ./mvnw spring-boot:run ;;
-  reset)  docker compose down -v ;;
+  reset)  docker compose down -v; rm -f "$SECRETS_FILE" ;;
   genkey) echo "v1:$(genkey)" ;;
   *)      echo "usage: ./dev {up|down|logs|run|reset|genkey}"; exit 1 ;;
 esac

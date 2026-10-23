@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html th:replace="~{layout/auth :: page(~{::title}, ~{::section})}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="#{login.title} + ' · ' + #{app.name}">Sign in · PatientVault</title>
+</head>
+<body>
+<section class="card pv-card">
+    <div class="card-body p-4">
+        <h1 class="h4 mb-3" th:text="#{login.heading}">Sign in</h1>
+
+        <div class="alert alert-danger" role="alert" th:if="${param.error}" th:text="#{login.error}">Error</div>
+        <div class="alert alert-warning" role="alert" th:if="${param.expired}" th:text="#{login.expired}">Expired</div>
+        <div class="alert alert-warning" role="alert" th:if="${param.throttled}" th:text="#{login.throttled}">Throttled</div>
+        <div class="alert alert-success" role="status" th:if="${param.logout}" th:text="#{login.logout}">Signed out</div>
+
+        <form method="post" th:action="@{/login}">
+            <div class="mb-3">
+                <label for="username" class="form-label" th:text="#{login.username}">Username</label>
+                <input type="text" class="form-control" id="username" name="username" required
+                       autocomplete="username" autocapitalize="none" spellcheck="false" autofocus data-pv-focus>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label" th:text="#{login.password}">Password</label>
+                <input type="password" class="form-control" id="password" name="password" required
+                       autocomplete="current-password">
+            </div>
+            <button type="submit" class="btn btn-primary w-100" th:text="#{login.submit}">Sign in</button>
+        </form>
+    </div>
+</section>
+</body>
+</html>

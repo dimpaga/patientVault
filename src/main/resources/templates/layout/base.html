@@ -9,7 +9,7 @@
 <body class="pv-body">
 <a class="visually-hidden-focusable pv-skip" href="#pv-main" th:text="#{nav.skip}">Skip to main content</a>
 
-<div id="pv-app" hx-boost="true">
+<div id="pv-app" hx-boost="true" th:attr='hx-headers=|{"${_csrf.headerName}":"${_csrf.token}"}|'>
     <header class="pv-topbar navbar bg-body border-bottom sticky-top">
         <div class="container-fluid gap-2">
             <button type="button" class="btn btn-outline-secondary btn-sm pv-icon-btn d-none d-lg-inline-flex"
@@ -22,6 +22,23 @@
                 <span th:text="#{app.name}">PatientVault</span>
             </a>
             <div th:replace="~{fragments/shell :: preferences}"></div>
+            <div class="dropdown" th:if="${currentUsername != null}">
+                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button"
+                        data-bs-toggle="dropdown" aria-expanded="false" th:aria-label="#{topbar.user}">
+                    <i class="bi bi-person-circle" aria-hidden="true"></i>
+                    <span class="d-none d-sm-inline" th:text="${currentUsername}">doctor</span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                        <form th:action="@{/logout}" method="post" hx-boost="false">
+                            <button type="submit" class="dropdown-item">
+                                <i class="bi bi-box-arrow-right me-2" aria-hidden="true"></i>
+                                <span th:text="#{nav.logout}">Sign out</span>
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
         </div>
     </header>
 
