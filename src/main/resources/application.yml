@@ -51,3 +51,7 @@ logging:
 
 app:
   timezone: Europe/Athens
+  crypto:
+    master-keys: ${APP_MASTER_KEYS:}
+    active-key-id: ${APP_ACTIVE_KEY_ID:}
+    blind-index-key-id: ${APP_BLIND_INDEX_KEY_ID:}

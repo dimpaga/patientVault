@@ -1,5 +1,6 @@
 target/
 .env
+.dev-secrets.env
 *.log
 .idea/
 *.iml
