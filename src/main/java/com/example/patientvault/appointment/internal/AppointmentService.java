@@ -163,6 +163,15 @@ public class AppointmentService implements AppointmentApi {
         return views(List.of(appointment)).get(0);
     }
 
+    /** Patient of an appointment, for the link in the reminder e-mail. */
+    @PreAuthorize("hasAuthority('" + Permissions.PATIENT_READ + "')")
+    @Transactional(readOnly = true)
+    public UUID patientIdOf(UUID appointmentId) {
+        Appointment appointment = appointments.findById(appointmentId).orElseThrow(AppointmentNotFoundException::new);
+        requireActive(appointment.getPatientId());
+        return appointment.getPatientId();
+    }
+
     @PreAuthorize("hasAuthority('" + Permissions.PATIENT_READ + "')")
     @Transactional(readOnly = true)
     public List<AppointmentView> forPatient(UUID patientId) {

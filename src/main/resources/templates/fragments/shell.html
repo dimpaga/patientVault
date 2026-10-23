@@ -35,6 +35,13 @@
         </a>
     </li>
     <li class="nav-item">
+        <a class="nav-link" th:href="@{/appointments}" th:classappend="${active == 'appointments'} ? 'active'"
+           th:attr="aria-current=${active == 'appointments'} ? 'page'">
+            <i class="bi bi-calendar-event" aria-hidden="true"></i>
+            <span th:text="#{nav.appointments}">Appointments</span>
+        </a>
+    </li>
+    <li class="nav-item">
         <a class="nav-link" th:href="@{/patients/new}" th:classappend="${active == 'new'} ? 'active'"
            th:attr="aria-current=${active == 'new'} ? 'page'">
             <i class="bi bi-person-plus" aria-hidden="true"></i>

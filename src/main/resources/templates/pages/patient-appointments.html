@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html th:replace="~{layout/base :: page(~{::title}, ~{::#pv-page}, ${nav})}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${patient.fullName} + ' · ' + #{patient.tab.appointments} + ' · ' + #{app.name}">Appointments · PatientVault</title>
+</head>
+<body>
+<!-- Full-page form of the Appointments tab (direct link, e-mail deep link, no JavaScript). -->
+<div id="pv-page">
+    <div class="d-flex flex-wrap align-items-start justify-content-between gap-2 mb-3">
+        <h1 class="h3 mb-1" th:text="${patient.fullName}">Name</h1>
+        <a class="btn btn-outline-primary" th:href="@{/patients/{id}(id=${patient.id})}">
+            <i class="bi bi-person-vcard" aria-hidden="true"></i><span th:text="#{patient.record}">Patient record</span>
+        </a>
+    </div>
+    <th:block th:replace="~{pages/patient-view :: tabs}"></th:block>
+</div>
+</body>
+</html>

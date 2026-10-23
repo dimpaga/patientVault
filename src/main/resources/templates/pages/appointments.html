@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html th:replace="~{layout/base :: page(~{::title}, ~{::#pv-page}, 'appointments')}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="#{appointments.title} + ' · ' + #{app.name}">Appointments · PatientVault</title>
+</head>
+<body>
+<div id="pv-page">
+    <h1 class="h3 mb-3" th:text="#{appointments.heading}">Appointments</h1>
+
+    <ul class="nav nav-pills mb-3" th:aria-label="#{appointments.range}">
+        <li class="nav-item" th:each="r : ${ {'today','week','month'} }">
+            <a class="nav-link" th:classappend="${range == r} ? 'active'" th:href="@{/appointments(range=${r})}"
+               th:attr="aria-current=${range == r} ? 'page'" th:text="#{'appointments.range.' + ${r}}">Today</a>
+        </li>
+    </ul>
+
+    <div class="card pv-card" th:if="${#maps.isEmpty(days)}">
+        <div class="card-body text-body-secondary" th:text="#{appointments.empty}">No appointments in this period.</div>
+    </div>
+
+    <section class="mb-4" th:each="day : ${days}" th:aria-labelledby="'day-' + ${day.key}">
+        <h2 class="h6 text-body-secondary text-uppercase mb-2" th:id="'day-' + ${day.key}"
+            th:text="${#temporals.format(day.key, 'EEEE dd/MM/yyyy')} + (${day.key == today} ? ' · ' + #{appointments.today} : '')">Monday 01/01/2026</h2>
+        <div class="list-group">
+            <a class="list-group-item list-group-item-action d-flex flex-wrap align-items-center gap-3"
+               th:each="a : ${day.value}" th:href="@{/patients/{p}/appointments(p=${a.patientId})}">
+                <span class="fw-semibold pv-time" th:text="${#temporals.format(a.scheduled, 'HH:mm')}">10:00</span>
+                <span class="flex-grow-1" th:text="${a.patientName}">Name</span>
+                <span class="text-body-secondary small" th:text="#{appointment.minutes(${a.durationMinutes})}">30 min</span>
+                <span class="badge text-bg-warning" th:if="${a.scheduled.isBefore(now)}" th:text="#{appointment.overdue}">Past</span>
+            </a>
+        </div>
+    </section>
+</div>
+</body>
+</html>

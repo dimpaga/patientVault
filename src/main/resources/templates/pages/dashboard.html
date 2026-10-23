@@ -27,7 +27,20 @@
                         <i class="bi bi-calendar-event me-2 pv-accent" aria-hidden="true"></i>
                         <span th:text="#{dashboard.appointments}">Today's appointments</span>
                     </h2>
-                    <p class="text-body-secondary mb-0" th:text="#{dashboard.appointments.empty}">No appointments.</p>
+                    <p class="text-body-secondary" th:if="${#lists.isEmpty(todayAppointments)}" th:text="#{dashboard.appointments.empty}">No appointments.</p>
+                    <ul class="list-unstyled mb-2" th:unless="${#lists.isEmpty(todayAppointments)}">
+                        <li th:each="a : ${todayAppointments}">
+                            <a class="d-flex align-items-center gap-3 py-2 text-decoration-none"
+                               th:href="@{/patients/{id}/appointments(id=${a.patientId})}">
+                                <span class="fw-semibold pv-time" th:text="${#temporals.format(a.time, 'HH:mm')}">10:00</span>
+                                <span class="flex-grow-1" th:text="${a.patientName}">Name</span>
+                                <span class="text-body-secondary small" th:text="#{appointment.minutes(${a.durationMinutes})}">30 min</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <a class="btn btn-outline-primary" th:href="@{/appointments(range='week')}">
+                        <i class="bi bi-calendar-week" aria-hidden="true"></i><span th:text="#{dashboard.appointments.all}">All appointments</span>
+                    </a>
                 </div>
             </div>
         </section>
@@ -60,7 +73,14 @@
                         <i class="bi bi-bell me-2 pv-accent" aria-hidden="true"></i>
                         <span th:text="#{dashboard.alerts}">Alerts</span>
                     </h2>
-                    <p class="text-body-secondary mb-0" th:text="#{dashboard.alerts.empty}">Nothing needs attention.</p>
+                    <div class="alert alert-danger d-flex align-items-start gap-2" role="alert" th:if="${failedReminders > 0}">
+                        <i class="bi bi-exclamation-triangle-fill" aria-hidden="true"></i>
+                        <span>
+                            <span th:text="#{dashboard.alerts.reminders(${failedReminders})}">Reminders could not be sent.</span>
+                            <a th:href="@{/settings/reminders}" th:text="#{dashboard.alerts.reminders.check}">Check e-mail settings</a>
+                        </span>
+                    </div>
+                    <p class="text-body-secondary mb-0" th:if="${failedReminders == 0}" th:text="#{dashboard.alerts.empty}">Nothing needs attention.</p>
                 </div>
             </div>
         </section>

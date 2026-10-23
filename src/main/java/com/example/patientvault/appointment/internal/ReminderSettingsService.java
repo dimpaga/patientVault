@@ -17,6 +17,9 @@ public class ReminderSettingsService {
 
     public enum Outcome { SENT, NO_ADDRESS, FAILED }
 
+    private static final java.util.regex.Pattern EMAIL =
+            java.util.regex.Pattern.compile("^[^\\s@<>\"',;:()\\[\\]\\\\]{1,64}@[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?\\.[A-Za-z]{2,}$");
+
     private final DoctorContact contact;
     private final MailComposer composer;
     private final MailSender mail;
@@ -39,8 +42,17 @@ public class ReminderSettingsService {
 
     @PreAuthorize("hasAuthority('" + Permissions.SETTINGS_MANAGE + "')")
     public void saveNotificationEmail(String email) {
-        contact.updateNotificationEmail(email);
+        String normalised = email == null ? "" : email.strip();
+        if (!isValidEmail(normalised)) {
+            throw new IllegalArgumentException("Invalid e-mail address");
+        }
+        contact.updateNotificationEmail(normalised);
         audit.record(AuditEvent.success(AuditAction.SETTINGS_CHANGED).withDetail("setting", "notificationEmail"));
+    }
+
+    /** One plain address: no spaces, quotes, angle brackets or line breaks (they would allow header injection). */
+    public static boolean isValidEmail(String email) {
+        return email != null && email.length() <= 254 && EMAIL.matcher(email.strip()).matches();
     }
 
     @PreAuthorize("hasAuthority('" + Permissions.SETTINGS_MANAGE + "')")

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- Appointments tab: schedule form, upcoming appointments (card or inline edit form), then history. -->
+<th:block th:fragment="appointmentsTab">
+    <div class="card pv-card mb-3" id="appt-add">
+        <div class="card-body">
+            <h2 class="h6" th:text="#{appointment.add}">Schedule an appointment</h2>
+            <form method="post" th:action="@{/patients/{id}/appointments(id=${patient.id})}"
+                  th:hx-post="@{/patients/{id}/appointments(id=${patient.id})}" hx-target="#pv-tabs" hx-swap="outerHTML" novalidate>
+                <th:block th:replace="~{appointments/tab :: appointmentFields(form=${addForm}, errors=${addErrors}, prefix='add', focus=${focusAdd})}"></th:block>
+                <button type="submit" class="btn btn-primary" th:text="#{appointment.save}">Schedule</button>
+            </form>
+        </div>
+    </div>
+
+    <h2 class="h6 text-body-secondary text-uppercase mb-2" th:text="#{appointment.upcoming}">Upcoming</h2>
+    <div class="card pv-card mb-3" th:if="${#lists.isEmpty(upcoming)}">
+        <div class="card-body text-body-secondary" th:text="#{appointment.empty}">No upcoming appointments.</div>
+    </div>
+    <div th:each="a : ${upcoming}" th:id="'appointment-' + ${a.id}" class="mb-3">
+        <th:block th:if="${editId != null and editId == a.id}">
+            <th:block th:replace="~{appointments/tab :: appointmentEdit}"></th:block>
+        </th:block>
+        <th:block th:unless="${editId != null and editId == a.id}">
+            <th:block th:replace="~{appointments/tab :: appointmentCard(a=${a})}"></th:block>
+        </th:block>
+    </div>
+
+    <th:block th:unless="${#lists.isEmpty(history)}">
+        <h2 class="h6 text-body-secondary text-uppercase mb-2 mt-4" th:text="#{appointment.history}">Past and cancelled</h2>
+        <div th:each="a : ${history}" class="mb-2">
+            <th:block th:replace="~{appointments/tab :: appointmentCard(a=${a})}"></th:block>
+        </div>
+    </th:block>
+</th:block>
+
+<!-- One appointment, read-only. Actions only while it is still SCHEDULED. -->
+<div th:fragment="appointmentCard(a)" class="card pv-card" th:classappend="${!a.scheduledStatus} ? 'pv-card-muted'">
+    <div class="card-body">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-1">
+            <h3 class="h6 mb-0">
+                <i class="bi bi-calendar-event me-1 pv-accent" aria-hidden="true"></i>
+                <span th:text="${#temporals.format(a.scheduled, 'EEE dd/MM/yyyy HH:mm')}">Mon 01/01/2026 10:00</span>
+                <span class="text-body-secondary fw-normal" th:text="#{appointment.minutes(${a.durationMinutes})}">30 min</span>
+            </h3>
+            <span>
+                <span class="badge text-bg-warning" th:if="${a.scheduledStatus and a.scheduled.isBefore(now)}"
+                      th:text="#{appointment.overdue}">Past</span>
+                <span class="badge" th:classappend="${a.status == 'SCHEDULED'} ? 'text-bg-primary' : (${a.status == 'COMPLETED'} ? 'text-bg-success' : 'text-bg-secondary')"
+                      th:text="#{'appointment.status.' + ${a.status}}">Scheduled</span>
+            </span>
+        </div>
+        <p class="pv-prewrap mb-1" th:if="${a.reason != null}" th:text="${a.reason}">reason</p>
+        <p class="small text-body-secondary mb-0" th:if="${a.scheduledStatus}">
+            <i class="bi bi-bell me-1" aria-hidden="true"></i>
+            <span th:if="${a.pendingReminders + a.sentReminders + a.failedReminders == 0}" th:text="#{appointment.reminders.none}">No reminders</span>
+            <span th:if="${a.pendingReminders > 0}" th:text="#{appointment.reminders.pending(${a.pendingReminders})}">1 reminder scheduled</span>
+            <span th:if="${a.sentReminders > 0}" th:text="#{appointment.reminders.sent(${a.sentReminders})}">1 sent</span>
+            <span class="text-danger fw-semibold" th:if="${a.failedReminders > 0}" th:text="#{appointment.reminders.failed(${a.failedReminders})}">1 failed</span>
+        </p>
+        <div class="d-flex flex-wrap gap-2 mt-2" th:if="${a.scheduledStatus}">
+            <a class="btn btn-outline-secondary btn-sm" th:href="@{/patients/{p}/appointments(p=${patient.id},edit=${a.id})}"
+               th:hx-get="@{/patients/{p}/appointments(p=${patient.id},edit=${a.id})}"
+               hx-target="#pv-tabs" hx-swap="outerHTML" hx-boost="false">
+                <i class="bi bi-pencil" aria-hidden="true"></i><span th:text="#{appointment.reschedule}">Edit</span>
+            </a>
+            <form method="post" th:action="@{/patients/{p}/appointments/{a}/complete(p=${patient.id},a=${a.id})}"
+                  th:hx-post="@{/patients/{p}/appointments/{a}/complete(p=${patient.id},a=${a.id})}"
+                  hx-target="#pv-tabs" hx-swap="outerHTML" th:attr="hx-confirm=#{appointment.complete.confirm}">
+                <button type="submit" class="btn btn-outline-success btn-sm">
+                    <i class="bi bi-check2-circle" aria-hidden="true"></i><span th:text="#{appointment.complete}">Mark completed</span>
+                </button>
+            </form>
+            <form method="post" th:action="@{/patients/{p}/appointments/{a}/cancel(p=${patient.id},a=${a.id})}"
+                  th:hx-post="@{/patients/{p}/appointments/{a}/cancel(p=${patient.id},a=${a.id})}"
+                  hx-target="#pv-tabs" hx-swap="outerHTML" th:attr="hx-confirm=#{appointment.cancel.confirm}">
+                <button type="submit" class="btn btn-outline-danger btn-sm">
+                    <i class="bi bi-x-circle" aria-hidden="true"></i><span th:text="#{appointment.cancel}">Cancel appointment</span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Inline edit form of the appointment in model attribute "editForm" (id "editId"). -->
+<div th:fragment="appointmentEdit" class="card pv-card border-primary">
+    <div class="card-body">
+        <div class="alert alert-danger" role="alert" th:if="${editConflict}">
+            <strong th:text="#{patient.conflict.title}">This record has changed</strong>
+            <span th:text="#{appointment.conflict.text}">Reload and try again.</span>
+            <a th:href="@{/patients/{id}/appointments(id=${patient.id})}" th:text="#{patient.conflict.reload}" hx-boost="false">Reload</a>
+        </div>
+        <form method="post" th:action="@{/patients/{p}/appointments/{a}(p=${patient.id},a=${editId})}"
+              th:hx-post="@{/patients/{p}/appointments/{a}(p=${patient.id},a=${editId})}"
+              hx-target="#pv-tabs" hx-swap="outerHTML" novalidate>
+            <input type="hidden" name="version" th:value="${editForm.version}">
+            <th:block th:replace="~{appointments/tab :: appointmentFields(form=${editForm}, errors=${editErrors}, prefix='edit', focus=false)}"></th:block>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-primary" th:text="#{appointment.save.changes}">Save changes</button>
+                <a class="btn btn-outline-secondary" th:href="@{/patients/{id}/appointments(id=${patient.id})}"
+                   th:hx-get="@{/patients/{id}/appointments(id=${patient.id})}" hx-target="#pv-tabs" hx-swap="outerHTML"
+                   hx-boost="false" th:text="#{common.cancel}">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Date and time (local time of the practice), duration and reason. The prefix keeps element ids unique. -->
+<th:block th:fragment="appointmentFields(form, errors, prefix, focus)">
+    <div class="row g-3 mb-3">
+        <div class="col-12 col-md-6">
+            <label th:for="${prefix} + '-when'" class="form-label" th:text="#{appointment.when}">Date and time</label>
+            <input type="datetime-local" class="form-control" th:id="${prefix} + '-when'" name="scheduledAt" required
+                   th:value="${form.scheduledAt}" th:classappend="${errors.get('scheduledAt') != null} ? 'is-invalid'"
+                   th:attr="autofocus=${focus} ? 'autofocus'">
+            <div class="invalid-feedback" th:if="${errors.get('scheduledAt') != null}"
+                 th:text="#{${errors.get('scheduledAt')}}"></div>
+        </div>
+        <div class="col-12 col-md-6">
+            <label th:for="${prefix} + '-duration'" class="form-label" th:text="#{appointment.duration}">Duration (minutes)</label>
+            <input type="number" class="form-control" th:id="${prefix} + '-duration'" name="durationMinutes" required
+                   min="5" max="480" step="5" inputmode="numeric"
+                   th:value="${form.durationMinutes}" th:classappend="${errors.get('durationMinutes') != null} ? 'is-invalid'">
+            <div class="invalid-feedback" th:if="${errors.get('durationMinutes') != null}"
+                 th:text="#{${errors.get('durationMinutes')}}"></div>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label th:for="${prefix} + '-reason'" class="form-label" th:text="#{appointment.reason}">Reason (optional)</label>
+        <textarea class="form-control" th:id="${prefix} + '-reason'" name="reason" rows="2" maxlength="500"
+                  th:classappend="${errors.get('reason') != null} ? 'is-invalid'" th:attr="aria-describedby=${prefix} + '-reason-help'"
+                  th:text="${form.reason}"></textarea>
+        <div class="form-text" th:id="${prefix} + '-reason-help'" th:text="#{appointment.reason.help}">Never included in e-mails.</div>
+        <div class="invalid-feedback" th:if="${errors.get('reason') != null}"
+             th:text="#{${errors.get('reason')}}"></div>
+    </div>
+</th:block>
+
+</body>
+</html>

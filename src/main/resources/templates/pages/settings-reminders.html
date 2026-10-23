@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html th:replace="~{layout/base :: page(~{::title}, ~{::#pv-page}, 'settings')}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="#{settings.reminders} + ' · ' + #{app.name}">Reminders · PatientVault</title>
+</head>
+<body>
+<div id="pv-page">
+    <h1 class="h3 mb-3" th:text="#{settings.reminders}">Reminders</h1>
+
+    <div class="alert alert-success" role="status" th:if="${testOutcome == 'SENT'}" th:text="#{settings.reminders.test.sent}">Sent</div>
+    <div class="alert alert-warning" role="alert" th:if="${testOutcome == 'NO_ADDRESS'}" th:text="#{settings.reminders.test.noAddress}">No address</div>
+    <div class="alert alert-danger" role="alert" th:if="${testOutcome == 'FAILED'}" th:text="#{settings.reminders.test.failed}">Failed</div>
+
+    <div class="row g-3">
+        <section class="col-12 col-xl-6" aria-labelledby="rem-email">
+            <div class="card pv-card h-100">
+                <div class="card-body">
+                    <h2 class="h5" id="rem-email">
+                        <i class="bi bi-envelope me-2 pv-accent" aria-hidden="true"></i>
+                        <span th:text="#{settings.reminders.email}">Notification e-mail</span>
+                    </h2>
+                    <p class="text-body-secondary" th:text="#{settings.reminders.email.hint}">Reminders are sent here.</p>
+                    <form method="post" th:action="@{/settings/reminders/email}" hx-boost="false" novalidate>
+                        <div class="mb-3">
+                            <label for="rem-address" class="form-label" th:text="#{settings.reminders.email.label}">E-mail address</label>
+                            <input type="email" class="form-control" id="rem-address" name="email" th:value="${email}" required
+                                   maxlength="254" autocomplete="email" th:classappend="${emailError != null} ? 'is-invalid'">
+                            <div class="invalid-feedback" th:if="${emailError != null}" th:text="#{patient.error.email.invalid}">Invalid</div>
+                        </div>
+                        <button type="submit" class="btn btn-primary" th:text="#{common.save}">Save</button>
+                    </form>
+                    <hr>
+                    <form method="post" th:action="@{/settings/reminders/test}" hx-boost="false">
+                        <button type="submit" class="btn btn-outline-primary">
+                            <i class="bi bi-send" aria-hidden="true"></i><span th:text="#{settings.reminders.test}">Send test e-mail</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <section class="col-12 col-xl-6" aria-labelledby="rem-config">
+            <div class="card pv-card h-100">
+                <div class="card-body">
+                    <h2 class="h5" id="rem-config">
+                        <i class="bi bi-bell me-2 pv-accent" aria-hidden="true"></i>
+                        <span th:text="#{settings.reminders.config}">Configuration</span>
+                    </h2>
+                    <p class="text-body-secondary" th:text="#{settings.reminders.config.hint}">Set by the administrator.</p>
+                    <dl class="row mb-0 pv-details">
+                        <dt class="col-sm-5" th:text="#{settings.reminders.leadTimes}">Reminders before</dt>
+                        <dd class="col-sm-7" th:text="${#strings.listJoin(prefs.leadTimes, ', ')}">P1D, PT1H</dd>
+                        <dt class="col-sm-5" th:text="#{settings.reminders.privacy}">Patient name in e-mail</dt>
+                        <dd class="col-sm-7" th:text="#{'settings.reminders.privacy.' + ${prefs.privacyMode}}">Full name</dd>
+                        <dt class="col-sm-5" th:text="#{settings.reminders.digest}">Daily agenda</dt>
+                        <dd class="col-sm-7 mb-0">
+                            <span th:if="${prefs.dailyDigest.enabled}"
+                                  th:text="#{settings.reminders.digest.on(${#temporals.format(prefs.dailyDigest.at, 'HH:mm')})}">On, 07:30</span>
+                            <span th:unless="${prefs.dailyDigest.enabled}" th:text="#{settings.reminders.digest.off}">Off</span>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+</body>
+</html>

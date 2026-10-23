@@ -21,6 +21,19 @@
             </div>
         </section>
 
+        <section class="col-12 col-xl-6" aria-labelledby="set-reminders">
+            <div class="card pv-card h-100">
+                <div class="card-body">
+                    <h2 class="h5" id="set-reminders">
+                        <i class="bi bi-bell me-2 pv-accent" aria-hidden="true"></i>
+                        <span th:text="#{settings.reminders}">Reminders</span>
+                    </h2>
+                    <p class="text-body-secondary" th:text="#{settings.reminders.hint}">E-mail reminders for appointments.</p>
+                    <a class="btn btn-outline-primary" th:href="@{/settings/reminders}" th:text="#{settings.reminders.open}">Reminder settings</a>
+                </div>
+            </div>
+        </section>
+
         <section class="col-12 col-xl-6" aria-labelledby="set-mfa">
             <div class="card pv-card h-100">
                 <div class="card-body">
