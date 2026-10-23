@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.patientvault.audit.AuditAction;
 import com.example.patientvault.audit.AuditEvent;
 import com.example.patientvault.audit.AuditService;
+import com.example.patientvault.records.RecordsApi;
 import com.example.patientvault.search.PatientSearch;
 import com.example.patientvault.search.QueryType;
 import com.example.patientvault.search.SearchResult;
@@ -38,7 +39,7 @@ public class PatientSearchService {
     /** One result card. {@code toString()} prints the id only. */
     public record PatientCard(UUID id, String firstName, String lastName, String email, String mobile, String amka,
                               String referralSource, boolean consentGiven, LocalDate latestVisitDate,
-                              String latestDiagnosis) {
+                              String latestDiagnosis, long fileCount) {
         public String fullName() {
             return firstName + " " + lastName;
         }
@@ -70,9 +71,11 @@ public class PatientSearchService {
     private final VisitRepository visits;
     private final PatientCodec codec;
     private final AuditService audit;
+    private final RecordsApi records;
 
     PatientSearchService(PatientSearch search, PatientRepository patients, VisitRepository visits,
-                         PatientCodec codec, AuditService audit) {
+                         PatientCodec codec, AuditService audit, RecordsApi records) {
+        this.records = records;
         this.search = search;
         this.patients = patients;
         this.visits = visits;
@@ -110,6 +113,7 @@ public class PatientSearchService {
         visits.findByPatientIdInOrderByVisitDateDescCreatedAtDesc(entities.stream().map(PatientEntity::getId).toList())
                 .forEach(v -> latest.putIfAbsent(v.getPatientId(), v));
 
+        Map<UUID, Long> fileCounts = records.countFiles(entities.stream().map(PatientEntity::getId).toList());
         List<PatientCard> cards = new ArrayList<>(entities.size());
         for (PatientEntity entity : entities) {
             PatientData data = codec.decode(entity);
@@ -117,7 +121,8 @@ public class PatientSearchService {
             cards.add(new PatientCard(entity.getId(), data.firstName(), data.lastName(), data.email(), data.mobile(),
                     data.amka(), data.referralSource(), data.consentGiven(),
                     visit == null ? null : visit.getVisitDate(),
-                    visit == null ? null : snippet(codec.decodeDiagnosis(visit, entity))));
+                    visit == null ? null : snippet(codec.decodeDiagnosis(visit, entity)),
+                    fileCounts.getOrDefault(entity.getId(), 0L)));
         }
         // the page itself is chosen by recent activity; within it people are listed by name
         cards.sort(Comparator.comparing((PatientCard c) -> TextNormalizer.normalize(c.lastName()))

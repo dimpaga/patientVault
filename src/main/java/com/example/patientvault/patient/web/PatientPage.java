@@ -15,6 +15,7 @@ import com.example.patientvault.patient.internal.FieldMessage;
 import com.example.patientvault.patient.internal.PatientNotFoundException;
 import com.example.patientvault.patient.internal.PatientService;
 import com.example.patientvault.patient.internal.PatientView;
+import com.example.patientvault.records.RecordsApi;
 
 /** Fills the model of the patient page (header, tab bar and the selected tab). Shared by the page and tab endpoints. */
 @Component
@@ -38,11 +39,16 @@ class PatientPage {
     }
 
     private final PatientService patients;
+    private final RecordsApi records;
     private final ZoneId zone;
+    private final long maxUploadBytes;
 
-    PatientPage(PatientService patients, @Value("${app.timezone}") ZoneId zone) {
+    PatientPage(PatientService patients, RecordsApi records, @Value("${app.timezone}") ZoneId zone,
+                @Value("${app.uploads.max-file-size}") org.springframework.util.unit.DataSize maxUpload) {
         this.patients = patients;
+        this.records = records;
         this.zone = zone;
+        this.maxUploadBytes = maxUpload.toBytes();
     }
 
     /** Initial Visits-tab state, optionally with one existing visit opened for editing (no-JS fallback of the edit link). */
@@ -64,7 +70,16 @@ class PatientPage {
         return patients.get(id).orElseThrow(PatientNotFoundException::new);
     }
 
+    /** Files tab state: which folder level is open and whether the grid or the list is shown. */
+    record FilesState(UUID folderId, String view) {
+        static final FilesState ROOT = new FilesState(null, "grid");
+    }
+
     void fill(Model model, PatientView patient, String tab, VisitState visitState) {
+        fill(model, patient, tab, visitState, FilesState.ROOT);
+    }
+
+    void fill(Model model, PatientView patient, String tab, VisitState visitState, FilesState filesState) {
         model.addAttribute("patient", patient);
         model.addAttribute("createdAt", local(patient.createdAt()));
         model.addAttribute("updatedAt", local(patient.updatedAt()));
@@ -72,6 +87,13 @@ class PatientPage {
         model.addAttribute("nav", "patients");
         String selected = "visits".equals(tab) ? "visits" : "files".equals(tab) ? "files" : "overview";
         model.addAttribute("tab", selected);
+        if ("files".equals(selected)) {
+            model.addAttribute("listing", records.browse(patient.id(), filesState.folderId()));
+            model.addAttribute("fileView", filesState.view());
+            model.addAttribute("zone", zone);
+            model.addAttribute("maxUploadBytes", maxUploadBytes);
+            model.addAttribute("maxUploadMb", maxUploadBytes / (1024 * 1024));
+        }
         if ("visits".equals(selected)) {
             model.addAttribute("visits", patients.visits(patient.id()));
             model.addAttribute("addForm", visitState.addForm());

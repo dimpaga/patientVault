@@ -248,17 +248,19 @@ public class RecordsService implements RecordsApi {
     // ---- reading content ----------------------------------------------------------------------
 
     /**
-     * Opens a file for display or download. {@code viewed} selects the audit action (FILE_VIEWED / FILE_DOWNLOADED).
-     * The first cipher segment is verified before this returns.
+     * Opens a file for display or download. Images and PDFs are shown inline unless {@code download} is set; the
+     * read is audited as FILE_VIEWED or FILE_DOWNLOADED accordingly. The first cipher segment is verified before
+     * this returns.
      */
     @PreAuthorize("hasAuthority('" + Permissions.FILE_READ + "')")
-    public FileContent open(UUID patientId, UUID fileId, boolean viewed) {
+    public FileContent open(UUID patientId, UUID fileId, boolean download) {
         requireActive(patientId);
         DataKey key = access.dataKey(patientId);
         MedicalFile file = files.findByIdAndPatientId(fileId, patientId)
                 .filter(f -> MedicalFile.AVAILABLE.equals(f.getStatus())).orElseThrow(RecordsException::notFound);
-        FileContent content = openStream(file, key);
-        audit.record(AuditEvent.success(viewed ? AuditAction.FILE_VIEWED : AuditAction.FILE_DOWNLOADED)
+        boolean inline = !download && UploadPolicy.isViewableInline(file.getMimeType());
+        FileContent content = openStream(file, key, inline);
+        audit.record(AuditEvent.success(inline ? AuditAction.FILE_VIEWED : AuditAction.FILE_DOWNLOADED)
                 .onEntity("FILE", fileId).withDetail("patientId", patientId));
         return content;
     }
@@ -287,7 +289,7 @@ public class RecordsService implements RecordsApi {
         }
     }
 
-    private FileContent openStream(MedicalFile file, DataKey key) {
+    private FileContent openStream(MedicalFile file, DataKey key, boolean inline) {
         InputStream stored = null;
         try {
             stored = blobs.openContent(BlobRef.of(file.getId()));
@@ -300,7 +302,7 @@ public class RecordsService implements RecordsApi {
             UUID patientId = file.getPatientId();
             UUID fileId = file.getId();
             return new FileContent(fileId, fileName(key, file), file.getMimeType(), file.getCategory(),
-                    file.getSizeBytes(), plain, () -> reportIntegrityFailure(patientId, fileId));
+                    file.getSizeBytes(), inline, plain, () -> reportIntegrityFailure(patientId, fileId));
         } catch (IntegrityFailureException e) {
             closeQuietly(stored);
             reportIntegrityFailure(file.getPatientId(), file.getId());
@@ -461,6 +463,65 @@ public class RecordsService implements RecordsApi {
         blobs.erase(BlobRef.of(file.getId()));
         tx.executeWithoutResult(status -> files.deleteById(file.getId()));
         audit.record(AuditEvent.success(AuditAction.FILE_DELETED).onEntity("FILE", fileId).withDetail("patientId", patientId));
+    }
+
+    // ---- archive ------------------------------------------------------------------------------
+
+    /**
+     * Streams a folder (null = everything) as a ZIP, decrypting each file on the fly; nothing is buffered whole.
+     * Folder structure is kept, including empty folders. Entry names are the decrypted, sanitised names.
+     */
+    @PreAuthorize("hasAuthority('" + Permissions.FILE_READ + "')")
+    public void zip(UUID patientId, UUID folderId, java.io.OutputStream out) throws IOException {
+        requireActive(patientId);
+        DataKey key = access.dataKey(patientId);
+        Tree tree = tree(patientId, key);
+        if (folderId != null && !tree.contains(folderId)) {
+            throw RecordsException.notFound();
+        }
+        Set<UUID> folderIds = folderId == null ? new LinkedHashSet<>(tree.byId.keySet()) : tree.subtree(folderId);
+        folderIds.remove(folderId);
+        List<MedicalFile> toPack = new ArrayList<>(files.findByPatientIdAndFolderIdIn(patientId, folderIds));
+        if (folderId == null) {
+            toPack.addAll(files.findInFolder(patientId, null, List.of(MedicalFile.AVAILABLE)));
+        } else {
+            toPack.addAll(files.findInFolder(patientId, folderId, List.of(MedicalFile.AVAILABLE)));
+        }
+        toPack.removeIf(f -> !MedicalFile.AVAILABLE.equals(f.getStatus()));
+
+        Set<String> used = new HashSet<>();
+        int count = 0;
+        java.util.zip.ZipOutputStream zip = new java.util.zip.ZipOutputStream(out, StandardCharsets.UTF_8);
+        zip.setLevel(java.util.zip.Deflater.BEST_SPEED);
+        for (UUID id : folderIds) {
+            String dir = tree.relativePath(id, folderId);
+            if (!dir.isEmpty() && used.add(dir + "/")) {
+                zip.putNextEntry(new java.util.zip.ZipEntry(dir + "/"));
+                zip.closeEntry();
+            }
+        }
+        for (MedicalFile file : toPack) {
+            String dir = file.getFolderId() == null ? "" : tree.relativePath(file.getFolderId(), folderId);
+            String entry = uniqueEntry(used, (dir.isEmpty() ? "" : dir + "/") + fileName(key, file));
+            try (FileContent content = openStream(file, key, false)) {
+                zip.putNextEntry(new java.util.zip.ZipEntry(entry));
+                content.transferTo(zip);
+                zip.closeEntry();
+                count++;
+            }
+        }
+        zip.finish();
+        audit.record(AuditEvent.success(AuditAction.FILE_DOWNLOADED).onEntity(folderId == null ? "PATIENT" : "FOLDER",
+                folderId == null ? patientId : folderId).withDetail("patientId", patientId).withDetail("files", count)
+                .withDetail("archive", true));
+    }
+
+    private static String uniqueEntry(Set<String> used, String entry) {
+        String candidate = entry;
+        for (int n = 2; !used.add(candidate); n++) {
+            candidate = FileNames.withSuffix(entry, n);
+        }
+        return candidate;
     }
 
     // ---- helpers ------------------------------------------------------------------------------
@@ -647,6 +708,15 @@ public class RecordsService implements RecordsApi {
                 }
             }
             return result;
+        }
+
+        /** Names from below {@code from} (exclusive; null = root) down to {@code folderId}, joined with "/". */
+        String relativePath(UUID folderId, UUID from) {
+            List<String> parts = new ArrayList<>();
+            for (UUID id = folderId; id != null && !id.equals(from); id = byId.get(id).getParentId()) {
+                parts.add(0, name(byId.get(id)));
+            }
+            return String.join("/", parts);
         }
 
         List<FolderListing.Crumb> crumbs(UUID folderId) {

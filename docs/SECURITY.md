@@ -125,7 +125,24 @@ Per patient: random 256-bit DEK, stored only wrapped by the KEK
   values.
 - Only ACTIVE patients are returned; results are decrypted in memory, one page at a time.
 
-## 6. Secrets handling
+## 6. Medical files (implemented: step 6)
+
+- **At rest:** file content is stream-encrypted (AES256_GCM_HKDF_1MB, key derived from the patient data key,
+  file id and purpose) before it leaves the JVM; names are encrypted fields. CouchDB documents hold only
+  technical fields (type, patientId, keyId, cipher, size, time). Verified by searching raw PostgreSQL and CouchDB
+  for sentinel names/content (plain and base64): nothing found.
+- **Upload:** one file per request; content sniffed with Tika against an allow-list; HTML, SVG, EXE, scripts and
+  extension/content mismatches are rejected before anything is stored; size limit 100 MB (413); names and relative
+  paths sanitised; failed uploads leave no blob or row.
+- **Download:** streamed through the app after authentication, authorisation and the patient/file ownership
+  check; no public or pre-signed URLs; `Content-Disposition: attachment` except images/PDF (inline), PDFs with
+  `Content-Security-Policy: sandbox`, `nosniff` and `no-store` on every response.
+- **Integrity:** a modified ciphertext byte makes the download fail (500, no content sent) and is audited as
+  `FILE_INTEGRITY_FAILURE`.
+- **Availability:** if CouchDB is down, uploads and downloads answer 503, nothing half-written remains, the
+  listing still works (it comes from PostgreSQL) and readiness reports DOWN until CouchDB returns.
+
+## 7. Secrets handling
 
 - Secrets only via environment variables; `.env`, `.dev-secrets.env` are git-ignored.
 - `./dev run` generates local development keys and a local doctor account into `.dev-secrets.env`

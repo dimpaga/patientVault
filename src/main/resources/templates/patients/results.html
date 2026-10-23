@@ -52,6 +52,10 @@
                         <li th:if="${c.referralSource != null}"><i class="bi bi-signpost-split" aria-hidden="true"></i>
                             <span th:text="${c.referralSource}">source</span></li>
                     </ul>
+                    <p class="small mb-0 text-body-secondary" th:if="${c.fileCount > 0}">
+                        <i class="bi bi-paperclip" aria-hidden="true"></i>
+                        <span th:text="#{search.files(${c.fileCount})}">3 files</span>
+                    </p>
                     <p class="small mb-0 text-body-secondary" th:if="${c.latestVisitDate != null}">
                         <i class="bi bi-clipboard2-pulse" aria-hidden="true"></i>
                         <span th:text="#{search.lastVisit(${#temporals.format(c.latestVisitDate, 'dd/MM/yyyy')})}">Last visit: 01/10/2026</span>

@@ -109,23 +109,29 @@ class PatientController {
     @PreAuthorize("hasAuthority('" + Permissions.PATIENT_READ + "')")
     String view(@PathVariable UUID id, @RequestParam(name = "tab", required = false) String tab,
                 @RequestParam(name = "edit", required = false) UUID editVisit,
+                @RequestParam(name = "folder", required = false) UUID folder,
+                @RequestParam(name = "view", required = false) String fileView,
                 @RequestHeader(name = "HX-Request", required = false) String htmx,
                 @RequestHeader(name = "HX-Boosted", required = false) String boosted, Model model) {
-        return render(id, tab, editVisit, htmx, boosted, model);
+        return render(id, tab, editVisit, folder, fileView, htmx, boosted, model);
     }
 
     /** "View medical data": the patient's page opened on the Files tab. */
     @GetMapping("/{id}/files")
     @PreAuthorize("hasAuthority('" + Permissions.PATIENT_READ + "')")
-    String files(@PathVariable UUID id, @RequestHeader(name = "HX-Request", required = false) String htmx,
+    String files(@PathVariable UUID id, @RequestParam(name = "folder", required = false) UUID folder,
+                 @RequestParam(name = "view", required = false) String fileView,
+                 @RequestHeader(name = "HX-Request", required = false) String htmx,
                  @RequestHeader(name = "HX-Boosted", required = false) String boosted, Model model) {
-        return render(id, "files", null, htmx, boosted, model);
+        return render(id, "files", null, folder, fileView, htmx, boosted, model);
     }
 
-    private String render(UUID id, String tab, UUID editVisit, String htmx, String boosted, Model model) {
+    private String render(UUID id, String tab, UUID editVisit, UUID folder, String fileView, String htmx,
+                          String boosted, Model model) {
         PatientView patient = page.load(id);
         PatientPage.VisitState state = page.stateForEdit(patient.id(), editVisit);
-        page.fill(model, patient, tab, state);
+        PatientPage.FilesState filesState = new PatientPage.FilesState(folder, "list".equals(fileView) ? "list" : "grid");
+        page.fill(model, patient, tab, state, filesState);
         // htmx tab clicks swap only the tab bar and panel; boosted navigation and plain requests get the full page
         boolean tabSwap = "true".equalsIgnoreCase(htmx) && !"true".equalsIgnoreCase(boosted);
         return tabSwap ? "pages/patient-view :: tabs" : "pages/patient-view";

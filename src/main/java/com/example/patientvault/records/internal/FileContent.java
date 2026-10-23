@@ -20,16 +20,18 @@ public final class FileContent implements AutoCloseable {
     private final String mimeType;
     private final String category;
     private final long size;
+    private final boolean inline;
     private final InputStream stream;
     private final Runnable onIntegrityFailure;
 
-    FileContent(UUID id, String name, String mimeType, String category, long size, InputStream stream,
-                Runnable onIntegrityFailure) {
+    FileContent(UUID id, String name, String mimeType, String category, long size, boolean inline,
+                InputStream stream, Runnable onIntegrityFailure) {
         this.id = id;
         this.name = name;
         this.mimeType = mimeType;
         this.category = category;
         this.size = size;
+        this.inline = inline;
         this.stream = stream;
         this.onIntegrityFailure = onIntegrityFailure;
     }
@@ -52,6 +54,11 @@ public final class FileContent implements AutoCloseable {
 
     public long size() {
         return size;
+    }
+
+    /** True when the browser may display it in place (images and PDF) and the caller did not ask for a download. */
+    public boolean inline() {
+        return inline;
     }
 
     /** Copies the plaintext to {@code out}. A mid-stream authentication failure raises {@link FileIntegrityException}. */

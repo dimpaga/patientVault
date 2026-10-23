@@ -60,6 +60,8 @@
         <main id="pv-main" class="pv-content container-fluid py-4" tabindex="-1">
             <div class="alert alert-success" role="status" th:if="${flashSuccess != null}" th:text="#{${flashSuccess}}">Saved</div>
             <div class="alert alert-warning" role="status" th:each="warning : ${flashWarnings}" th:text="#{${warning}}">Warning</div>
+            <div class="alert alert-success" role="status" th:if="${flashMessage != null}" th:text="${flashMessage}">Done</div>
+            <div class="alert alert-danger" role="alert" th:if="${flashError != null}" th:text="${flashError}">Error</div>
             <div th:replace="${content}">page content</div>
         </main>
     </div>
