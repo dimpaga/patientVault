@@ -4,6 +4,11 @@ spring:
   mvc:
     format:
       date: iso
+  servlet:
+    multipart:
+      max-file-size: ${app.uploads.max-file-size}
+      max-request-size: 110MB
+      file-size-threshold: 1MB
   messages:
     basename: messages
     fallback-to-system-locale: false
@@ -41,6 +46,9 @@ spring:
 server:
   port: ${PORT:8080}
   forward-headers-strategy: native
+  tomcat:
+    # read (and discard) the rest of an oversized upload so the browser gets the error message, not a reset
+    max-swallow-size: 120MB
   servlet:
     session:
       timeout: ${app.security.session.idle-timeout}
@@ -97,6 +105,10 @@ app:
     min-prefix-length: 3
     max-prefix-length: 15
     max-candidates: 2000
+  uploads:
+    max-file-size: 100MB
+    max-folder-depth: 12
+    thumbnail-size: 320
   couchdb:
     url: ${COUCHDB_URL:http://${COUCHDB_HOSTPORT:localhost:5984}}
     database: patient_files

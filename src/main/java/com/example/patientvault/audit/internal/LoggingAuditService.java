@@ -31,7 +31,7 @@ class LoggingAuditService implements AuditService {
             AuditAction.ACCOUNT_LOCKED, AuditAction.LOGOUT, AuditAction.PASSWORD_CHANGED, AuditAction.MFA_ENROLLED,
             AuditAction.ACCESS_DENIED, AuditAction.RATE_LIMITED, AuditAction.REAUTH_SUCCESS,
             AuditAction.REAUTH_FAILURE, AuditAction.RECOVERY_CODES_REGENERATED, AuditAction.SESSION_TIMEOUT,
-            AuditAction.CSRF_FAILURE);
+            AuditAction.CSRF_FAILURE, AuditAction.FILE_INTEGRITY_FAILURE);
 
     @Override
     public void record(AuditEvent event) {
@@ -55,6 +55,9 @@ class LoggingAuditService implements AuditService {
 
     private static String module(AuditAction action) {
         String name = action.name();
+        if (action == AuditAction.FILE_INTEGRITY_FAILURE) {
+            return "records";
+        }
         if (SECURITY_ACTIONS.contains(action)) {
             return "identity";
         }
