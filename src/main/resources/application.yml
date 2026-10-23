@@ -90,6 +90,9 @@ app:
     rate-limit:
       attempts: 10
       window: 1m
+  search:
+    min-prefix-length: 3
+    max-prefix-length: 15
   bootstrap:
     username: ${APP_BOOTSTRAP_USERNAME:}
     password: ${APP_BOOTSTRAP_PASSWORD:}
