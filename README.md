@@ -10,7 +10,8 @@ before it reaches PostgreSQL or CouchDB. The full design and requirements are in
 
 ## Status
 
-Implementation follows spec section 14. Done so far: step 0 (foundation). Automated tests are deferred.
+Implementation follows spec section 14. Done so far: step 0 (foundation), step 1 (crypto kernel).
+Automated tests are deferred.
 
 ## Prerequisites
 
@@ -37,6 +38,10 @@ Health: `http://localhost:8080/actuator/health/readiness`.
 
 See spec section 15. Local defaults live in `application.yml` / `application-local.yml`;
 `.env.example` lists the variables used by Docker Compose. Never commit real secrets.
+
+The application **will not start** without a key ring: set `APP_MASTER_KEYS` (`v1:<base64 256-bit key>`)
+and `APP_ACTIVE_KEY_ID`. `./dev genkey` prints a new key; `./dev run` creates local development keys
+automatically. See [docs/SECURITY.md](docs/SECURITY.md).
 
 ## Module layout
 
