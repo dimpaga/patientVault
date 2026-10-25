@@ -30,6 +30,7 @@ public class PatientValidator {
     public static final int MAX_AMKA_INPUT = 20;
     public static final int MAX_REFERRAL = 500;
     public static final int MAX_TEXT = 10_000;
+    public static final int MAX_REASON_CODE = 40;
 
     /** One '@', no spaces, a dot in the domain; deliberately pragmatic rather than RFC-complete. */
     private static final Pattern EMAIL = Pattern.compile("^[^\\s@]+@[^\\s@.]+(\\.[^\\s@.]+)+$");
@@ -49,12 +50,15 @@ public class PatientValidator {
 
     private final Validator validator;
     private final AmkaProperties amka;
+    private final VisitReasons reasons;
     private final Clock clock;
     private final ZoneId zone;
 
-    PatientValidator(Validator validator, AmkaProperties amka, Clock clock, @Value("${app.timezone}") ZoneId zone) {
+    PatientValidator(Validator validator, AmkaProperties amka, VisitReasons reasons, Clock clock,
+                     @Value("${app.timezone}") ZoneId zone) {
         this.validator = validator;
         this.amka = amka;
+        this.reasons = reasons;
         this.clock = clock;
         this.zone = zone;
     }
@@ -116,10 +120,14 @@ public class PatientValidator {
             Object max = violation.getConstraintDescriptor().getAttributes().get("max");
             errors.putIfAbsent(violation.getPropertyPath().toString(), new FieldMessage("patient.error.tooLong", max));
         }
+        String reason = reasonCode(input.reason());
+        if (reason != null && !reasons.exists(reason)) {
+            errors.putIfAbsent("reason", FieldMessage.of("visit.error.reason.invalid"));
+        }
         if (!errors.isEmpty()) {
             return new VisitResult(null, errors);
         }
-        return new VisitResult(new VisitData(input.visitDate(), optionalMultiline(input.description()),
+        return new VisitResult(new VisitData(input.visitDate(), reason,
                 optionalMultiline(input.diagnosis()), optionalMultiline(input.treatment())), errors);
     }
 
@@ -135,10 +143,13 @@ public class PatientValidator {
     }
 
     private VisitData firstVisit(PatientInput input, Map<String, FieldMessage> errors) {
-        String description = optionalMultiline(input.visitDescription());
+        String reason = reasonCode(input.visitReason());
+        if (reason != null && !reasons.exists(reason)) {
+            errors.put("visitReason", FieldMessage.of("visit.error.reason.invalid"));
+        }
         String diagnosis = optionalMultiline(input.visitDiagnosis());
         String treatment = optionalMultiline(input.visitTreatment());
-        boolean any = input.visitDate() != null || description != null || diagnosis != null || treatment != null;
+        boolean any = input.visitDate() != null || reason != null || diagnosis != null || treatment != null;
         if (!any) {
             return null;
         }
@@ -147,7 +158,11 @@ public class PatientValidator {
             errors.put("visitDate", FieldMessage.of("patient.error.date.future"));
             return null;
         }
-        return new VisitData(date, description, diagnosis, treatment);
+        return new VisitData(date, reason, diagnosis, treatment);
+    }
+
+    private static String reasonCode(String value) {
+        return value == null || value.isBlank() ? null : value.strip();
     }
 
     private static FieldResult requiredText(String value) {

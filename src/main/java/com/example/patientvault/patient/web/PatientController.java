@@ -23,6 +23,7 @@ import com.example.patientvault.patient.internal.PatientNotFoundException;
 import com.example.patientvault.patient.internal.PatientService;
 import com.example.patientvault.patient.internal.PatientValidator;
 import com.example.patientvault.patient.internal.PatientView;
+import com.example.patientvault.patient.internal.VisitReasons;
 import com.example.patientvault.shared.Permissions;
 
 /** Create, view, edit and inline-validate patients. */
@@ -32,16 +33,18 @@ class PatientController {
 
     private static final Set<String> INLINE_FIELDS = Set.of("firstName", "lastName", "email", "mobile", "amka");
     private static final Set<String> MORE_DETAILS_FIELDS = Set.of(
-            "referralSource", "notes", "visitDate", "visitDescription", "visitDiagnosis", "visitTreatment");
+            "referralSource", "notes", "visitDate", "visitReason", "visitDiagnosis", "visitTreatment");
 
     private final PatientService patients;
     private final PatientValidator validator;
     private final PatientPage page;
+    private final VisitReasons visitReasons;
 
-    PatientController(PatientService patients, PatientValidator validator, PatientPage page) {
+    PatientController(PatientService patients, PatientValidator validator, PatientPage page, VisitReasons visitReasons) {
         this.patients = patients;
         this.validator = validator;
         this.page = page;
+        this.visitReasons = visitReasons;
     }
 
     // ---- create -------------------------------------------------------------------------------
@@ -176,6 +179,7 @@ class PatientController {
     private String form(Model model, PatientForm form, UUID patientId, Map<String, FieldMessage> errors,
                         Map<String, FieldMessage> warnings, boolean conflict, UUID duplicateOf) {
         model.addAttribute("form", form);
+        model.addAttribute("reasons", visitReasons.options(form.visitReason()));
         model.addAttribute("patientId", patientId);
         model.addAttribute("errors", errors);
         model.addAttribute("warnings", warnings);
@@ -198,7 +202,7 @@ class PatientController {
     }
 
     private static boolean hasMoreDetails(PatientForm form) {
-        return form.visitDate() != null || notBlank(form.visitDescription()) || notBlank(form.visitDiagnosis())
+        return form.visitDate() != null || notBlank(form.visitReason()) || notBlank(form.visitDiagnosis())
                 || notBlank(form.visitTreatment()) || notBlank(form.referralSource()) || notBlank(form.notes())
                 || Boolean.TRUE.equals(form.consentGiven());
     }

@@ -15,6 +15,7 @@ import com.example.patientvault.patient.internal.FieldMessage;
 import com.example.patientvault.patient.internal.PatientNotFoundException;
 import com.example.patientvault.patient.internal.PatientService;
 import com.example.patientvault.patient.internal.PatientView;
+import com.example.patientvault.patient.internal.VisitReasons;
 import com.example.patientvault.records.RecordsApi;
 
 /** Fills the model of the patient page (header, tab bar and the selected tab). Shared by the page and tab endpoints. */
@@ -40,13 +41,15 @@ class PatientPage {
 
     private final PatientService patients;
     private final RecordsApi records;
+    private final VisitReasons visitReasons;
     private final ZoneId zone;
     private final long maxUploadBytes;
 
-    PatientPage(PatientService patients, RecordsApi records, @Value("${app.timezone}") ZoneId zone,
+    PatientPage(PatientService patients, RecordsApi records, VisitReasons visitReasons, @Value("${app.timezone}") ZoneId zone,
                 @Value("${app.uploads.max-file-size}") org.springframework.util.unit.DataSize maxUpload) {
         this.patients = patients;
         this.records = records;
+        this.visitReasons = visitReasons;
         this.zone = zone;
         this.maxUploadBytes = maxUpload.toBytes();
     }
@@ -96,6 +99,10 @@ class PatientPage {
         }
         if ("visits".equals(selected)) {
             model.addAttribute("visits", patients.visits(patient.id()));
+            model.addAttribute("reasonLabels", visitReasons.labels());
+            model.addAttribute("addReasons", visitReasons.options());
+            model.addAttribute("editReasons", visitReasons.options(
+                    visitState.editForm() == null ? null : visitState.editForm().reason()));
             model.addAttribute("addForm", visitState.addForm());
             model.addAttribute("addErrors", visitState.addErrors());
             model.addAttribute("editVisitId", visitState.editId());

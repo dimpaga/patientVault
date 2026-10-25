@@ -22,5 +22,5 @@ public interface PatientApi {
     List<PatientSummary> recent(int limit);
 
     /** Records a visit (for example from a completed appointment). The date must not be in the future. */
-    UUID addVisit(UUID patientId, LocalDate date, String description);
+    UUID addVisit(UUID patientId, LocalDate date);
 }

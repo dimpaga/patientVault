@@ -74,11 +74,14 @@
                              th:text="#{${errors['visitDate'].key}(${errors['visitDate'].arg})}"></div>
                     </div>
                     <div class="mb-3">
-                        <label for="visitDescription" class="form-label" th:text="#{patient.visit.description}">Description</label>
-                        <textarea class="form-control" id="visitDescription" name="visitDescription" rows="3"
-                                  th:classappend="${errors['visitDescription'] != null} ? 'is-invalid'" th:text="${form.visitDescription}"></textarea>
-                        <div class="invalid-feedback" th:if="${errors['visitDescription'] != null}"
-                             th:text="#{${errors['visitDescription'].key}(${errors['visitDescription'].arg})}"></div>
+                        <label for="visitReason" class="form-label" th:text="#{patient.visit.reason}">Reason for visit</label>
+                        <select class="form-select" id="visitReason" name="visitReason"
+                                th:classappend="${errors['visitReason'] != null} ? 'is-invalid'">
+                            <option value="" th:text="#{visit.reason.none}">Select a reason</option>
+                            <option th:each="r : ${reasons}" th:value="${r.code}" th:text="${r.label}" th:selected="${r.code == form.visitReason}"></option>
+                        </select>
+                        <div class="invalid-feedback" th:if="${errors['visitReason'] != null}"
+                             th:text="#{${errors['visitReason'].key}(${errors['visitReason'].arg})}"></div>
                     </div>
                     <div class="mb-3">
                         <label for="visitDiagnosis" class="form-label" th:text="#{patient.visit.diagnosis}">Diagnosis</label>

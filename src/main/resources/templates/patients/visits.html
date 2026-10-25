@@ -9,7 +9,7 @@
             <h2 class="h6" th:text="#{visit.add}">Add a visit</h2>
             <form method="post" th:action="@{/patients/{id}/visits(id=${patient.id})}"
                   th:hx-post="@{/patients/{id}/visits(id=${patient.id})}" hx-target="#pv-tabs" hx-swap="outerHTML" novalidate>
-                <th:block th:replace="~{patients/visits :: visitFields(form=${addForm}, errors=${addErrors}, prefix='add')}"></th:block>
+                <th:block th:replace="~{patients/visits :: visitFields(form=${addForm}, errors=${addErrors}, prefix='add', reasons=${addReasons})}"></th:block>
                 <button type="submit" class="btn btn-primary" th:text="#{visit.save}">Save visit</button>
             </form>
         </div>
@@ -53,9 +53,9 @@
             </div>
         </div>
         <dl class="mb-0 pv-details">
-            <th:block th:if="${v.data.description != null}">
-                <dt th:text="#{patient.visit.description}">Description</dt>
-                <dd class="pv-prewrap" th:text="${v.data.description}">text</dd>
+            <th:block th:if="${v.data.reason != null}">
+                <dt th:text="#{patient.visit.reason}">Reason for visit</dt>
+                <dd th:text="${reasonLabels.get(v.data.reason) ?: v.data.reason}">Knee</dd>
             </th:block>
             <th:block th:if="${v.data.diagnosis != null}">
                 <dt th:text="#{patient.visit.diagnosis}">Diagnosis</dt>
@@ -66,7 +66,7 @@
                 <dd class="pv-prewrap" th:text="${v.data.treatment}">text</dd>
             </th:block>
             <dd class="text-body-secondary mb-0"
-                th:if="${v.data.description == null and v.data.diagnosis == null and v.data.treatment == null}"
+                th:if="${v.data.reason == null and v.data.diagnosis == null and v.data.treatment == null}"
                 th:text="#{visit.noDetails}">No details recorded.</dd>
         </dl>
     </div>
@@ -84,7 +84,7 @@
               th:hx-post="@{/patients/{p}/visits/{v}(p=${patient.id},v=${editVisitId})}"
               hx-target="#pv-tabs" hx-swap="outerHTML" novalidate>
             <input type="hidden" name="version" th:value="${editForm.version}">
-            <th:block th:replace="~{patients/visits :: visitFields(form=${editForm}, errors=${editErrors}, prefix='edit')}"></th:block>
+            <th:block th:replace="~{patients/visits :: visitFields(form=${editForm}, errors=${editErrors}, prefix='edit', reasons=${editReasons})}"></th:block>
             <div class="d-flex gap-2">
                 <button type="submit" class="btn btn-primary" th:text="#{visit.save}">Save visit</button>
                 <a class="btn btn-outline-secondary" th:href="@{/patients/{id}(id=${patient.id},tab='visits')}"
@@ -95,8 +95,8 @@
     </div>
 </div>
 
-<!-- Date + three text areas. The prefix keeps element ids unique when several forms are on the page. -->
-<th:block th:fragment="visitFields(form, errors, prefix)">
+<!-- Date, reason dropdown + two text areas. The prefix keeps element ids unique when several forms are on the page. -->
+<th:block th:fragment="visitFields(form, errors, prefix, reasons)">
     <div class="mb-3">
         <label th:for="${prefix} + '-date'" class="form-label" th:text="#{patient.visit.date}">Visit date</label>
         <input type="date" class="form-control pv-date" th:id="${prefix} + '-date'" name="visitDate" required
@@ -105,11 +105,14 @@
              th:text="#{${errors.get('visitDate').key}(${errors.get('visitDate').arg})}"></div>
     </div>
     <div class="mb-3">
-        <label th:for="${prefix} + '-description'" class="form-label" th:text="#{patient.visit.description}">Description</label>
-        <textarea class="form-control" th:id="${prefix} + '-description'" name="description" rows="3"
-                  th:classappend="${errors.get('description') != null} ? 'is-invalid'" th:text="${form.description}"></textarea>
-        <div class="invalid-feedback" th:if="${errors.get('description') != null}"
-             th:text="#{${errors.get('description').key}(${errors.get('description').arg})}"></div>
+        <label th:for="${prefix} + '-reason'" class="form-label" th:text="#{patient.visit.reason}">Reason for visit</label>
+        <select class="form-select" th:id="${prefix} + '-reason'" name="reason"
+                th:classappend="${errors.get('reason') != null} ? 'is-invalid'">
+            <option value="" th:text="#{visit.reason.none}">Select a reason</option>
+            <option th:each="r : ${reasons}" th:value="${r.code}" th:text="${r.label}" th:selected="${r.code == form.reason}"></option>
+        </select>
+        <div class="invalid-feedback" th:if="${errors.get('reason') != null}"
+             th:text="#{${errors.get('reason').key}(${errors.get('reason').arg})}"></div>
     </div>
     <div class="mb-3">
         <label th:for="${prefix} + '-diagnosis'" class="form-label" th:text="#{patient.visit.diagnosis}">Diagnosis</label>

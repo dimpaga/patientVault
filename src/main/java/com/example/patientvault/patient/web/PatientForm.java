@@ -20,7 +20,7 @@ record PatientForm(
         String notes,
         Boolean consentGiven,
         LocalDate visitDate,
-        String visitDescription,
+        String visitReason,
         String visitDiagnosis,
         String visitTreatment) {
 
@@ -36,7 +36,7 @@ record PatientForm(
 
     PatientInput toInput() {
         return new PatientInput(firstName, lastName, email, mobile, amka, referralSource, notes, Boolean.TRUE.equals(consentGiven),
-                visitDate, visitDescription, visitDiagnosis, visitTreatment);
+                visitDate, visitReason, visitDiagnosis, visitTreatment);
     }
 
     private static String nullToEmpty(String value) {

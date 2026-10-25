@@ -281,8 +281,8 @@ public class PatientService {
         if (!Objects.equals(a.visitDate(), b.visitDate())) {
             changed.add("visitDate");
         }
-        if (!Objects.equals(a.description(), b.description())) {
-            changed.add("description");
+        if (!Objects.equals(a.reason(), b.reason())) {
+            changed.add("reason");
         }
         if (!Objects.equals(a.diagnosis(), b.diagnosis())) {
             changed.add("diagnosis");

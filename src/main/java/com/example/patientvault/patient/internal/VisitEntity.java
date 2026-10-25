@@ -28,8 +28,8 @@ public class VisitEntity {
     @Column(name = "visit_date", nullable = false)
     private LocalDate visitDate;
 
-    @Column(name = "description_enc")
-    private byte[] descriptionEnc;
+    @Column(name = "reason_enc")
+    private byte[] reasonEnc;
 
     @Column(name = "diagnosis_enc")
     private byte[] diagnosisEnc;
@@ -88,12 +88,12 @@ public class VisitEntity {
         this.visitDate = visitDate;
     }
 
-    public byte[] getDescriptionEnc() {
-        return descriptionEnc;
+    public byte[] getReasonEnc() {
+        return reasonEnc;
     }
 
-    public void setDescriptionEnc(byte[] descriptionEnc) {
-        this.descriptionEnc = descriptionEnc;
+    public void setReasonEnc(byte[] reasonEnc) {
+        this.reasonEnc = reasonEnc;
     }
 
     public byte[] getDiagnosisEnc() {

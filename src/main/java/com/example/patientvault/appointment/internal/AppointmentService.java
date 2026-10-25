@@ -133,17 +133,15 @@ public class AppointmentService implements AppointmentApi {
                 .withDetail("patientId", patientId));
     }
 
-    /** Marks the appointment completed and records a visit from it (the reason becomes the visit description). */
+    /** Marks the appointment completed and records a visit for it (dated like the appointment, never in the future). */
     @PreAuthorize("hasAuthority('" + Permissions.PATIENT_WRITE + "')")
     @Transactional
     public UUID complete(UUID patientId, UUID appointmentId) {
         requireActive(patientId);
         Appointment appointment = scheduled(patientId, appointmentId);
-        DataKey key = access.dataKey(patientId);
-        String reason = decryptReason(key, appointment);
         LocalDate visitDate = appointment.getScheduledAt().atZone(zone).toLocalDate();
         LocalDate today = LocalDate.now(clock.withZone(zone));
-        UUID visitId = patients.addVisit(patientId, visitDate.isAfter(today) ? today : visitDate, reason);
+        UUID visitId = patients.addVisit(patientId, visitDate.isAfter(today) ? today : visitDate);
         appointment.setStatus(Appointment.COMPLETED);
         reminders.findByAppointmentIdOrderByRemindAt(appointmentId).stream()
                 .filter(r -> Reminder.PENDING.equals(r.getStatus())).forEach(r -> r.setStatus(Reminder.CANCELLED));

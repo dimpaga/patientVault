@@ -2,8 +2,11 @@ package com.example.patientvault.patient.internal;
 
 import java.time.LocalDate;
 
-/** Validated visit values (plaintext, memory only). Empty optional texts are {@code null}. */
-public record VisitData(LocalDate visitDate, String description, String diagnosis, String treatment) {
+/**
+ * Validated visit values (plaintext, memory only). {@code reason} is the code of a row in {@code doctor_visit_reasons}.
+ * Empty optional values are {@code null}.
+ */
+public record VisitData(LocalDate visitDate, String reason, String diagnosis, String treatment) {
 
     @Override
     public String toString() {
