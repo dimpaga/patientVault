@@ -5,7 +5,11 @@
 </head>
 <body>
 <div id="pv-page">
-    <h1 class="h3 mb-3" th:text="#{search.heading}">Patients</h1>
+    <h1 class="h3 mb-4" th:text="#{search.heading}">Patients</h1>
+
+    <a class="btn btn-cta btn-lg mb-4" th:href="@{/patients/new}">
+        <i class="bi bi-person-plus" aria-hidden="true"></i><span th:text="#{nav.newPatient}">New patient</span>
+    </a>
 
     <div th:replace="~{patients/results :: results}"></div>
 </div>
