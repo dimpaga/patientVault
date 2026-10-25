@@ -124,10 +124,14 @@ public class PatientValidator {
         if (reason != null && !reasons.exists(reason)) {
             errors.putIfAbsent("reason", FieldMessage.of("visit.error.reason.invalid"));
         }
+        VisitType type = VisitType.parse(input.visitType()).orElse(null);
+        if (type == null) {
+            errors.putIfAbsent("visitType", FieldMessage.of("visit.error.type.invalid"));
+        }
         if (!errors.isEmpty()) {
             return new VisitResult(null, errors);
         }
-        return new VisitResult(new VisitData(input.visitDate(), reason,
+        return new VisitResult(new VisitData(input.visitDate(), type, reason,
                 optionalMultiline(input.diagnosis()), optionalMultiline(input.treatment())), errors);
     }
 
@@ -147,9 +151,14 @@ public class PatientValidator {
         if (reason != null && !reasons.exists(reason)) {
             errors.put("visitReason", FieldMessage.of("visit.error.reason.invalid"));
         }
+        VisitType type = VisitType.parse(input.visitType()).orElse(null);
+        if (type == null) {
+            errors.put("visitType", FieldMessage.of("visit.error.type.invalid"));
+            type = VisitType.DOCTOR_VISIT;
+        }
         String diagnosis = optionalMultiline(input.visitDiagnosis());
         String treatment = optionalMultiline(input.visitTreatment());
-        boolean any = input.visitDate() != null || reason != null || diagnosis != null || treatment != null;
+        boolean any = input.visitDate() != null || type == VisitType.SURGERY || reason != null || diagnosis != null || treatment != null;
         if (!any) {
             return null;
         }
@@ -158,7 +167,7 @@ public class PatientValidator {
             errors.put("visitDate", FieldMessage.of("patient.error.date.future"));
             return null;
         }
-        return new VisitData(date, reason, diagnosis, treatment);
+        return new VisitData(date, type, reason, diagnosis, treatment);
     }
 
     private static String reasonCode(String value) {

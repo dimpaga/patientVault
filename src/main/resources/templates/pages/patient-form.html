@@ -74,6 +74,16 @@
                              th:text="#{${errors['visitDate'].key}(${errors['visitDate'].arg})}"></div>
                     </div>
                     <div class="mb-3">
+                        <label for="visitType" class="form-label" th:text="#{patient.visit.type}">Visit type</label>
+                        <select class="form-select" id="visitType" name="visitType"
+                                th:classappend="${errors['visitType'] != null} ? 'is-invalid'">
+                            <option th:each="t : ${visitTypes}" th:value="${t.name()}" th:text="#{${t.messageKey()}}"
+                                    th:selected="${t.name() == form.visitType}"></option>
+                        </select>
+                        <div class="invalid-feedback" th:if="${errors['visitType'] != null}"
+                             th:text="#{${errors['visitType'].key}(${errors['visitType'].arg})}"></div>
+                    </div>
+                    <div class="mb-3">
                         <label for="visitReason" class="form-label" th:text="#{patient.visit.reason}">Reason for visit</label>
                         <select class="form-select" id="visitReason" name="visitReason"
                                 th:classappend="${errors['visitReason'] != null} ? 'is-invalid'">

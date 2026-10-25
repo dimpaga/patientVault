@@ -16,6 +16,7 @@ import com.example.patientvault.patient.internal.PatientNotFoundException;
 import com.example.patientvault.patient.internal.PatientService;
 import com.example.patientvault.patient.internal.PatientView;
 import com.example.patientvault.patient.internal.VisitReasons;
+import com.example.patientvault.patient.internal.VisitType;
 import com.example.patientvault.records.RecordsApi;
 
 /** Fills the model of the patient page (header, tab bar and the selected tab). Shared by the page and tab endpoints. */
@@ -100,6 +101,7 @@ class PatientPage {
         if ("visits".equals(selected)) {
             model.addAttribute("visits", patients.visits(patient.id()));
             model.addAttribute("reasonLabels", visitReasons.labels());
+            model.addAttribute("visitTypes", VisitType.values());
             model.addAttribute("addReasons", visitReasons.options());
             model.addAttribute("editReasons", visitReasons.options(
                     visitState.editForm() == null ? null : visitState.editForm().reason()));

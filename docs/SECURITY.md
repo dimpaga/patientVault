@@ -99,6 +99,7 @@ Per patient: random 256-bit DEK, stored only wrapped by the KEK
   e-mail, phone, AMKA, referral source, notes, visit reasons, diagnoses and treatments are encrypted per
   field by `PatientCodec` (the only class that sees both forms). Verified by dumping the tables and
   searching for sentinel values (plain and hex): none found.
+  Not encrypted, by design: the visit date and the visit type (doctor visit or surgery).
 - **Search tokens:** `patient_search_token` holds HMAC-SHA256 tokens only (AMKA, e-mail, mobile, name
   prefixes 3..15). A unique index on AMKA tokens enforces one patient per AMKA without the database
   knowing the number. Tokens are rebuilt in the same transaction when a searchable field changes.

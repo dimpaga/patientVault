@@ -30,12 +30,14 @@
 </th:block>
 
 <!-- One visit, read-only. -->
-<div th:fragment="visitCard(v)" class="card pv-card">
+<div th:fragment="visitCard(v)" class="card pv-card" th:classappend="${v.data.type.name() == 'SURGERY'} ? 'pv-visit-surgery'">
     <div class="card-body">
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
             <h3 class="h6 mb-0">
                 <i class="bi bi-clipboard2-pulse me-1 pv-accent" aria-hidden="true"></i>
                 <span th:text="${#temporals.format(v.data.visitDate, 'dd/MM/yyyy')}">01/01/2026</span>
+                <span class="badge ms-1" th:classappend="${v.data.type.name() == 'SURGERY'} ? 'text-bg-success' : 'text-bg-secondary'"
+                      th:text="#{${v.data.type.messageKey()}}">Doctor visit</span>
             </h3>
             <div class="d-flex gap-2">
                 <a class="btn btn-outline-secondary btn-sm" th:href="@{/patients/{p}(p=${patient.id},tab='visits',edit=${v.id})}"
@@ -95,7 +97,7 @@
     </div>
 </div>
 
-<!-- Date, reason dropdown + two text areas. The prefix keeps element ids unique when several forms are on the page. -->
+<!-- Date, type and reason dropdowns + two text areas. The prefix keeps element ids unique when several forms are on the page. -->
 <th:block th:fragment="visitFields(form, errors, prefix, reasons)">
     <div class="mb-3">
         <label th:for="${prefix} + '-date'" class="form-label" th:text="#{patient.visit.date}">Visit date</label>
@@ -103,6 +105,16 @@
                th:value="${form.visitDate}" th:classappend="${errors.get('visitDate') != null} ? 'is-invalid'">
         <div class="invalid-feedback" th:if="${errors.get('visitDate') != null}"
              th:text="#{${errors.get('visitDate').key}(${errors.get('visitDate').arg})}"></div>
+    </div>
+    <div class="mb-3">
+        <label th:for="${prefix} + '-type'" class="form-label" th:text="#{patient.visit.type}">Visit type</label>
+        <select class="form-select" th:id="${prefix} + '-type'" name="visitType"
+                th:classappend="${errors.get('visitType') != null} ? 'is-invalid'">
+            <option th:each="t : ${visitTypes}" th:value="${t.name()}" th:text="#{${t.messageKey()}}"
+                    th:selected="${t.name() == form.visitType}"></option>
+        </select>
+        <div class="invalid-feedback" th:if="${errors.get('visitType') != null}"
+             th:text="#{${errors.get('visitType').key}(${errors.get('visitType').arg})}"></div>
     </div>
     <div class="mb-3">
         <label th:for="${prefix} + '-reason'" class="form-label" th:text="#{patient.visit.reason}">Reason for visit</label>

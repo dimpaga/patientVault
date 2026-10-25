@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import com.example.patientvault.patient.internal.PatientData;
 import com.example.patientvault.patient.internal.PatientInput;
+import com.example.patientvault.patient.internal.VisitType;
 
 /**
  * The create/edit patient form (explicit binding object, never an entity). {@code version} is the record
@@ -20,23 +21,24 @@ record PatientForm(
         String notes,
         Boolean consentGiven,
         LocalDate visitDate,
+        String visitType,
         String visitReason,
         String visitDiagnosis,
         String visitTreatment) {
 
     static PatientForm empty() {
-        return new PatientForm(null, "", "", "", "", "", "", "", false, null, "", "", "");
+        return new PatientForm(null, "", "", "", "", "", "", "", false, null, VisitType.DOCTOR_VISIT.name(), "", "", "");
     }
 
     static PatientForm from(PatientData data, long version) {
         return new PatientForm(version, data.firstName(), data.lastName(), data.email(), data.mobile(), data.amka(),
                 nullToEmpty(data.referralSource()), nullToEmpty(data.notes()), data.consentGiven(),
-                null, "", "", "");
+                null, VisitType.DOCTOR_VISIT.name(), "", "", "");
     }
 
     PatientInput toInput() {
         return new PatientInput(firstName, lastName, email, mobile, amka, referralSource, notes, Boolean.TRUE.equals(consentGiven),
-                visitDate, visitReason, visitDiagnosis, visitTreatment);
+                visitDate, visitType, visitReason, visitDiagnosis, visitTreatment);
     }
 
     private static String nullToEmpty(String value) {

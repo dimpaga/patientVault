@@ -18,6 +18,7 @@ public record PatientInput(
         @Size(max = PatientValidator.MAX_TEXT) String notes,
         boolean consentGiven,
         LocalDate visitDate,
+        @Size(max = 20) String visitType,
         @Size(max = PatientValidator.MAX_REASON_CODE) String visitReason,
         @Size(max = PatientValidator.MAX_TEXT) String visitDiagnosis,
         @Size(max = PatientValidator.MAX_TEXT) String visitTreatment) {

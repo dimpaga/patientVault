@@ -172,6 +172,17 @@ h1, .h1, h2, .h2, h3, .h3 { letter-spacing: -0.02em; }
 .pv-search-input:focus-visible { outline: 0; }
 .pv-search-help { margin-top: 0.75rem; margin-bottom: 0; font-size: 0.85rem; color: var(--bs-secondary-color); }
 
+/* Surgeries stand out in the visit list */
+.pv-card.pv-visit-surgery {
+    --bs-card-bg: #e6f6ea;
+    box-shadow: inset 4px 0 0 #2e9e5b, 0 1px 2px rgba(0, 0, 0, 0.03), 0 12px 32px rgba(0, 0, 0, 0.04);
+}
+[data-bs-theme="dark"] .pv-card.pv-visit-surgery { --bs-card-bg: #12301f; box-shadow: inset 4px 0 0 #3fbf75; }
+
+/* Past, completed and cancelled appointments */
+.pv-card-muted { opacity: 0.8; box-shadow: none; }
+.pv-time { font-variant-numeric: tabular-nums; min-width: 3.5rem; }
+
 /* App shell: top bar, collapsible sidebar (laptop), bottom tab bar (phone) */
 .pv-frame { display: flex; min-height: calc(100vh - var(--pv-topbar-h)); }
 

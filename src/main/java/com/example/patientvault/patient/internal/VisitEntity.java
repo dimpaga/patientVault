@@ -28,6 +28,9 @@ public class VisitEntity {
     @Column(name = "visit_date", nullable = false)
     private LocalDate visitDate;
 
+    @Column(name = "visit_type", nullable = false)
+    private String visitType = "DOCTOR_VISIT";
+
     @Column(name = "reason_enc")
     private byte[] reasonEnc;
 
@@ -86,6 +89,14 @@ public class VisitEntity {
 
     public void setVisitDate(LocalDate visitDate) {
         this.visitDate = visitDate;
+    }
+
+    public String getVisitType() {
+        return visitType;
+    }
+
+    public void setVisitType(String visitType) {
+        this.visitType = visitType;
     }
 
     public byte[] getReasonEnc() {

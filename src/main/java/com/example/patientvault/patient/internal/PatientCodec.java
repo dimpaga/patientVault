@@ -76,6 +76,7 @@ public class PatientCodec {
         DataKey key = key(patient);
         return new VisitData(
                 visit.getVisitDate(),
+                VisitType.valueOf(visit.getVisitType()),
                 text(key, visitField(visit, "reason"), visit.getReasonEnc()),
                 text(key, visitField(visit, "diagnosis"), visit.getDiagnosisEnc()),
                 text(key, visitField(visit, "treatment"), visit.getTreatmentEnc()));
@@ -103,6 +104,7 @@ public class PatientCodec {
 
     private void encryptInto(VisitEntity visit, DataKey key, VisitData data) {
         visit.setVisitDate(data.visitDate());
+        visit.setVisitType(data.type().name());
         visit.setReasonEnc(optional(key, visitField(visit, "reason"), data.reason()));
         visit.setDiagnosisEnc(optional(key, visitField(visit, "diagnosis"), data.diagnosis()));
         visit.setTreatmentEnc(optional(key, visitField(visit, "treatment"), data.treatment()));
