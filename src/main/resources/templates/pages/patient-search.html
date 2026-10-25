@@ -7,21 +7,6 @@
 <div id="pv-page">
     <h1 class="h3 mb-3" th:text="#{search.heading}">Patients</h1>
 
-    <form role="search" method="get" th:action="@{/patients}" class="pv-searchbox mb-3">
-        <label for="q" class="form-label visually-hidden" th:text="#{search.label}">Search patients</label>
-        <div class="input-group input-group-lg">
-            <span class="input-group-text" aria-hidden="true"><i class="bi bi-search"></i></span>
-            <input id="q" name="q" type="search" class="form-control" th:value="${q}" th:placeholder="#{search.placeholder}"
-                   autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="100" autofocus data-pv-focus
-                   aria-describedby="search-help"
-                   th:hx-get="@{/patients}" hx-trigger="input changed delay:300ms, search"
-                   hx-target="#results" hx-swap="outerHTML" hx-push-url="true" hx-boost="false">
-            <button class="btn btn-primary" type="submit" th:text="#{search.submit}">Search</button>
-        </div>
-        <div id="search-help" class="form-text" th:text="#{search.help}">
-            Search by name (at least 3 letters of each word), the full email address, phone number or AMKA.</div>
-    </form>
-
     <div th:replace="~{patients/results :: results}"></div>
 </div>
 </body>

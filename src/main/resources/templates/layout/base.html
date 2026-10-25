@@ -10,30 +10,23 @@
 <a class="visually-hidden-focusable pv-skip" href="#pv-main" th:text="#{nav.skip}">Skip to main content</a>
 
 <div id="pv-app" hx-boost="true" th:attr='hx-headers=|{"${_csrf.headerName}":"${_csrf.token}"}|'>
-    <header class="pv-topbar navbar bg-body border-bottom sticky-top">
-        <div class="container-fluid gap-2">
-            <button type="button" class="btn btn-outline-secondary btn-sm pv-icon-btn d-none d-lg-inline-flex"
+    <header class="pv-topbar sticky-top">
+        <div class="pv-topbar-inner">
+            <button type="button" class="pv-ghost pv-icon-btn d-none d-lg-inline-flex"
                     data-pv-sidebar-toggle th:aria-label="#{topbar.sidebar}" th:title="#{topbar.sidebar}">
                 <i class="bi bi-layout-sidebar" aria-hidden="true"></i>
             </button>
-            <a class="navbar-brand fw-semibold d-flex align-items-center gap-2 me-auto" th:href="@{/}"
-               th:aria-label="#{topbar.home}">
+            <a class="pv-brand me-auto" th:href="@{/}" th:aria-label="#{topbar.home}">
                 <i class="bi bi-shield-plus pv-accent" aria-hidden="true"></i>
                 <span th:text="#{app.name}">PatientVault</span>
             </a>
-            <form class="pv-topsearch" role="search" method="get" th:action="@{/patients}" th:unless="${nav == 'search'}">
-                <label for="pv-topq" class="visually-hidden" th:text="#{search.label}">Search patients</label>
-                <div class="input-group">
-                    <input id="pv-topq" name="q" type="search" class="form-control" th:placeholder="#{search.placeholder}"
-                           autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="100">
-                    <button class="btn btn-outline-secondary" type="submit" th:aria-label="#{search.submit}" th:title="#{search.submit}">
-                        <i class="bi bi-search" aria-hidden="true"></i>
-                    </button>
-                </div>
-            </form>
+            <a class="pv-ghost pv-icon-btn" th:href="@{/patients}" data-pv-search-toggle hx-boost="false" aria-expanded="false"
+               aria-controls="pv-search-panel" th:aria-label="#{search.label}" th:title="#{search.label}">
+                <i class="bi bi-search" aria-hidden="true"></i>
+            </a>
             <div th:replace="~{fragments/shell :: preferences}"></div>
             <div class="dropdown" th:if="${currentUsername != null}">
-                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button"
+                <button class="pv-ghost dropdown-toggle" type="button"
                         data-bs-toggle="dropdown" aria-expanded="false" th:aria-label="#{topbar.user}">
                     <i class="bi bi-person-circle" aria-hidden="true"></i>
                     <span class="d-none d-sm-inline" th:text="${currentUsername}">doctor</span>
@@ -51,6 +44,24 @@
             </div>
         </div>
     </header>
+
+    <!-- Search, opened from the magnifier in the top bar on every page. Submitting shows the results on /patients. -->
+    <div id="pv-search-panel" class="pv-search-panel" hidden data-pv-search-panel>
+        <div class="pv-search-bar">
+            <form role="search" method="get" th:action="@{/patients}" class="pv-search-form">
+                <label for="pv-topq" class="visually-hidden" th:text="#{search.label}">Search patients</label>
+                <i class="bi bi-search pv-search-icon" aria-hidden="true"></i>
+                <input id="pv-topq" name="q" type="search" class="pv-search-input" th:value="${q}"
+                       th:placeholder="#{search.placeholder}" autocomplete="off" autocapitalize="off" spellcheck="false"
+                       maxlength="100" aria-describedby="pv-search-help" data-pv-search-input>
+                <button type="button" class="pv-ghost pv-icon-btn" data-pv-search-close
+                        th:aria-label="#{common.close}" th:title="#{common.close}">
+                    <i class="bi bi-x-lg" aria-hidden="true"></i>
+                </button>
+            </form>
+            <p id="pv-search-help" class="pv-search-help" th:text="#{search.help}">Search by name, email, phone or AMKA.</p>
+        </div>
+    </div>
 
     <div class="pv-frame">
         <nav class="pv-sidebar d-none d-lg-block" th:aria-label="#{nav.main}">

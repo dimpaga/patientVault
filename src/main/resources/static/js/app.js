@@ -26,6 +26,42 @@
         }
     });
 
+    // Search panel opened from the magnifier in the top bar (the link itself goes to /patients without JavaScript).
+    function searchPanel() { return document.querySelector('[data-pv-search-panel]'); }
+
+    function setSearch(open) {
+        var panel = searchPanel();
+        if (!panel) { return; }
+        panel.hidden = !open;
+        document.querySelectorAll('[data-pv-search-toggle]').forEach(function (button) {
+            button.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+        var input = panel.querySelector('[data-pv-search-input]');
+        if (open && input) { input.focus(); input.select(); }
+    }
+
+    document.addEventListener('click', function (event) {
+        var toggle = event.target.closest('[data-pv-search-toggle]');
+        if (toggle) {
+            event.preventDefault();
+            var panel = searchPanel();
+            setSearch(panel ? panel.hidden : false);
+            return;
+        }
+        if (event.target.closest('[data-pv-search-close]') || event.target === searchPanel()) {
+            setSearch(false);
+        }
+    });
+
+    document.addEventListener('keydown', function (event) {
+        var panel = searchPanel();
+        if (event.key === 'Escape' && panel && !panel.hidden) {
+            setSearch(false);
+            var toggle = document.querySelector('[data-pv-search-toggle]');
+            if (toggle) { toggle.focus(); }
+        }
+    });
+
     var LEVELS = ['success', 'danger', 'warning', 'info', 'secondary'];
 
     function showToast(message, level) {
