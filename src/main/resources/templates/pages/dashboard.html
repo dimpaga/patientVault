@@ -8,6 +8,10 @@
     <h1 class="h3 mb-1" th:text="#{dashboard.heading}">Welcome</h1>
     <p class="text-body-secondary mb-4" th:text="#{dashboard.subtitle}">Your patient records at a glance.</p>
 
+    <a class="btn btn-cta btn-lg mb-4" th:href="@{/patients/new}">
+        <i class="bi bi-person-plus" aria-hidden="true"></i><span th:text="#{nav.newPatient}">New patient</span>
+    </a>
+
     <form role="search" method="get" th:action="@{/patients}" class="pv-searchbox mb-4">
         <label for="dash-q" class="form-label visually-hidden" th:text="#{search.label}">Search patients</label>
         <div class="input-group input-group-lg">
@@ -60,9 +64,6 @@
                             </a>
                         </li>
                     </ul>
-                    <a class="btn btn-outline-primary mt-2" th:href="@{/patients/new}">
-                        <i class="bi bi-person-plus" aria-hidden="true"></i><span th:text="#{nav.newPatient}">New patient</span>
-                    </a>
                 </div>
             </div>
         </section>
