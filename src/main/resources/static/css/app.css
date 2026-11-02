@@ -1,36 +1,128 @@
 /* PatientVault UI. No inline styles are used anywhere (strict CSP), so everything lives here. */
 
 :root {
-    --pv-accent: #0b6b6b;
-    --pv-accent-hover: #095757;
     --pv-sidebar-w: 15rem;
     --pv-touch: 44px;
     --pv-radius: 1rem;
     --pv-topbar-h: 3.5rem;
-    --pv-bg: #f5f5f7;
-    --pv-surface: #ffffff;
-    --pv-hairline: rgba(0, 0, 0, 0.08);
-    --pv-cta: #4f46e5;
-    --pv-cta-hover: #4338ca;
-    --bs-primary: var(--pv-accent);
-    --bs-primary-rgb: 11, 107, 107;
-    --bs-link-color: var(--pv-accent);
-    --bs-link-hover-color: var(--pv-accent-hover);
-    --bs-link-color-rgb: 11, 107, 107;
-    --bs-link-hover-color-rgb: 9, 87, 87;
 }
 
+/*
+ * Light theme: warm beige page, white cards, green actions.
+ * Greens on beige keep at least 4.5:1 contrast for text; white on --pv-accent is 5:1.
+ */
+:root,
+[data-bs-theme="light"] {
+    --pv-accent: #2b7a4b;
+    --pv-accent-hover: #226239;
+    --pv-on-accent: #ffffff;
+    --pv-bg: #f6efe0;
+    --pv-bg-top: #f0e3c4;
+    --pv-surface: #fffdf8;
+    --pv-hairline: rgba(70, 52, 20, 0.12);
+    --pv-cta: #26302a;
+    --pv-cta-hover: #111a14;
+    --pv-on-cta: #ffffff;
+    --pv-surgery-bg: #e3f1df;
+    --pv-surgery-edge: #2b7a4b;
+
+    --bs-body-color: #26231c;
+    --bs-body-color-rgb: 38, 35, 28;
+    --bs-body-bg: var(--pv-surface);
+    --bs-body-bg-rgb: 255, 253, 248;
+    --bs-secondary-color: rgba(38, 35, 28, 0.68);
+    --bs-tertiary-color: rgba(38, 35, 28, 0.5);
+    --bs-secondary-bg: #efe6d1;
+    --bs-tertiary-bg: #f6efe0;
+    --bs-border-color: #e4d9c0;
+    --bs-border-color-translucent: rgba(70, 52, 20, 0.12);
+    --bs-emphasis-color: #14110b;
+
+    --bs-primary: var(--pv-accent);
+    --bs-primary-rgb: 43, 122, 75;
+    --bs-link-color: var(--pv-accent);
+    --bs-link-hover-color: var(--pv-accent-hover);
+    --bs-link-color-rgb: 43, 122, 75;
+    --bs-link-hover-color-rgb: 34, 98, 57;
+
+    /* status colours, matched to the beige and green palette */
+    --bs-success: #2b7a4b;
+    --bs-success-rgb: 43, 122, 75;
+    --bs-success-bg-subtle: #e3f1df;
+    --bs-success-border-subtle: #bcdcb7;
+    --bs-success-text-emphasis: #1c4f31;
+    --bs-danger: #b3412f;
+    --bs-danger-rgb: 179, 65, 47;
+    --bs-danger-bg-subtle: #f8e1da;
+    --bs-danger-border-subtle: #eebbaf;
+    --bs-danger-text-emphasis: #7a2417;
+    --bs-warning: #e3b04b;
+    --bs-warning-rgb: 227, 176, 75;
+    --bs-warning-bg-subtle: #fbefcf;
+    --bs-warning-border-subtle: #f0d894;
+    --bs-warning-text-emphasis: #6b4a08;
+    --bs-info: #4a7a80;
+    --bs-info-rgb: 74, 122, 128;
+    --bs-info-bg-subtle: #dfeceb;
+    --bs-info-border-subtle: #b7d3d1;
+    --bs-info-text-emphasis: #2e5559;
+    --bs-secondary: #7d7463;
+    --bs-secondary-rgb: 125, 116, 99;
+}
+
+/* Dark theme: denim. Deep denim blue background, light denim blue actions. */
 [data-bs-theme="dark"] {
-    --pv-bg: #0c0d0f;
-    --pv-surface: #1a1b1e;
-    --pv-hairline: rgba(255, 255, 255, 0.1);
-    --pv-accent: #3dd6c4;
-    --pv-accent-hover: #6fe3d5;
-    --pv-cta: #8b8bf5;
-    --pv-cta-hover: #a5a5f8;
-    --bs-primary-rgb: 61, 214, 196;
-    --bs-link-color-rgb: 61, 214, 196;
-    --bs-link-hover-color-rgb: 111, 227, 213;
+    --pv-accent: #86b0e3;
+    --pv-accent-hover: #a6c6ee;
+    --pv-on-accent: #0a1627;
+    --pv-bg: #0e1b2e;
+    --pv-bg-top: #12233b;
+    --pv-surface: #172a45;
+    --pv-hairline: rgba(150, 185, 235, 0.16);
+    --pv-cta: #e4c88f;
+    --pv-cta-hover: #f0d9a8;
+    --pv-on-cta: #2a2010;
+    --pv-surgery-bg: #153a3a;
+    --pv-surgery-edge: #5fc3a2;
+
+    --bs-body-color: #dce6f4;
+    --bs-body-color-rgb: 220, 230, 244;
+    --bs-body-bg: var(--pv-surface);
+    --bs-body-bg-rgb: 23, 42, 69;
+    --bs-secondary-color: rgba(220, 230, 244, 0.7);
+    --bs-tertiary-color: rgba(220, 230, 244, 0.5);
+    --bs-secondary-bg: #20375a;
+    --bs-tertiary-bg: #12233b;
+    --bs-border-color: #2a4468;
+    --bs-border-color-translucent: rgba(150, 185, 235, 0.16);
+    --bs-emphasis-color: #ffffff;
+
+    --bs-primary-rgb: 134, 176, 227;
+    --bs-link-color-rgb: 134, 176, 227;
+    --bs-link-hover-color-rgb: 166, 198, 238;
+
+    --bs-success: #5fc3a2;
+    --bs-success-rgb: 95, 195, 162;
+    --bs-success-bg-subtle: #13362f;
+    --bs-success-border-subtle: #22594b;
+    --bs-success-text-emphasis: #8fdcc0;
+    --bs-danger: #e57f76;
+    --bs-danger-rgb: 229, 127, 118;
+    --bs-danger-bg-subtle: #3d1f2a;
+    --bs-danger-border-subtle: #6b3342;
+    --bs-danger-text-emphasis: #f2a8a1;
+    --bs-warning: #e6bd6a;
+    --bs-warning-rgb: 230, 189, 106;
+    --bs-warning-bg-subtle: #3a2f1a;
+    --bs-warning-border-subtle: #66532b;
+    --bs-warning-text-emphasis: #f0d192;
+    --bs-info: #7fb3e0;
+    --bs-info-rgb: 127, 179, 224;
+    --bs-info-bg-subtle: #16324f;
+    --bs-info-border-subtle: #274f79;
+    --bs-info-text-emphasis: #a9cdee;
+    --bs-secondary: #8397b3;
+    --bs-secondary-rgb: 131, 151, 179;
 }
 
 .btn-primary {
@@ -42,15 +134,9 @@
     --bs-btn-active-border-color: var(--pv-accent-hover);
     --bs-btn-disabled-bg: var(--pv-accent);
     --bs-btn-disabled-border-color: var(--pv-accent);
-    --bs-btn-color: #fff;
-    --bs-btn-hover-color: #fff;
-    --bs-btn-active-color: #fff;
-}
-
-[data-bs-theme="dark"] .btn-primary {
-    --bs-btn-color: #04201c;
-    --bs-btn-hover-color: #04201c;
-    --bs-btn-active-color: #04201c;
+    --bs-btn-color: var(--pv-on-accent);
+    --bs-btn-hover-color: var(--pv-on-accent);
+    --bs-btn-active-color: var(--pv-on-accent);
 }
 
 .btn-outline-primary {
@@ -60,9 +146,20 @@
     --bs-btn-hover-border-color: var(--pv-accent);
     --bs-btn-active-bg: var(--pv-accent);
     --bs-btn-active-border-color: var(--pv-accent);
+    --bs-btn-hover-color: var(--pv-on-accent);
+    --bs-btn-active-color: var(--pv-on-accent);
 }
 
-/* Prominent call-to-action (New patient), deliberately a different colour from the teal brand buttons */
+/* Light status colours in the dark theme need dark text on badges and toasts */
+[data-bs-theme="dark"] .text-bg-primary,
+[data-bs-theme="dark"] .text-bg-secondary,
+[data-bs-theme="dark"] .text-bg-success,
+[data-bs-theme="dark"] .text-bg-danger,
+[data-bs-theme="dark"] .text-bg-warning,
+[data-bs-theme="dark"] .text-bg-info { color: #0a1627 !important; }
+[data-bs-theme="dark"] .toast .btn-close-white { filter: none; }
+
+/* Prominent call-to-action (New patient), deliberately a different colour from the green action buttons */
 .btn-cta {
     --bs-btn-bg: var(--pv-cta);
     --bs-btn-border-color: var(--pv-cta);
@@ -70,16 +167,15 @@
     --bs-btn-hover-border-color: var(--pv-cta-hover);
     --bs-btn-active-bg: var(--pv-cta-hover);
     --bs-btn-active-border-color: var(--pv-cta-hover);
-    --bs-btn-color: #fff;
-    --bs-btn-hover-color: #fff;
-    --bs-btn-active-color: #fff;
+    --bs-btn-color: var(--pv-on-cta);
+    --bs-btn-hover-color: var(--pv-on-cta);
+    --bs-btn-active-color: var(--pv-on-cta);
     font-weight: 600;
     padding-inline: 1.75rem;
     box-shadow: 0 6px 16px color-mix(in srgb, var(--pv-cta) 30%, transparent);
     transition: transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
 }
 .btn-cta:hover { transform: translateY(-1px); box-shadow: 0 8px 20px color-mix(in srgb, var(--pv-cta) 38%, transparent); }
-[data-bs-theme="dark"] .btn-cta { --bs-btn-color: #12123a; --bs-btn-hover-color: #12123a; --bs-btn-active-color: #12123a; }
 
 .pv-accent { color: var(--pv-accent); }
 
@@ -94,7 +190,7 @@
 }
 main:focus { outline: none; }
 
-.pv-body { background: var(--pv-bg); min-height: 100vh; letter-spacing: -0.003em; }
+.pv-body { background: linear-gradient(180deg, var(--pv-bg-top) 0, var(--pv-bg) 24rem) no-repeat var(--pv-bg); min-height: 100vh; letter-spacing: -0.003em; }
 h1, .h1, h2, .h2, h3, .h3 { letter-spacing: -0.02em; }
 
 /* Large, quiet page titles */
@@ -106,9 +202,9 @@ h1, .h1, h2, .h2, h3, .h3 { letter-spacing: -0.02em; }
     --bs-card-bg: var(--pv-surface);
     border-radius: 1.25rem;
     border: 0;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03), 0 12px 32px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 1px 2px rgba(70, 52, 20, 0.04), 0 12px 32px rgba(70, 52, 20, 0.06);
 }
-[data-bs-theme="dark"] .pv-card { box-shadow: none; }
+[data-bs-theme="dark"] .pv-card { box-shadow: 0 1px 0 rgba(150, 185, 235, 0.06); }
 
 .form-control, .form-select, .input-group-text { border-radius: 0.7rem; }
 .input-group > .form-control:not(:first-child), .input-group > .btn:not(:first-child) { border-top-left-radius: 0; border-bottom-left-radius: 0; }
@@ -174,10 +270,10 @@ h1, .h1, h2, .h2, h3, .h3 { letter-spacing: -0.02em; }
 
 /* Surgeries stand out in the visit list */
 .pv-card.pv-visit-surgery {
-    --bs-card-bg: #e6f6ea;
-    box-shadow: inset 4px 0 0 #2e9e5b, 0 1px 2px rgba(0, 0, 0, 0.03), 0 12px 32px rgba(0, 0, 0, 0.04);
+    --bs-card-bg: var(--pv-surgery-bg);
+    box-shadow: inset 4px 0 0 var(--pv-surgery-edge), 0 1px 2px rgba(0, 0, 0, 0.03), 0 12px 32px rgba(0, 0, 0, 0.04);
 }
-[data-bs-theme="dark"] .pv-card.pv-visit-surgery { --bs-card-bg: #12301f; box-shadow: inset 4px 0 0 #3fbf75; }
+[data-bs-theme="dark"] .pv-card.pv-visit-surgery { box-shadow: inset 4px 0 0 var(--pv-surgery-edge); }
 
 /* Past, completed and cancelled appointments */
 .pv-card-muted { opacity: 0.8; box-shadow: none; }
