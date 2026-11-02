@@ -20,9 +20,9 @@
     --pv-bg-top: #f0e3c4;
     --pv-surface: #fffdf8;
     --pv-hairline: rgba(70, 52, 20, 0.12);
-    --pv-cta: #26302a;
-    --pv-cta-hover: #111a14;
-    --pv-on-cta: #ffffff;
+    --pv-cta: #74c46d;
+    --pv-cta-hover: #62b35b;
+    --pv-on-cta: #0f2d14;
     --pv-surgery-bg: #e3f1df;
     --pv-surgery-edge: #2b7a4b;
 
@@ -159,7 +159,7 @@
 [data-bs-theme="dark"] .text-bg-info { color: #0a1627 !important; }
 [data-bs-theme="dark"] .toast .btn-close-white { filter: none; }
 
-/* Prominent call-to-action (New patient), deliberately a different colour from the green action buttons */
+/* Prominent call-to-action (New patient): the light green of the reference design in the light theme */
 .btn-cta {
     --bs-btn-bg: var(--pv-cta);
     --bs-btn-border-color: var(--pv-cta);
