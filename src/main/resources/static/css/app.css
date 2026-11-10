@@ -13,7 +13,7 @@
  */
 :root,
 [data-bs-theme="light"] {
-    --pv-accent: #616762;
+    --pv-accent: #396c42;
     --pv-accent-hover: #226239;
     --pv-on-accent: #ffffff;
     --pv-bg: #ebe5d3;   /* main background*/
@@ -390,6 +390,11 @@ h1, .h1, h2, .h2, h3, .h3 { letter-spacing: -0.02em; }
 }
 
 /* Search results: contact lines and diagnosis snippet on result cards */
+/* Patient tile: name on top, details a little lower, files and last visit on the right */
+.pv-card-head { margin-bottom: 1.25rem; }
+.pv-card-stats p { display: flex; align-items: baseline; gap: 0.4rem; }
+@media (min-width: 576px) { .pv-card-stats p { justify-content: flex-end; } }
+.pv-card-stats .bi { color: var(--bs-secondary-color); }
 .pv-contact li { display: flex; align-items: baseline; gap: 0.5rem; overflow-wrap: anywhere; }
 .pv-contact .bi { color: var(--bs-secondary-color); }
 .pv-snippet { border-left: 3px solid var(--pv-accent); padding-left: 0.6rem; margin-top: 0.4rem; }

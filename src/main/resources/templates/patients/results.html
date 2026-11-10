@@ -32,8 +32,8 @@
         <div class="col-12 col-xl-6" th:each="c : ${result.cards}">
             <article class="card pv-card h-100" th:aria-labelledby="'pn-' + ${c.id}">
                 <div class="card-body">
-                    <div class="d-flex align-items-start justify-content-between gap-2 mb-2">
-                        <h2 class="h5 mb-0" th:id="'pn-' + ${c.id}">
+                    <div class="d-flex align-items-start justify-content-between gap-2 pv-card-head">
+                        <h2 class="h4 fw-semibold mb-0" th:id="'pn-' + ${c.id}">
                             <a class="text-decoration-none" th:href="@{/patients/{id}(id=${c.id})}" th:text="${c.fullName}">Name</a>
                         </h2>
                         <span class="badge text-bg-success flex-shrink-0" th:if="${c.consentGiven}">
@@ -41,7 +41,8 @@
                         </span>
                         <span class="badge text-bg-secondary flex-shrink-0" th:unless="${c.consentGiven}" th:text="#{patient.consent.notGiven}">No consent recorded</span>
                     </div>
-                    <ul class="list-unstyled pv-contact mb-2">
+                    <div class="d-flex flex-wrap justify-content-between gap-3 pv-card-details">
+                    <ul class="list-unstyled pv-contact mb-0">
                         <li><i class="bi bi-envelope" aria-hidden="true"></i>
                             <a th:href="'mailto:' + ${c.email}" th:text="${c.email}">email</a></li>
                         <li><i class="bi bi-telephone" aria-hidden="true"></i>
@@ -52,14 +53,17 @@
                         <li th:if="${c.referralSource != null}"><i class="bi bi-signpost-split" aria-hidden="true"></i>
                             <span th:text="${c.referralSource}">source</span></li>
                     </ul>
-                    <p class="small mb-0 text-body-secondary" th:if="${c.fileCount > 0}">
+                    <div class="pv-card-stats small text-body-secondary ms-sm-auto text-sm-end">
+                    <p class="mb-1" th:if="${c.fileCount > 0}">
                         <i class="bi bi-paperclip" aria-hidden="true"></i>
                         <span th:text="#{search.files(${c.fileCount})}">3 files</span>
                     </p>
-                    <p class="small mb-0 text-body-secondary" th:if="${c.latestVisitDate != null}">
+                    <p class="mb-1" th:if="${c.latestVisitDate != null}">
                         <i class="bi bi-clipboard2-pulse" aria-hidden="true"></i>
                         <span th:text="#{search.lastVisit(${#temporals.format(c.latestVisitDate, 'dd/MM/yyyy')})}">Last visit: 01/10/2026</span>
                     </p>
+                    </div>
+                    </div>
                     <p class="small mb-0 pv-snippet" th:if="${c.latestDiagnosis != null}" th:text="${c.latestDiagnosis}">diagnosis</p>
                 </div>
                 <div class="card-footer bg-transparent d-flex flex-wrap gap-2">
