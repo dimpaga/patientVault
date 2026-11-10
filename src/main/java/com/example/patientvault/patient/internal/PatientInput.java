@@ -14,6 +14,7 @@ public record PatientInput(
         @Size(max = PatientValidator.MAX_EMAIL) String email,
         @Size(max = PatientValidator.MAX_PHONE) String mobile,
         @Size(max = PatientValidator.MAX_AMKA_INPUT) String amka,
+        @Size(max = PatientValidator.MAX_ADDRESS) String address,
         @Size(max = PatientValidator.MAX_REFERRAL) String referralSource,
         @Size(max = PatientValidator.MAX_TEXT) String notes,
         boolean consentGiven,

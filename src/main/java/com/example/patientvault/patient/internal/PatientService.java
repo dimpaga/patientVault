@@ -264,6 +264,9 @@ public class PatientService {
         if (!Objects.equals(a.amka(), b.amka())) {
             changed.add("amka");
         }
+        if (!Objects.equals(a.address(), b.address())) {
+            changed.add("address");
+        }
         if (!Objects.equals(a.referralSource(), b.referralSource())) {
             changed.add("referralSource");
         }

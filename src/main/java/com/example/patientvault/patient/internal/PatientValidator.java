@@ -29,6 +29,7 @@ public class PatientValidator {
     public static final int MAX_PHONE = 40;
     public static final int MAX_AMKA_INPUT = 20;
     public static final int MAX_REFERRAL = 500;
+    public static final int MAX_ADDRESS = 300;
     public static final int MAX_TEXT = 10_000;
     public static final int MAX_REASON_CODE = 40;
 
@@ -97,7 +98,7 @@ public class PatientValidator {
             return new Result(null, null, errors, warnings);
         }
         PatientData data = new PatientData(firstName, lastName, email, mobile, amkaDigits,
-                optional(input.referralSource()), optionalMultiline(input.notes()), input.consentGiven());
+                optional(input.address()), optional(input.referralSource()), optionalMultiline(input.notes()), input.consentGiven());
         return new Result(data, visit, errors, warnings);
     }
 

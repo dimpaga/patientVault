@@ -7,6 +7,7 @@ package com.example.patientvault.patient.internal;
  * @param email lower-case address
  * @param mobile E.164 number
  * @param amka the 11 digits without separators
+ * @param address optional single-line postal address
  */
 public record PatientData(
         String firstName,
@@ -14,6 +15,7 @@ public record PatientData(
         String email,
         String mobile,
         String amka,
+        String address,
         String referralSource,
         String notes,
         boolean consentGiven) {

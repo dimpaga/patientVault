@@ -46,6 +46,9 @@ public class PatientEntity {
     @Column(name = "amka_enc", nullable = false)
     private byte[] amkaEnc;
 
+    @Column(name = "address_enc")
+    private byte[] addressEnc;
+
     @Column(name = "referral_source_enc")
     private byte[] referralSourceEnc;
 
@@ -154,6 +157,14 @@ public class PatientEntity {
 
     public void setAmkaEnc(byte[] amkaEnc) {
         this.amkaEnc = amkaEnc;
+    }
+
+    public byte[] getAddressEnc() {
+        return addressEnc;
+    }
+
+    public void setAddressEnc(byte[] addressEnc) {
+        this.addressEnc = addressEnc;
     }
 
     public byte[] getReferralSourceEnc() {

@@ -21,6 +21,7 @@ public class PatientCodec {
     static final String EMAIL = "email";
     static final String MOBILE = "mobile";
     static final String AMKA = "amka";
+    static final String ADDRESS = "address";
     static final String REFERRAL_SOURCE = "referral_source";
     static final String NOTES = "notes";
 
@@ -51,6 +52,7 @@ public class PatientCodec {
                 text(key, EMAIL, entity.getEmailEnc()),
                 text(key, MOBILE, entity.getMobileEnc()),
                 text(key, AMKA, entity.getAmkaEnc()),
+                text(key, ADDRESS, entity.getAddressEnc()),
                 text(key, REFERRAL_SOURCE, entity.getReferralSourceEnc()),
                 text(key, NOTES, entity.getNotesEnc()),
                 entity.isConsentGiven());
@@ -97,6 +99,7 @@ public class PatientCodec {
         entity.setEmailEnc(crypto.encryptText(key, EMAIL, data.email()));
         entity.setMobileEnc(crypto.encryptText(key, MOBILE, data.mobile()));
         entity.setAmkaEnc(crypto.encryptText(key, AMKA, data.amka()));
+        entity.setAddressEnc(optional(key, ADDRESS, data.address()));
         entity.setReferralSourceEnc(optional(key, REFERRAL_SOURCE, data.referralSource()));
         entity.setNotesEnc(optional(key, NOTES, data.notes()));
         entity.setConsentGiven(data.consentGiven());

@@ -84,6 +84,12 @@
                     <dt class="col-sm-4 col-lg-3" th:text="#{patient.field.amka}">AMKA</dt>
                     <dd class="col-sm-8 col-lg-9" th:text="${patient.data.amka}">amka</dd>
 
+                    <dt class="col-sm-4 col-lg-3" th:text="#{patient.field.address}">Address</dt>
+                    <dd class="col-sm-8 col-lg-9">
+                        <span th:if="${patient.data.address != null}" th:text="${patient.data.address}">address</span>
+                        <span class="text-body-secondary" th:unless="${patient.data.address != null}" th:text="#{common.notProvided}">Not provided</span>
+                    </dd>
+
                     <dt class="col-sm-4 col-lg-3" th:text="#{patient.field.referralSource}">Referral</dt>
                     <dd class="col-sm-8 col-lg-9">
                         <span th:if="${patient.data.referralSource != null}" th:text="${patient.data.referralSource}">source</span>

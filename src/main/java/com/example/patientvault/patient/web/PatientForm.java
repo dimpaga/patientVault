@@ -17,6 +17,7 @@ record PatientForm(
         String email,
         String mobile,
         String amka,
+        String address,
         String referralSource,
         String notes,
         Boolean consentGiven,
@@ -27,17 +28,17 @@ record PatientForm(
         String visitTreatment) {
 
     static PatientForm empty() {
-        return new PatientForm(null, "", "", "", "", "", "", "", false, null, VisitType.DOCTOR_VISIT.name(), "", "", "");
+        return new PatientForm(null, "", "", "", "", "", "", "", "", false, null, VisitType.DOCTOR_VISIT.name(), "", "", "");
     }
 
     static PatientForm from(PatientData data, long version) {
         return new PatientForm(version, data.firstName(), data.lastName(), data.email(), data.mobile(), data.amka(),
-                nullToEmpty(data.referralSource()), nullToEmpty(data.notes()), data.consentGiven(),
+                nullToEmpty(data.address()), nullToEmpty(data.referralSource()), nullToEmpty(data.notes()), data.consentGiven(),
                 null, VisitType.DOCTOR_VISIT.name(), "", "", "");
     }
 
     PatientInput toInput() {
-        return new PatientInput(firstName, lastName, email, mobile, amka, referralSource, notes, Boolean.TRUE.equals(consentGiven),
+        return new PatientInput(firstName, lastName, email, mobile, amka, address, referralSource, notes, Boolean.TRUE.equals(consentGiven),
                 visitDate, visitType, visitReason, visitDiagnosis, visitTreatment);
     }
 
