@@ -391,7 +391,7 @@ h1, .h1, h2, .h2, h3, .h3 { letter-spacing: -0.02em; }
 
 /* Search results: contact lines and diagnosis snippet on result cards */
 /* Patient tile: name on top, details a little lower, files and last visit on the right */
-.pv-card-head { margin-bottom: 1.25rem; }
+.pv-card-head { margin-bottom: 2.25rem; }
 .pv-card-stats p { display: flex; align-items: baseline; gap: 0.4rem; }
 @media (min-width: 576px) { .pv-card-stats p { justify-content: flex-end; } }
 .pv-card-stats .bi { color: var(--bs-secondary-color); }
