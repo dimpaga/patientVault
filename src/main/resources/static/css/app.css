@@ -13,14 +13,14 @@
  */
 :root,
 [data-bs-theme="light"] {
-    --pv-accent: #2b7a4b;
+    --pv-accent: #616762;
     --pv-accent-hover: #226239;
     --pv-on-accent: #ffffff;
-    --pv-bg: #f6efe0;
+    --pv-bg: #ebe5d3;   /* main background*/
     --pv-bg-top: #f0e3c4;
-    --pv-surface: #fbf6e9;
+    --pv-surface: #f9f5e9;  /* tiles background*/
     --pv-hairline: rgba(70, 52, 20, 0.12);
-    --pv-cta: #74c46d;
+    --pv-cta: #30D158;
     --pv-cta-hover: #62b35b;
     --pv-on-cta: #0f2d14;
     --pv-surgery-bg: #e3f1df;
@@ -379,6 +379,16 @@ h1, .h1, h2, .h2, h3, .h3 { letter-spacing: -0.02em; }
 .pv-patient-form { max-width: 56rem; }
 .nav-tabs .nav-link { display: inline-flex; align-items: center; gap: 0.4rem; min-height: var(--pv-touch); }
 .btn i + span { margin-left: 0; }
+/* Result card actions: same outline look, green on hover */
+.pv-result-action {
+    --bs-btn-hover-bg: var(--pv-accent);
+    --bs-btn-hover-border-color: var(--pv-accent);
+    --bs-btn-hover-color: var(--pv-on-accent);
+    --bs-btn-active-bg: var(--pv-accent-hover);
+    --bs-btn-active-border-color: var(--pv-accent-hover);
+    --bs-btn-active-color: var(--pv-on-accent);
+}
+
 /* Search results: contact lines and diagnosis snippet on result cards */
 .pv-contact li { display: flex; align-items: baseline; gap: 0.5rem; overflow-wrap: anywhere; }
 .pv-contact .bi { color: var(--bs-secondary-color); }

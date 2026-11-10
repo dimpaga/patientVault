@@ -63,13 +63,13 @@
                     <p class="small mb-0 pv-snippet" th:if="${c.latestDiagnosis != null}" th:text="${c.latestDiagnosis}">diagnosis</p>
                 </div>
                 <div class="card-footer bg-transparent d-flex flex-wrap gap-2">
-                    <a class="btn btn-primary btn-sm" th:href="@{/patients/{id}/files(id=${c.id})}">
+                    <a class="btn btn-outline-secondary btn-sm pv-result-action" th:href="@{/patients/{id}/files(id=${c.id})}">
                         <i class="bi bi-folder2-open" aria-hidden="true"></i><span th:text="#{search.viewMedical}">View medical data</span>
                     </a>
-                    <a class="btn btn-outline-secondary btn-sm" th:href="@{/patients/{id}(id=${c.id})}">
+                    <a class="btn btn-outline-secondary btn-sm pv-result-action" th:href="@{/patients/{id}(id=${c.id})}">
                         <i class="bi bi-person-vcard" aria-hidden="true"></i><span th:text="#{search.open}">Open patient</span>
                     </a>
-                    <a class="btn btn-outline-secondary btn-sm" th:href="@{/patients/{id}/appointments(id=${c.id},new='1')}">
+                    <a class="btn btn-outline-secondary btn-sm pv-result-action" th:href="@{/patients/{id}/appointments(id=${c.id},new='1')}">
                         <i class="bi bi-calendar-plus" aria-hidden="true"></i><span th:text="#{search.schedule}">Schedule appointment</span>
                     </a>
                 </div>
