@@ -31,10 +31,6 @@ class PatientPage {
             return new VisitState(VisitForm.empty(today), Map.of(), null, null, Map.of(), false);
         }
 
-        VisitState withAddForm(VisitForm form, Map<String, FieldMessage> errors) {
-            return new VisitState(form, errors, editId, editForm, editErrors, editConflict);
-        }
-
         VisitState editing(UUID visitId, VisitForm form, Map<String, FieldMessage> errors, boolean conflict) {
             return new VisitState(addForm, addErrors, visitId, form, errors, conflict);
         }
@@ -64,6 +60,16 @@ class PatientPage {
         return patients.visits(patientId).stream().filter(v -> v.id().equals(editVisitId)).findFirst()
                 .map(v -> state.editing(v.id(), VisitForm.from(v.data(), v.version()), Map.of(), false))
                 .orElse(state);
+    }
+
+    /** Model of the "new visit" page: the form, its errors and the dropdown options. */
+    void fillNewVisit(Model model, PatientView patient, VisitForm form, Map<String, FieldMessage> errors) {
+        model.addAttribute("patient", patient);
+        model.addAttribute("nav", "patients");
+        model.addAttribute("form", form);
+        model.addAttribute("errors", errors);
+        model.addAttribute("reasons", visitReasons.options());
+        model.addAttribute("visitTypes", VisitType.values());
     }
 
     LocalDate today() {
@@ -102,11 +108,8 @@ class PatientPage {
             model.addAttribute("visits", patients.visits(patient.id()));
             model.addAttribute("reasonLabels", visitReasons.labels());
             model.addAttribute("visitTypes", VisitType.values());
-            model.addAttribute("addReasons", visitReasons.options());
             model.addAttribute("editReasons", visitReasons.options(
                     visitState.editForm() == null ? null : visitState.editForm().reason()));
-            model.addAttribute("addForm", visitState.addForm());
-            model.addAttribute("addErrors", visitState.addErrors());
             model.addAttribute("editVisitId", visitState.editId());
             model.addAttribute("editForm", visitState.editForm());
             model.addAttribute("editErrors", visitState.editErrors());

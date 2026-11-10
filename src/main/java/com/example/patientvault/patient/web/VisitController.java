@@ -60,6 +60,13 @@ class VisitController {
         return "true".equalsIgnoreCase(htmx) ? "patients/visits :: visitEdit" : "pages/patient-view";
     }
 
+    /** The page with the form for a new visit (opened by the "New visit" button of the Visits tab). */
+    @GetMapping("/new")
+    @PreAuthorize("hasAuthority('" + Permissions.PATIENT_WRITE + "')")
+    String newForm(@PathVariable UUID patientId, Model model) {
+        return newPage(patientId, VisitForm.empty(page.today()), Map.of(), model);
+    }
+
     @PostMapping
     @PreAuthorize("hasAuthority('" + Permissions.PATIENT_WRITE + "')")
     String add(@PathVariable UUID patientId, VisitForm form, BindingResult binding,
@@ -68,7 +75,7 @@ class VisitController {
         PatientValidator.VisitResult result = validator.validateVisit(form.toInput());
         Map<String, FieldMessage> errors = withBindingErrors(result.errors(), binding);
         if (!errors.isEmpty()) {
-            return renderTab(patientId, page.stateForEdit(patientId, null).withAddForm(form, errors), htmx, model);
+            return newPage(patientId, form, errors, model);
         }
         patients.addVisit(patientId, result.data());
         return done(patientId, "visit.added", htmx, model, response, redirect);
@@ -117,6 +124,11 @@ class VisitController {
         }
         redirect.addFlashAttribute("flashSuccess", messageKey);
         return "redirect:/patients/" + patientId + "?tab=visits";
+    }
+
+    private String newPage(UUID patientId, VisitForm form, Map<String, FieldMessage> errors, Model model) {
+        page.fillNewVisit(model, page.load(patientId), form, errors);
+        return "pages/visit-new";
     }
 
     private String renderTab(UUID patientId, PatientPage.VisitState state, String htmx, Model model) {

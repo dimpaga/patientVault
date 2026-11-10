@@ -2,18 +2,11 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 
-<!-- Visits tab: add form, then the visits (newest first), each either as a card or as an inline edit form. -->
+<!-- Visits tab: "New visit" button, then the visits (newest first), each either as a card or as an inline edit form. -->
 <th:block th:fragment="visitsTab">
-    <div class="card pv-card mb-3">
-        <div class="card-body">
-            <h2 class="h6" th:text="#{visit.add}">Add a visit</h2>
-            <form method="post" th:action="@{/patients/{id}/visits(id=${patient.id})}"
-                  th:hx-post="@{/patients/{id}/visits(id=${patient.id})}" hx-target="#pv-tabs" hx-swap="outerHTML" novalidate>
-                <th:block th:replace="~{patients/visits :: visitFields(form=${addForm}, errors=${addErrors}, prefix='add', reasons=${addReasons})}"></th:block>
-                <button type="submit" class="btn btn-primary" th:text="#{visit.save}">Save visit</button>
-            </form>
-        </div>
-    </div>
+    <a class="btn btn-cta btn-lg mb-4" th:href="@{/patients/{id}/visits/new(id=${patient.id})}">
+        <i class="bi bi-plus-lg" aria-hidden="true"></i><span th:text="#{visit.new}">New visit</span>
+    </a>
 
     <div class="card pv-card" th:if="${#lists.isEmpty(visits)}">
         <div class="card-body text-body-secondary" th:text="#{visit.empty}">No visits yet.</div>

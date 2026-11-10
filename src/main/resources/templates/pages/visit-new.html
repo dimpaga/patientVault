@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html th:replace="~{layout/base :: page(~{::title}, ~{::#pv-page}, ${nav})}" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="#{visit.new.title} + ' · ' + ${patient.data.firstName} + ' ' + ${patient.data.lastName} + ' · ' + #{app.name}">New visit · PatientVault</title>
+</head>
+<body>
+<div id="pv-page">
+    <nav th:aria-label="#{visit.new.title}">
+        <a class="text-decoration-none small" th:href="@{/patients/{id}(id=${patient.id},tab='visits')}">
+            <i class="bi bi-arrow-left" aria-hidden="true"></i>
+            <span th:text="${patient.data.firstName} + ' ' + ${patient.data.lastName}">Patient</span>
+        </a>
+    </nav>
+    <h1 class="h3 mb-4 mt-1" th:text="#{visit.new.title}">New visit</h1>
+
+    <div class="alert alert-danger" role="alert" th:if="${!errors.isEmpty()}" th:text="#{patient.error.summary}">Please correct the highlighted fields.</div>
+
+    <div class="card pv-card pv-form-card">
+        <div class="card-body">
+            <form method="post" th:action="@{/patients/{id}/visits(id=${patient.id})}" hx-boost="false" novalidate>
+                <th:block th:replace="~{patients/visits :: visitFields(form=${form}, errors=${errors}, prefix='add', reasons=${reasons})}"></th:block>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary" th:text="#{visit.save}">Save visit</button>
+                    <a class="btn btn-outline-secondary" th:href="@{/patients/{id}(id=${patient.id},tab='visits')}"
+                       th:text="#{common.cancel}">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
