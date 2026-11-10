@@ -8,7 +8,7 @@
 }
 
 /*
- * Light theme: warm beige page, white cards, green actions.
+ * Light theme: warm beige throughout. Cards are a lighter beige than the page, never white.
  * Greens on beige keep at least 4.5:1 contrast for text; white on --pv-accent is 5:1.
  */
 :root,
@@ -18,7 +18,7 @@
     --pv-on-accent: #ffffff;
     --pv-bg: #f6efe0;
     --pv-bg-top: #f0e3c4;
-    --pv-surface: #fffdf8;
+    --pv-surface: #fbf6e9;
     --pv-hairline: rgba(70, 52, 20, 0.12);
     --pv-cta: #74c46d;
     --pv-cta-hover: #62b35b;
@@ -29,7 +29,7 @@
     --bs-body-color: #26231c;
     --bs-body-color-rgb: 38, 35, 28;
     --bs-body-bg: var(--pv-surface);
-    --bs-body-bg-rgb: 255, 253, 248;
+    --bs-body-bg-rgb: 251, 246, 233;
     --bs-secondary-color: rgba(38, 35, 28, 0.68);
     --bs-tertiary-color: rgba(38, 35, 28, 0.5);
     --bs-secondary-bg: #efe6d1;
