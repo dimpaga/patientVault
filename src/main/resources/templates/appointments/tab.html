@@ -10,7 +10,7 @@
             <form method="post" th:action="@{/patients/{id}/appointments(id=${patient.id})}"
                   th:hx-post="@{/patients/{id}/appointments(id=${patient.id})}" hx-target="#pv-tabs" hx-swap="outerHTML" novalidate>
                 <th:block th:replace="~{appointments/tab :: appointmentFields(form=${addForm}, errors=${addErrors}, prefix='add', focus=${focusAdd})}"></th:block>
-                <button type="submit" class="btn btn-primary" th:text="#{appointment.save}">Schedule</button>
+                <button type="submit" class="btn btn-cta" th:text="#{appointment.save}">Schedule</button>
             </form>
         </div>
     </div>
