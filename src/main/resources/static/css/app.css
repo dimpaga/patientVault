@@ -24,6 +24,9 @@
     --pv-cta: #30D158;
     --pv-cta-hover: #62b35b;
     --pv-on-cta: #0f2d14;
+    --pv-search: #3f6ea8;
+    --pv-search-hover: #345c8d;
+    --pv-on-search: #ffffff;
     --pv-surgery-bg: #e3f1df;
     --pv-surgery-edge: #2b7a4b;
 
@@ -84,6 +87,9 @@
     --pv-cta: #e4c88f;
     --pv-cta-hover: #f0d9a8;
     --pv-on-cta: #2a2010;
+    --pv-search: #5fc3a2;
+    --pv-search-hover: #7fd4b8;
+    --pv-on-search: #0a1627;
     --pv-surgery-bg: #153a3a;
     --pv-surgery-edge: #5fc3a2;
 
@@ -178,6 +184,25 @@
     transition: transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
 }
 .btn-cta:hover { transform: translateY(-1px); box-shadow: 0 8px 20px color-mix(in srgb, var(--pv-cta) 38%, transparent); }
+
+/* Round icon-only search button next to "New patient"; its own colour in each theme */
+.btn-search {
+    --bs-btn-bg: var(--pv-search);
+    --bs-btn-border-color: var(--pv-search);
+    --bs-btn-color: var(--pv-on-search);
+    --bs-btn-hover-bg: var(--pv-search-hover);
+    --bs-btn-hover-border-color: var(--pv-search-hover);
+    --bs-btn-hover-color: var(--pv-on-search);
+    --bs-btn-active-bg: var(--pv-search-hover);
+    --bs-btn-active-border-color: var(--pv-search-hover);
+    --bs-btn-active-color: var(--pv-on-search);
+    width: 2.75rem;
+    height: 2.75rem;
+    padding: 0;
+    border-radius: 50%;
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--pv-search) 28%, transparent);
+}
+.btn-search .bi { font-size: 1.1rem; }
 
 .pv-accent { color: var(--pv-accent); }
 

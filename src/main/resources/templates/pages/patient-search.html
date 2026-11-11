@@ -7,9 +7,15 @@
 <div id="pv-page">
     <h1 class="h3 mb-4" th:text="#{search.heading}">Patients</h1>
 
-    <a class="btn btn-cta btn-lg mb-4" th:href="@{/patients/new}">
-        <i class="bi bi-person-plus" aria-hidden="true"></i><span th:text="#{nav.newPatient}">New patient</span>
-    </a>
+    <div class="d-flex align-items-center gap-2 mb-4">
+        <a class="btn btn-cta btn-lg" th:href="@{/patients/new}">
+            <i class="bi bi-person-plus" aria-hidden="true"></i><span th:text="#{nav.newPatient}">New patient</span>
+        </a>
+        <a class="btn btn-search" th:href="@{/patients}" data-pv-search-toggle hx-boost="false" aria-expanded="false"
+           aria-controls="pv-search-panel" th:aria-label="#{search.label}" th:title="#{search.label}">
+            <i class="bi bi-search" aria-hidden="true"></i>
+        </a>
+    </div>
 
     <div th:replace="~{patients/results :: results}"></div>
 </div>
