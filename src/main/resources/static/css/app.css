@@ -16,9 +16,9 @@
     --pv-accent: #396c42;
     --pv-accent-hover: #226239;
     --pv-on-accent: #ffffff;
-    --pv-bg: #ebe5d3;   /* main background*/
-    --pv-bg-top: #f0e3c4;
-    --pv-surface: #f9f5e9;  /* tiles background*/
+    --pv-bg: #f7f6f1;   /* main background*/
+    --pv-bg-top: #f6f1e5;
+    --pv-surface: #fffefc;  /* tiles background*/
     --pv-hairline: rgba(70, 52, 20, 0.12);
     --pv-cta: #30D158;
     --pv-cta-hover: #62b35b;
@@ -379,6 +379,13 @@ h1, .h1, h2, .h2, h3, .h3 { letter-spacing: -0.02em; }
 .pv-patient-form { max-width: 56rem; }
 .nav-tabs .nav-link { display: inline-flex; align-items: center; gap: 0.4rem; min-height: var(--pv-touch); }
 .btn i + span { margin-left: 0; }
+/* Appointments range selector: the active choice uses the call-to-action colour */
+.pv-range-pills {
+    --bs-nav-pills-link-active-bg: var(--pv-cta);
+    --bs-nav-pills-link-active-color: var(--pv-on-cta);
+}
+.pv-range-pills .nav-link { border-radius: 980px; }
+
 /* Result card actions: same outline look, green on hover */
 .pv-result-action {
     --bs-btn-hover-bg: var(--pv-accent);

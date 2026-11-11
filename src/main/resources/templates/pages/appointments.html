@@ -7,7 +7,7 @@
 <div id="pv-page">
     <h1 class="h3 mb-3" th:text="#{appointments.heading}">Appointments</h1>
 
-    <ul class="nav nav-pills mb-3" th:aria-label="#{appointments.range}">
+    <ul class="nav nav-pills pv-range-pills mb-3" th:aria-label="#{appointments.range}">
         <li class="nav-item" th:each="r : ${ {'today','week','month'} }">
             <a class="nav-link" th:classappend="${range == r} ? 'active'" th:href="@{/appointments(range=${r})}"
                th:attr="aria-current=${range == r} ? 'page'" th:text="#{'appointments.range.' + ${r}}">Today</a>
