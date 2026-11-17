@@ -8,7 +8,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.time.Clock;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -50,7 +49,7 @@ import com.example.patientvault.shared.Permissions;
 /**
  * Medical files and folders of a patient. Every method checks the permission, that the patient is ACTIVE and
  * that the folder/file belongs to that patient (IDOR). Names are encrypted per patient, file content is
- * stream-encrypted and stored in the object store; PostgreSQL only holds metadata. Nothing here logs names.
+ * stream-encrypted and stored in the object store (Amazon S3); PostgreSQL only holds metadata. Nothing here logs names.
  */
 @Service
 public class RecordsService implements RecordsApi {
@@ -71,13 +70,12 @@ public class RecordsService implements RecordsApi {
     private final ThumbnailService thumbnails;
     private final UploadProperties properties;
     private final AuditService audit;
-    private final Clock clock;
     private final TransactionTemplate tx;
     private final ConcurrentHashMap<UUID, Object> patientLocks = new ConcurrentHashMap<>();
 
     RecordsService(MedicalFileRepository files, MedicalFolderRepository folders, BlobStore blobs, CryptoService crypto,
                    PatientAccess access, UploadPolicy policy, ThumbnailService thumbnails, UploadProperties properties,
-                   AuditService audit, Clock clock, PlatformTransactionManager transactionManager) {
+                   AuditService audit, PlatformTransactionManager transactionManager) {
         this.files = files;
         this.folders = folders;
         this.blobs = blobs;
@@ -87,7 +85,6 @@ public class RecordsService implements RecordsApi {
         this.thumbnails = thumbnails;
         this.properties = properties;
         this.audit = audit;
-        this.clock = clock;
         this.tx = new TransactionTemplate(transactionManager);
     }
 
@@ -176,7 +173,7 @@ public class RecordsService implements RecordsApi {
         try {
             return store(patientId, fileId, key, detected, source);
         } catch (RuntimeException e) {
-            discard(fileId);
+            discard(patientId, fileId);
             audit.record(AuditEvent.failure(AuditAction.FILE_UPLOADED).onEntity("FILE", fileId)
                     .withDetail("patientId", patientId));
             throw e;
@@ -189,44 +186,43 @@ public class RecordsService implements RecordsApi {
         try (InputStream plain = source.open();
              InputStream encrypted = new DigestInputStream(
                      crypto.encryptStream(key, fileId, CryptoService.PURPOSE_CONTENT, plain), digest)) {
-            ref = blobs.put(fileId, patientId, encrypted, crypto.encryptedSize(source.size()),
-                    new BlobMeta(keyIdOf(), CIPHER, source.size(), clock.instant()));
+            ref = blobs.put(fileId, patientId, encrypted, new BlobMeta(CIPHER));
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
 
-        boolean thumbnail = false;
+        String thumbnailKey = null;
         if ("PHOTO".equals(detected.category())) {
             Optional<byte[]> bytes = thumbnails.create(source::open);
             if (bytes.isPresent()) {
                 try (InputStream encrypted = crypto.encryptStream(key, fileId, CryptoService.PURPOSE_THUMBNAIL,
                         new java.io.ByteArrayInputStream(bytes.get()))) {
-                    blobs.putThumbnail(ref, encrypted, crypto.encryptedSize(bytes.get().length));
-                    thumbnail = true;
+                    thumbnailKey = blobs.putThumbnail(fileId, patientId, encrypted.readAllBytes());
                 } catch (IOException | RuntimeException e) {
                     LOG.warn("Thumbnail for file {} could not be stored: {}", fileId, e.getClass().getSimpleName());
                 }
             }
         }
 
-        boolean hasThumbnail = thumbnail;
+        String storedThumbnailKey = thumbnailKey;
         byte[] sha = digest.digest();
         tx.executeWithoutResult(status -> {
             MedicalFile file = files.findById(fileId).orElseThrow();
             file.setCiphertextSha256(sha);
-            file.setHasThumbnail(hasThumbnail);
+            file.setCiphertextSizeBytes(ref.ciphertextSize());
+            file.setThumbnailKey(storedThumbnailKey);
             file.setStatus(MedicalFile.AVAILABLE);
         });
         audit.record(AuditEvent.success(AuditAction.FILE_UPLOADED).onEntity("FILE", fileId)
                 .withDetail("patientId", patientId).withDetail("category", detected.category())
                 .withDetail("bytes", source.size()));
-        return new UploadResult(fileId, hasThumbnail);
+        return new UploadResult(fileId, storedThumbnailKey != null);
     }
 
     /** Removes whatever a failed upload left behind (blob and PENDING row). Best effort; reconciliation cleans the rest. */
-    private void discard(UUID fileId) {
+    private void discard(UUID patientId, UUID fileId) {
         try {
-            blobs.erase(BlobRef.of(fileId));
+            blobs.erase(BlobRef.of(patientId, fileId));
         } catch (RuntimeException e) {
             LOG.warn("Could not remove blob of failed upload {}", fileId);
         }
@@ -275,7 +271,7 @@ public class RecordsService implements RecordsApi {
         if (!file.isHasThumbnail()) {
             return Optional.empty();
         }
-        Optional<InputStream> stored = blobs.openThumbnail(BlobRef.of(file.getId()));
+        Optional<InputStream> stored = blobs.openThumbnail(refOf(file));
         if (stored.isEmpty()) {
             return Optional.empty();
         }
@@ -292,7 +288,7 @@ public class RecordsService implements RecordsApi {
     private FileContent openStream(MedicalFile file, DataKey key, boolean inline) {
         InputStream stored = null;
         try {
-            stored = blobs.openContent(BlobRef.of(file.getId()));
+            stored = blobs.openContent(refOf(file));
             PushbackInputStream plain = new PushbackInputStream(
                     crypto.decryptStream(key, file.getId(), CryptoService.PURPOSE_CONTENT, stored), 1);
             int first = plain.read();               // forces decryption + authentication of the first segment
@@ -407,7 +403,7 @@ public class RecordsService implements RecordsApi {
             List<MedicalFile> inside = new ArrayList<>(files.findByPatientIdAndFolderIdIn(patientId, subtree));
             tx.executeWithoutResult(status -> inside.forEach(f -> files.findById(f.getId()).ifPresent(g -> g.setStatus(MedicalFile.DELETING))));
             for (MedicalFile file : inside) {
-                blobs.erase(BlobRef.of(file.getId()));
+                blobs.erase(refOf(file));
                 tx.executeWithoutResult(status -> files.deleteById(file.getId()));
             }
             tx.executeWithoutResult(status -> folders.deleteById(folderId));
@@ -460,7 +456,7 @@ public class RecordsService implements RecordsApi {
         requireActive(patientId);
         MedicalFile file = files.findByIdAndPatientId(fileId, patientId).orElseThrow(RecordsException::notFound);
         tx.executeWithoutResult(status -> files.findById(file.getId()).ifPresent(f -> f.setStatus(MedicalFile.DELETING)));
-        blobs.erase(BlobRef.of(file.getId()));
+        blobs.erase(refOf(file));
         tx.executeWithoutResult(status -> files.deleteById(file.getId()));
         audit.record(AuditEvent.success(AuditAction.FILE_DELETED).onEntity("FILE", fileId).withDetail("patientId", patientId));
     }
@@ -605,8 +601,8 @@ public class RecordsService implements RecordsApi {
         return name.toLowerCase(Locale.ROOT);
     }
 
-    private String keyIdOf() {
-        return "dek";
+    private static BlobRef refOf(MedicalFile file) {
+        return new BlobRef(file.getStorageKey(), file.getThumbnailKey(), file.getCiphertextSizeBytes() == null ? 0 : file.getCiphertextSizeBytes());
     }
 
     private static MessageDigest sha256() {

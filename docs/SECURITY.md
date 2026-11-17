@@ -1,11 +1,11 @@
 # Security notes
 
 Living document; sections are added as the corresponding steps of the spec are implemented.
-Authoritative requirements: `PatientVault_Spec_v1.md` sections 6 and 7.
+Authoritative requirements: `PatientVault_Spec_v2.md` sections 6 and 7.
 
 ## 1. Encryption model (implemented: step 1)
 
-PostgreSQL and CouchDB are treated as **untrusted storage**. Everything personal or medical is
+PostgreSQL and the S3 bucket are treated as **untrusted storage**. Everything personal or medical is
 encrypted inside the JVM before it is stored.
 
 ```
@@ -129,9 +129,11 @@ Per patient: random 256-bit DEK, stored only wrapped by the KEK
 ## 6. Medical files (implemented: step 6)
 
 - **At rest:** file content is stream-encrypted (AES256_GCM_HKDF_1MB, key derived from the patient data key,
-  file id and purpose) before it leaves the JVM; names are encrypted fields. CouchDB documents hold only
-  technical fields (type, patientId, keyId, cipher, size, time). Verified by searching raw PostgreSQL and CouchDB
-  for sentinel names/content (plain and base64): nothing found.
+  file id and purpose) before it leaves the JVM; names are encrypted fields. S3 objects are ciphertext under
+  keys made only of UUIDs (`p/{patientId}/f/{fileId}/content|thumb`); their only user-defined metadata is the
+  cipher name and a schema number, and no tags are used. Bucket default encryption (SSE-S3) is a second layer.
+  Verified: the key listing contains no file or patient name and a stored PDF object does not contain the
+  plaintext. File metadata (encrypted name, type, size, folder, status, keys, SHA-256) is in PostgreSQL only.
 - **Upload:** one file per request; content sniffed with Tika against an allow-list; HTML, SVG, EXE, scripts and
   extension/content mismatches are rejected before anything is stored; size limit 100 MB (413); names and relative
   paths sanitised; failed uploads leave no blob or row.
@@ -140,8 +142,11 @@ Per patient: random 256-bit DEK, stored only wrapped by the KEK
   `Content-Security-Policy: sandbox`, `nosniff` and `no-store` on every response.
 - **Integrity:** a modified ciphertext byte makes the download fail (500, no content sent) and is audited as
   `FILE_INTEGRITY_FAILURE`.
-- **Availability:** if CouchDB is down, uploads and downloads answer 503, nothing half-written remains, the
-  listing still works (it comes from PostgreSQL) and readiness reports DOWN until CouchDB returns.
+- **Availability:** if S3 is unreachable, uploads and downloads answer 503, nothing half-written remains
+  (a failed multipart upload is aborted), the listing still works (it comes from PostgreSQL) and readiness
+  reports DOWN until S3 returns.
+- **Deletion:** the bucket is versioned, so deleting a file removes every object version and delete marker of its
+  content and thumbnail by version id (a plain delete would only add a delete marker).
 
 ## 7. Appointments and e-mail reminders (implemented: step 8)
 

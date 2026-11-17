@@ -3,6 +3,8 @@ package com.example.patientvault.records.internal;
 import java.time.Instant;
 import java.util.UUID;
 
+import com.example.patientvault.records.blob.StorageKeys;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -10,7 +12,7 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 
-/** File metadata row. The name is ciphertext; the content is in the object store under {@code couchDocId}. */
+/** File metadata row. The name is ciphertext; the content is in the object store under {@code storageKey}. */
 @Entity
 @Table(name = "medical_file")
 public class MedicalFile {
@@ -46,11 +48,14 @@ public class MedicalFile {
     @Column(name = "ciphertext_sha256")
     private byte[] ciphertextSha256;
 
-    @Column(name = "couch_doc_id", nullable = false, updatable = false)
-    private String couchDocId;
+    @Column(name = "ciphertext_size_bytes")
+    private Long ciphertextSizeBytes;
 
-    @Column(name = "has_thumbnail", nullable = false)
-    private boolean hasThumbnail;
+    @Column(name = "storage_key", nullable = false, updatable = false)
+    private String storageKey;
+
+    @Column(name = "thumbnail_key")
+    private String thumbnailKey;
 
     @Column(nullable = false)
     private String status = PENDING;
@@ -73,7 +78,7 @@ public class MedicalFile {
         this.displayNameEnc = displayNameEnc;
         this.mimeType = mimeType;
         this.sizeBytes = sizeBytes;
-        this.couchDocId = id.toString();
+        this.storageKey = StorageKeys.content(patientId, id);
     }
 
     @PrePersist
@@ -132,16 +137,28 @@ public class MedicalFile {
         this.ciphertextSha256 = ciphertextSha256;
     }
 
-    public String getCouchDocId() {
-        return couchDocId;
+    public Long getCiphertextSizeBytes() {
+        return ciphertextSizeBytes;
+    }
+
+    public void setCiphertextSizeBytes(Long ciphertextSizeBytes) {
+        this.ciphertextSizeBytes = ciphertextSizeBytes;
+    }
+
+    public String getStorageKey() {
+        return storageKey;
+    }
+
+    public String getThumbnailKey() {
+        return thumbnailKey;
+    }
+
+    public void setThumbnailKey(String thumbnailKey) {
+        this.thumbnailKey = thumbnailKey;
     }
 
     public boolean isHasThumbnail() {
-        return hasThumbnail;
-    }
-
-    public void setHasThumbnail(boolean hasThumbnail) {
-        this.hasThumbnail = hasThumbnail;
+        return thumbnailKey != null;
     }
 
     public String getStatus() {

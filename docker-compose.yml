@@ -15,17 +15,20 @@ services:
       timeout: 3s
       retries: 10
 
-  couchdb:
-    build: ./docker/couchdb
+  # S3-compatible emulator for local development (the real bucket is never used by local/test profiles by default)
+  s3:
+    image: adobe/s3mock:latest
+    user: root   # the named volume is root-owned; development only
     environment:
-      COUCHDB_USER: ${COUCHDB_USER:-admin}
-      COUCHDB_PASSWORD: ${COUCHDB_PASSWORD:-admin-dev-password}
+      COM_ADOBE_TESTING_S3MOCK_STORE_INITIAL_BUCKETS: ${S3_BUCKET:-patientvault-files-local}
+      COM_ADOBE_TESTING_S3MOCK_STORE_RETAIN_FILES_ON_EXIT: "true"
+      COM_ADOBE_TESTING_S3MOCK_STORE_ROOT: /s3data
     ports:
-      - "127.0.0.1:5984:5984"
+      - "127.0.0.1:9090:9090"
     volumes:
-      - couchdata:/opt/couchdb/data
+      - s3data:/s3data
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS -u $${COUCHDB_USER}:$${COUCHDB_PASSWORD} http://localhost:5984/_up || exit 1"]
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:9090/ || exit 1"]
       interval: 5s
       timeout: 3s
       retries: 15
@@ -38,4 +41,4 @@ services:
 
 volumes:
   pgdata:
-  couchdata:
+  s3data:

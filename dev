@@ -19,12 +19,20 @@ ensure_dev_secrets() {
     } >> "$SECRETS_FILE"
     echo "Generated local development encryption keys in $SECRETS_FILE"
   fi
-  if ! grep -q '^export COUCHDB_APP_PASSWORD=' "$SECRETS_FILE"; then
+  if ! grep -q '^export S3_BUCKET=' "$SECRETS_FILE"; then
     {
-      echo "export COUCHDB_ADMIN_PASSWORD=${COUCHDB_PASSWORD:-admin-dev-password}   # matches docker-compose.yml"
-      echo "export COUCHDB_APP_PASSWORD=$(openssl rand -base64 18 | tr '+/' 'ab')"
+      echo "# Local S3 emulator (docker compose). To use a real test bucket instead, replace these lines with:"
+      echo "#   export S3_BUCKET=<bucket>  S3_REGION=<region>  S3_ACCESS_KEY_ID=<key>  S3_SECRET_ACCESS_KEY=<secret>"
+      echo "export S3_BUCKET=patientvault-files-local"
+      echo "export S3_REGION=eu-central-1"
+      echo "export S3_ENDPOINT=http://localhost:9090"
+      echo "export S3_ACCESS_KEY_ID=local"
+      echo "export S3_SECRET_ACCESS_KEY=local-dev-only"
+      echo "export APP_STORAGE_S3_PATH_STYLE=true"
+      echo "export APP_STORAGE_S3_SSE=NONE"
+      echo "export APP_STORAGE_S3_CONDITIONAL_WRITES=false"
     } >> "$SECRETS_FILE"
-    echo "Added local CouchDB credentials to $SECRETS_FILE"
+    echo "Added local S3 emulator settings to $SECRETS_FILE"
   fi
   if ! grep -q '^export APP_BOOTSTRAP_PASSWORD=' "$SECRETS_FILE"; then
     local password
@@ -38,7 +46,11 @@ ensure_dev_secrets() {
 }
 
 case "${1:-}" in
-  up)     docker compose up -d --build --wait postgres couchdb mailpit ;;
+  up)     docker compose up -d --build --wait postgres s3 mailpit
+          # the bucket is versioned like in production (the emulator creates the bucket itself)
+          curl -fsS -X PUT "http://localhost:9090/${S3_BUCKET:-patientvault-files-local}?versioning" \
+            -H 'Content-Type: application/xml' \
+            -d '<VersioningConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/"><Status>Enabled</Status></VersioningConfiguration>' ;;
   down)   docker compose down ;;
   logs)   docker compose logs -f ;;
   run)    ensure_dev_secrets
