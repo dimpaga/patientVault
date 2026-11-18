@@ -432,6 +432,29 @@ h1, .h1, h2, .h2, h3, .h3 { letter-spacing: -0.02em; }
 }
 
 /* Search results: contact lines and diagnosis snippet on result cards */
+/* Patient result cards: frosted glass. The fill stays about half opaque and the text colours are untouched, so contrast holds on both themes. */
+.pv-patient-card {
+    /* light theme: milky glass on the beige page - a whiter, see-through fill, a bright rim and a sheen from the top left */
+    --bs-card-bg: color-mix(in srgb, var(--pv-surface) 72%, transparent);
+    background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0) 65%);
+    -webkit-backdrop-filter: blur(18px) saturate(180%);
+    backdrop-filter: blur(18px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.85);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 0 0 1px rgba(70, 52, 20, 0.05), 0 16px 36px rgba(70, 52, 20, 0.10);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+[data-bs-theme="dark"] .pv-patient-card {
+    --bs-card-bg: color-mix(in srgb, var(--pv-surface) 72%, transparent);
+    background-image: linear-gradient(135deg, rgba(150, 185, 235, 0.12), rgba(150, 185, 235, 0) 60%);
+    -webkit-backdrop-filter: blur(14px) saturate(160%);
+    backdrop-filter: blur(14px) saturate(160%);
+    border-color: var(--pv-hairline);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 14px 34px rgba(0, 0, 0, 0.3);
+}
+.pv-patient-card:hover { transform: translateY(-2px); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 0 0 1px rgba(70, 52, 20, 0.07), 0 20px 42px rgba(70, 52, 20, 0.14); }
+[data-bs-theme="dark"] .pv-patient-card:hover { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 18px 40px rgba(0, 0, 0, 0.4); }
+@media (prefers-reduced-motion: reduce) { .pv-patient-card { transition: none; } .pv-patient-card:hover { transform: none; } }
+
 /* Patient tile: name on top, details a little lower, files and last visit on the right */
 .pv-card-head { margin-bottom: 2.25rem; }
 .pv-card-stats p { display: flex; align-items: baseline; gap: 0.4rem; }

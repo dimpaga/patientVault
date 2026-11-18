@@ -13,8 +13,7 @@
 
     <th:block th:if="${result.messageKey == null}">
         <p class="text-body-secondary small mb-2" th:if="${result.total > 0}"
-           th:text="${result.type.name() == 'EMPTY'} ? #{search.recent(${result.total})} : #{search.count(${result.total})}">3 patients found</p>
-
+           th:text="${result.type.name() == 'EMPTY'} ? #{search.recent(${result.total})} : #{search.count(${result.total})}">3 patients found</p>        
         <div class="card pv-card" th:if="${result.total == 0}">
             <div class="card-body text-center py-5">
                 <i class="bi bi-search display-6 text-body-secondary" aria-hidden="true"></i>
@@ -30,7 +29,7 @@
 
     <div class="row g-3" th:if="${!result.cards.isEmpty()}">
         <div class="col-12 col-xl-6" th:each="c : ${result.cards}">
-            <article class="card pv-card h-100" th:aria-labelledby="'pn-' + ${c.id}">
+            <article class="card pv-card pv-patient-card h-100" th:aria-labelledby="'pn-' + ${c.id}">
                 <div class="card-body">
                     <div class="d-flex align-items-start justify-content-between gap-2 pv-card-head">
                         <h2 class="h4 fw-semibold mb-0" th:id="'pn-' + ${c.id}">
@@ -50,8 +49,6 @@
                         <li><i class="bi bi-card-text" aria-hidden="true"></i>
                             <span class="visually-hidden" th:text="#{patient.field.amka}">AMKA</span>
                             <span th:text="${c.amka}">amka</span></li>
-                        <li th:if="${c.referralSource != null}"><i class="bi bi-signpost-split" aria-hidden="true"></i>
-                            <span th:text="${c.referralSource}">source</span></li>
                     </ul>
                     <div class="pv-card-stats small text-body-secondary ms-sm-auto text-sm-end">
                     <p class="mb-1" th:if="${c.fileCount > 0}">
@@ -64,7 +61,6 @@
                     </p>
                     </div>
                     </div>
-                    <p class="small mb-0 pv-snippet" th:if="${c.latestDiagnosis != null}" th:text="${c.latestDiagnosis}">diagnosis</p>
                 </div>
                 <div class="card-footer bg-transparent d-flex flex-wrap gap-2">
                     <a class="btn btn-outline-secondary btn-sm pv-result-action" th:href="@{/patients/{id}(id=${c.id})}">
