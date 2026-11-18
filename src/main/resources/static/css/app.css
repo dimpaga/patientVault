@@ -24,8 +24,8 @@
     --pv-cta: #30D158;
     --pv-cta-hover: #62b35b;
     --pv-on-cta: #0f2d14;
-    --pv-search: #796254;
-    --pv-search-hover: #a27246;
+    --pv-search: #7f543a;
+    --pv-search-hover: #e25f0e;
     --pv-on-search: #ffffff;
     --pv-surgery-bg: #e3f1df;
     --pv-surgery-edge: #2b7a4b;
@@ -41,6 +41,7 @@
     --bs-border-color: #e4d9c0;
     --bs-border-color-translucent: rgba(70, 52, 20, 0.12);
     --bs-emphasis-color: #14110b;
+    --bs-heading-color: #383736;
 
     --bs-primary: var(--pv-accent);
     --bs-primary-rgb: 43, 122, 75;
@@ -104,6 +105,7 @@
     --bs-border-color: #2a4468;
     --bs-border-color-translucent: rgba(150, 185, 235, 0.16);
     --bs-emphasis-color: #ffffff;
+    --bs-heading-color: #ffffff;
 
     --bs-primary-rgb: 134, 176, 227;
     --bs-link-color-rgb: 134, 176, 227;
@@ -400,6 +402,9 @@ h1, .h1, h2, .h2, h3, .h3 { letter-spacing: -0.02em; }
 .pv-form-card { max-width: 32rem; }
 .pv-prewrap { white-space: pre-wrap; overflow-wrap: anywhere; }
 .pv-details dt { color: var(--bs-secondary-color); font-weight: 500; }
+/* provided values (not the e-mail/phone links, not the "Not provided" placeholders): black on light, white on dark */
+[data-bs-theme="light"] .pv-details dd { color: #000; }
+[data-bs-theme="dark"] .pv-details dd { color: #fff; }
 .pv-more > summary { cursor: pointer; min-height: var(--pv-touch); }
 .pv-patient-form { max-width: 56rem; }
 .nav-tabs .nav-link { display: inline-flex; align-items: center; gap: 0.4rem; min-height: var(--pv-touch); }
@@ -420,6 +425,11 @@ h1, .h1, h2, .h2, h3, .h3 { letter-spacing: -0.02em; }
     --bs-btn-active-border-color: var(--pv-accent-hover);
     --bs-btn-active-color: var(--pv-on-accent);
 }
+/* dark theme: off-white text and border (the hover and active colours above still apply) */
+[data-bs-theme="dark"] .pv-result-action {
+    --bs-btn-color: #f1eee6b2;
+    --bs-btn-border-color: #f1eee6b2;
+}
 
 /* Search results: contact lines and diagnosis snippet on result cards */
 /* Patient tile: name on top, details a little lower, files and last visit on the right */
@@ -436,14 +446,19 @@ h1, .h1, h2, .h2, h3, .h3 { letter-spacing: -0.02em; }
 .pv-dropzone.pv-dragover { outline: 3px dashed var(--pv-accent); outline-offset: -6px; background: color-mix(in srgb, var(--pv-accent) 8%, transparent); }
 .pv-filebtn { position: relative; cursor: pointer; }
 .pv-filebtn:focus-within { outline: 3px solid var(--pv-accent); outline-offset: 2px; }
+/* the list only takes space once files are queued */
+.pv-uploads:not(:empty) { margin-top: 1rem; }
 .pv-uploads li { display: grid; grid-template-columns: 1fr auto; gap: 0.15rem 0.75rem; align-items: center; padding: 0.4rem 0; border-top: 1px solid var(--bs-border-color-translucent); }
 .pv-uploads .pv-up-name { overflow-wrap: anywhere; }
 .pv-uploads progress { grid-column: 1 / -1; width: 100%; height: 0.5rem; accent-color: var(--pv-accent); }
 .pv-uploads .pv-up-error { grid-column: 1 / -1; color: var(--bs-danger); }
 .pv-filecard .pv-thumb-img { width: 100%; height: 9rem; object-fit: cover; border-radius: var(--pv-radius) var(--pv-radius) 0 0; display: block; background: var(--bs-secondary-bg); }
 .pv-filecard .pv-thumb-icon { display: flex; align-items: center; justify-content: center; height: 9rem; font-size: 3rem; color: var(--bs-secondary-color); background: var(--bs-secondary-bg); border-radius: var(--pv-radius) var(--pv-radius) 0 0; }
-.pv-manage > summary { list-style: none; cursor: pointer; }
-.pv-manage > summary::-webkit-details-marker { display: none; }
+/* "Take a photo" only makes sense where the primary pointer is a finger (phones, tablets) */
+.pv-filebtn.pv-touch-only { display: none; }
+@media (pointer: coarse) { .pv-filebtn.pv-touch-only { display: inline-block; } }
+.min-w-0 { min-width: 0; }
+.pv-manage .btn { min-width: 2.25rem; }
 .breadcrumb { --bs-breadcrumb-divider: '›'; }
 
 /* toasts sit below the top bar so they never cover its buttons */

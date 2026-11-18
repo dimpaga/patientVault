@@ -49,61 +49,60 @@
                    th:hx-get="@{/patients/{id}/files(id=${patient.id},folder=${listing.folderId})}"
                    hx-target="#pv-tabs" hx-swap="outerHTML" hx-push-url="true" hx-boost="false"
                    th:attr="aria-pressed=${fileView != 'list'}" th:title="#{files.view.grid}">
-                    <i class="bi bi-grid" aria-hidden="true"></i><span class="visually-hidden" th:text="#{files.view.grid}">Grid</span></a>
+                    <i class="bi bi-grid" aria-hidden="true"></i><span class="visually-hidden" th:text="#{files.view.grid}">Grid view</span></a>
                 <a class="btn btn-outline-secondary" th:classappend="${fileView == 'list'} ? 'active'"
                    th:href="@{/patients/{id}/files(id=${patient.id},folder=${listing.folderId},view='list')}"
                    th:hx-get="@{/patients/{id}/files(id=${patient.id},folder=${listing.folderId},view='list')}"
                    hx-target="#pv-tabs" hx-swap="outerHTML" hx-push-url="true" hx-boost="false"
                    th:attr="aria-pressed=${fileView == 'list'}" th:title="#{files.view.list}">
-                    <i class="bi bi-list-ul" aria-hidden="true"></i><span class="visually-hidden" th:text="#{files.view.list}">List</span></a>
+                    <i class="bi bi-list-ul" aria-hidden="true"></i><span class="visually-hidden" th:text="#{files.view.list}">List view</span></a>
             </div>
-            <a class="btn btn-outline-secondary btn-sm" hx-boost="false"
+            <a class="btn btn-outline-secondary btn-sm" hx-boost="false" th:title="#{files.zip}"
                th:href="@{/patients/{id}/files/zip(id=${patient.id},folder=${listing.folderId})}"
                th:if="${!listing.files.isEmpty() or !listing.folders.isEmpty()}">
-                <i class="bi bi-file-earmark-zip" aria-hidden="true"></i><span th:text="#{files.zip}">Download as ZIP</span></a>
+                <i class="bi bi-download" aria-hidden="true"></i><span class="visually-hidden" th:text="#{files.zip}">Download as ZIP</span></a>
         </div>
     </div>
 
     <!-- upload -->
     <div class="card pv-card mb-3 pv-dropzone" data-pv-dropzone>
         <div class="card-body">
-            <h2 class="h6 mb-2"><i class="bi bi-cloud-arrow-up me-1 pv-accent" aria-hidden="true"></i>
+            <h2 class="h5 mb-3"><i class="bi bi-cloud-arrow-up me-1 pv-accent" aria-hidden="true"></i>
                 <span th:text="#{upload.title}">Add files</span></h2>
-            <div class="d-flex flex-wrap gap-2 mb-2">
+            <div class="d-flex flex-wrap gap-2 mb-4">
                 <label class="btn btn-cta pv-filebtn">
                     <i class="bi bi-file-earmark-plus" aria-hidden="true"></i><span th:text="#{upload.files}">Choose files</span>
                     <input class="visually-hidden" type="file" multiple data-pv-file-input
                            accept="image/*,application/pdf,.dcm,.dicom,.zip,.txt,DICOMDIR">
                 </label>
-                <label class="btn btn-outline-primary pv-filebtn" data-pv-folder-button>
-                    <i class="bi bi-folder-plus" aria-hidden="true"></i><span th:text="#{upload.folder}">Choose a folder</span>
+                <label class="btn btn-outline-secondary pv-filebtn" data-pv-folder-button>
+                    <i class="bi bi-folder2-open" aria-hidden="true"></i><span th:text="#{upload.folder}">Choose a folder</span>
                     <input class="visually-hidden" type="file" webkitdirectory multiple data-pv-folder-input>
                 </label>
-                <label class="btn btn-outline-primary pv-filebtn">
+                <label class="btn btn-outline-secondary pv-filebtn pv-touch-only">
                     <i class="bi bi-camera" aria-hidden="true"></i><span th:text="#{upload.camera}">Take a photo</span>
                     <input class="visually-hidden" type="file" accept="image/*" capture="environment" data-pv-file-input>
                 </label>
+                <button type="button" class="btn btn-outline-secondary ms-sm-auto" data-bs-toggle="collapse"
+                        data-bs-target="#pv-new-folder" aria-expanded="false" aria-controls="pv-new-folder">
+                    <i class="bi bi-folder-plus" aria-hidden="true"></i><span th:text="#{files.folder.new}">New folder</span></button>
+            </div>
+            <div class="collapse mb-4" id="pv-new-folder">
+                <form method="post" class="d-flex flex-wrap gap-2" th:action="@{/patients/{id}/files/folders(id=${patient.id})}"
+                      th:hx-post="@{/patients/{id}/files/folders(id=${patient.id})}" hx-swap="none" hx-boost="false">
+                    <input type="hidden" name="folder" th:value="${listing.folderId}">
+                    <input type="hidden" name="view" th:value="${fileView}">
+                    <label for="new-folder-name" class="visually-hidden" th:text="#{files.folder.name}">Folder name</label>
+                    <input id="new-folder-name" name="name" class="form-control w-auto" maxlength="200" required
+                           th:placeholder="#{files.folder.name}" autocomplete="off">
+                    <button type="submit" class="btn btn-primary" th:text="#{files.folder.create}">Create folder</button>
+                </form>
             </div>
             <p class="small text-body-secondary mb-0" th:text="#{upload.hint(${maxUploadMb})}">
                 Drop files or folders here. Photos, PDF, DICOM, ZIP and text files up to 100 MB each.</p>
-            <ul class="list-unstyled mt-3 mb-0 pv-uploads" data-pv-upload-list aria-live="polite"></ul>
+            <ul class="list-unstyled mb-0 pv-uploads" data-pv-upload-list aria-live="polite"></ul>
         </div>
     </div>
-
-    <!-- new folder -->
-    <details class="mb-3">
-        <summary class="btn btn-outline-secondary btn-sm"><i class="bi bi-folder-plus" aria-hidden="true"></i>
-            <span th:text="#{files.folder.new}">New folder</span></summary>
-        <form method="post" class="d-flex flex-wrap gap-2 mt-2" th:action="@{/patients/{id}/files/folders(id=${patient.id})}"
-              th:hx-post="@{/patients/{id}/files/folders(id=${patient.id})}" hx-swap="none" hx-boost="false">
-            <input type="hidden" name="folder" th:value="${listing.folderId}">
-            <input type="hidden" name="view" th:value="${fileView}">
-            <label for="new-folder-name" class="visually-hidden" th:text="#{files.folder.name}">Folder name</label>
-            <input id="new-folder-name" name="name" class="form-control w-auto" maxlength="200" required
-                   th:placeholder="#{files.folder.name}" autocomplete="off">
-            <button type="submit" class="btn btn-primary" th:text="#{files.folder.create}">Create folder</button>
-        </form>
-    </details>
 
     <!-- empty state -->
     <div class="card pv-card" th:if="${listing.folders.isEmpty() and listing.files.isEmpty()}">
@@ -119,15 +118,19 @@
         <div class="col-12 col-sm-6 col-xl-4" th:each="f : ${listing.folders}">
             <div class="card pv-card h-100">
                 <div class="card-body">
-                    <h3 class="h6 mb-1 d-flex align-items-center gap-2">
-                        <i class="bi bi-folder-fill pv-accent" aria-hidden="true"></i>
-                        <a class="text-decoration-none text-break" th:text="${f.name}"
-                           th:href="@{/patients/{id}/files(id=${patient.id},folder=${f.id},view=${fileView == 'list'} ? 'list')}"
-                           th:hx-get="@{/patients/{id}/files(id=${patient.id},folder=${f.id},view=${fileView == 'list'} ? 'list')}"
-                           hx-target="#pv-tabs" hx-swap="outerHTML" hx-push-url="true" hx-boost="false">Folder</a>
-                    </h3>
-                    <p class="small text-body-secondary mb-2" th:text="#{files.items(${f.itemCount})}">3 items</p>
-                    <th:block th:replace="~{patients/files :: manage(kind='folders', id=${f.id}, name=${f.name})}"></th:block>
+                    <div class="d-flex align-items-start gap-2">
+                        <div class="flex-grow-1 min-w-0">
+                            <h3 class="h6 mb-1 d-flex align-items-center gap-2">
+                                <i class="bi bi-folder-fill pv-accent" aria-hidden="true"></i>
+                                <a class="text-decoration-none text-break" th:text="${f.name}"
+                                   th:href="@{/patients/{id}/files(id=${patient.id},folder=${f.id},view=${fileView == 'list'} ? 'list')}"
+                                   th:hx-get="@{/patients/{id}/files(id=${patient.id},folder=${f.id},view=${fileView == 'list'} ? 'list')}"
+                                   hx-target="#pv-tabs" hx-swap="outerHTML" hx-push-url="true" hx-boost="false">Folder</a>
+                            </h3>
+                            <p class="small text-body-secondary mb-0" th:text="#{files.items(${f.itemCount})}">3 items</p>
+                        </div>
+                        <th:block th:replace="~{patients/files :: manage(kind='folders', id=${f.id}, name=${f.name})}"></th:block>
+                    </div>
                 </div>
             </div>
         </div>
@@ -139,10 +142,14 @@
             <div class="card pv-card h-100 pv-filecard">
                 <th:block th:replace="~{patients/files :: open(f=${f}, cls='pv-thumb')}"></th:block>
                 <div class="card-body p-2">
-                    <p class="small fw-semibold mb-0 text-break" th:text="${f.name}">name</p>
-                    <p class="small text-body-secondary mb-2"
-                       th:text="${#numbers.formatDecimal(f.sizeBytes / 1024.0 / 1024.0, 1, 2)} + ' MB · ' + ${#temporals.format(f.uploadedAt.atZone(zone), 'dd/MM/yyyy')}">1 MB</p>
-                    <th:block th:replace="~{patients/files :: manage(kind='file', id=${f.id}, name=${f.name})}"></th:block>
+                    <div class="d-flex align-items-start gap-1">
+                        <div class="flex-grow-1 min-w-0">
+                            <p class="small fw-semibold mb-0 text-break" th:text="${f.name}">name</p>
+                            <p class="small text-body-secondary mb-0"
+                               th:text="${#numbers.formatDecimal(f.sizeBytes / 1024.0 / 1024.0, 1, 2)} + ' MB · ' + ${#temporals.format(f.uploadedAt.atZone(zone), 'dd/MM/yyyy')}">1 MB</p>
+                        </div>
+                        <th:block th:replace="~{patients/files :: manage(kind='file', id=${f.id}, name=${f.name})}"></th:block>
+                    </div>
                 </div>
             </div>
         </div>
@@ -174,6 +181,56 @@
                 </tr>
                 </tbody>
             </table>
+        </div>
+    </div>
+
+    <!-- rename / move dialogs, filled in by files.js when an item's menu entry is chosen -->
+    <div class="modal" id="pv-rename-modal" tabindex="-1" aria-hidden="true" aria-labelledby="pv-rename-title">
+        <div class="modal-dialog modal-dialog-centered">
+            <form class="modal-content" method="post" hx-boost="false" hx-swap="none" data-pv-action-form
+                  th:data-pv-url="@{/patients/{id}/files(id=${patient.id})}"
+                  th:action="@{/patients/{id}/files(id=${patient.id})}" th:hx-post="@{/patients/{id}/files(id=${patient.id})}">
+                <input type="hidden" name="folder" th:value="${listing.folderId}">
+                <input type="hidden" name="view" th:value="${fileView}">
+                <div class="modal-header">
+                    <h2 class="modal-title h5" id="pv-rename-title" th:text="#{files.rename}">Rename</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" th:aria-label="#{common.close}"></button>
+                </div>
+                <div class="modal-body">
+                    <label for="pv-rename-name" class="form-label" th:text="#{files.col.name}">Name</label>
+                    <input class="form-control" id="pv-rename-name" name="name" maxlength="200" required autocomplete="off">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" th:text="#{common.cancel}">Cancel</button>
+                    <button type="submit" class="btn btn-primary" th:text="#{common.save}">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="modal" id="pv-move-modal" tabindex="-1" aria-hidden="true" aria-labelledby="pv-move-title">
+        <div class="modal-dialog modal-dialog-centered">
+            <form class="modal-content" method="post" hx-boost="false" hx-swap="none" data-pv-action-form
+                  th:data-pv-url="@{/patients/{id}/files(id=${patient.id})}" th:data-pv-current="${listing.folderId}"
+                  th:action="@{/patients/{id}/files(id=${patient.id})}" th:hx-post="@{/patients/{id}/files(id=${patient.id})}">
+                <input type="hidden" name="folder" th:value="${listing.folderId}">
+                <input type="hidden" name="view" th:value="${fileView}">
+                <div class="modal-header">
+                    <h2 class="modal-title h5" id="pv-move-title" th:text="#{files.move}">Move to</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" th:aria-label="#{common.close}"></button>
+                </div>
+                <div class="modal-body">
+                    <label for="pv-move-target" class="form-label" th:text="#{files.move}">Move to</label>
+                    <select class="form-select" id="pv-move-target" name="target">
+                        <option value="" th:text="#{files.root}">All files</option>
+                        <option th:each="o : ${listing.folderOptions}" th:value="${o.id}" th:text="${o.path}"
+                                th:selected="${o.id == listing.folderId}">Folder</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" th:text="#{common.cancel}">Cancel</button>
+                    <button type="submit" class="btn btn-primary" th:text="#{files.move.confirm}">Move</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -219,56 +276,42 @@
 </th:block>
 
 <!--
-  Rename / move / delete for one file or folder, as plain forms inside a <details> (no JavaScript needed).
-  kind = 'file' | 'folders'; for a file the download link is shown next to the toggle.
+  The "..." menu of one file or folder: download, rename and move (small dialogs, see files.js) and delete.
+  kind = 'file' | 'folders'. The menu is positioned "fixed" so a scrolling table never clips it.
 -->
-<details class="pv-manage" th:fragment="manage(kind, id, name)">
-    <summary class="btn btn-outline-secondary btn-sm">
-        <i class="bi bi-three-dots" aria-hidden="true"></i><span th:text="#{files.manage}">Manage</span>
-    </summary>
-    <div class="mt-2 d-grid gap-2">
-        <a th:if="${kind == 'file'}" class="btn btn-outline-secondary btn-sm" hx-boost="false"
-           th:href="@{/patients/{p}/files/{fid}/content(p=${patient.id},fid=${id},download=true)}">
-            <i class="bi bi-download" aria-hidden="true"></i><span th:text="#{files.download}">Download</span></a>
-        <a th:if="${kind == 'folders'}" class="btn btn-outline-secondary btn-sm" hx-boost="false"
-           th:href="@{/patients/{p}/files/zip(p=${patient.id},folder=${id})}">
-            <i class="bi bi-file-earmark-zip" aria-hidden="true"></i><span th:text="#{files.zip}">Download as ZIP</span></a>
-
-        <form method="post" class="d-flex gap-1" hx-swap="none" hx-boost="false"
-              th:action="${kind == 'file'} ? @{/patients/{p}/files/{i}/rename(p=${patient.id},i=${id})} : @{/patients/{p}/files/folders/{i}/rename(p=${patient.id},i=${id})}"
-              th:hx-post="${kind == 'file'} ? @{/patients/{p}/files/{i}/rename(p=${patient.id},i=${id})} : @{/patients/{p}/files/folders/{i}/rename(p=${patient.id},i=${id})}">
-            <input type="hidden" name="folder" th:value="${listing.folderId}">
-            <input type="hidden" name="view" th:value="${fileView}">
-            <label class="visually-hidden" th:for="'rn-' + ${id}" th:text="#{files.rename}">Rename</label>
-            <input class="form-control form-control-sm" th:id="'rn-' + ${id}" name="name" th:value="${name}" maxlength="200" required>
-            <button class="btn btn-outline-primary btn-sm" type="submit" th:title="#{files.rename}"><i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden" th:text="#{files.rename}">Rename</span></button>
-        </form>
-
-        <form method="post" class="d-flex gap-1" hx-swap="none" hx-boost="false"
-              th:action="${kind == 'file'} ? @{/patients/{p}/files/{i}/move(p=${patient.id},i=${id})} : @{/patients/{p}/files/folders/{i}/move(p=${patient.id},i=${id})}"
-              th:hx-post="${kind == 'file'} ? @{/patients/{p}/files/{i}/move(p=${patient.id},i=${id})} : @{/patients/{p}/files/folders/{i}/move(p=${patient.id},i=${id})}">
-            <input type="hidden" name="folder" th:value="${listing.folderId}">
-            <input type="hidden" name="view" th:value="${fileView}">
-            <label class="visually-hidden" th:for="'mv-' + ${id}" th:text="#{files.move}">Move to</label>
-            <select class="form-select form-select-sm" th:id="'mv-' + ${id}" name="target">
-                <option value="" th:text="#{files.root}">All files</option>
-                <option th:each="o : ${listing.folderOptions}" th:if="${o.id != id}" th:value="${o.id}" th:text="${o.path}"
-                        th:selected="${o.id == listing.folderId}">Folder</option>
-            </select>
-            <button class="btn btn-outline-primary btn-sm" type="submit" th:title="#{files.move}"><i class="bi bi-folder-symlink" aria-hidden="true"></i><span class="visually-hidden" th:text="#{files.move}">Move</span></button>
-        </form>
-
-        <form method="post" hx-swap="none" hx-boost="false"
-              th:action="${kind == 'file'} ? @{/patients/{p}/files/{i}/delete(p=${patient.id},i=${id})} : @{/patients/{p}/files/folders/{i}/delete(p=${patient.id},i=${id})}"
-              th:hx-post="${kind == 'file'} ? @{/patients/{p}/files/{i}/delete(p=${patient.id},i=${id})} : @{/patients/{p}/files/folders/{i}/delete(p=${patient.id},i=${id})}"
-              th:attr="hx-confirm=${kind == 'file'} ? #{files.delete.confirm} : #{files.folder.delete.confirm}">
-            <input type="hidden" name="folder" th:value="${listing.folderId}">
-            <input type="hidden" name="view" th:value="${fileView}">
-            <button class="btn btn-outline-danger btn-sm w-100" type="submit">
-                <i class="bi bi-trash" aria-hidden="true"></i><span th:text="#{files.delete}">Delete</span></button>
-        </form>
-    </div>
-</details>
+<div class="dropdown pv-manage" th:fragment="manage(kind, id, name)">
+    <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false"
+            data-bs-popper-config='{"strategy":"fixed"}' th:title="#{files.manage}" th:aria-label="#{files.actions(${name})}">
+        <i class="bi bi-three-dots-vertical" aria-hidden="true"></i></button>
+    <ul class="dropdown-menu dropdown-menu-end">
+        <li th:if="${kind == 'file'}">
+            <a class="dropdown-item" hx-boost="false"
+               th:href="@{/patients/{p}/files/{fid}/content(p=${patient.id},fid=${id},download=true)}">
+                <i class="bi bi-download me-2" aria-hidden="true"></i><span th:text="#{files.download}">Download</span></a></li>
+        <li th:if="${kind == 'folders'}">
+            <a class="dropdown-item" hx-boost="false"
+               th:href="@{/patients/{p}/files/zip(p=${patient.id},folder=${id})}">
+                <i class="bi bi-file-earmark-zip me-2" aria-hidden="true"></i><span th:text="#{files.zip}">Download as ZIP</span></a></li>
+        <li>
+            <button type="button" class="dropdown-item" data-pv-action="rename" th:data-pv-kind="${kind}" th:data-pv-id="${id}"
+                    th:attr="data-pv-name=${name}">
+                <i class="bi bi-pencil me-2" aria-hidden="true"></i><span th:text="#{files.rename}">Rename</span></button></li>
+        <li>
+            <button type="button" class="dropdown-item" data-pv-action="move" th:data-pv-kind="${kind}" th:data-pv-id="${id}">
+                <i class="bi bi-folder-symlink me-2" aria-hidden="true"></i><span th:text="#{files.move}">Move to</span></button></li>
+        <li><hr class="dropdown-divider"></li>
+        <li>
+            <form method="post" hx-swap="none" hx-boost="false"
+                  th:action="${kind == 'file'} ? @{/patients/{p}/files/{i}/delete(p=${patient.id},i=${id})} : @{/patients/{p}/files/folders/{i}/delete(p=${patient.id},i=${id})}"
+                  th:hx-post="${kind == 'file'} ? @{/patients/{p}/files/{i}/delete(p=${patient.id},i=${id})} : @{/patients/{p}/files/folders/{i}/delete(p=${patient.id},i=${id})}"
+                  th:attr="hx-confirm=${kind == 'file'} ? #{files.delete.confirm} : #{files.folder.delete.confirm}">
+                <input type="hidden" name="folder" th:value="${listing.folderId}">
+                <input type="hidden" name="view" th:value="${fileView}">
+                <button class="dropdown-item text-danger" type="submit">
+                    <i class="bi bi-trash me-2" aria-hidden="true"></i><span th:text="#{files.delete}">Delete</span></button>
+            </form></li>
+    </ul>
+</div>
 
 </body>
 </html>

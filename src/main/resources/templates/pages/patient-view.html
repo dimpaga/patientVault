@@ -13,8 +13,8 @@
             </span>
             <span class="badge text-bg-secondary" th:unless="${patient.data.consentGiven}" th:text="#{patient.consent.notGiven}">No consent recorded</span>
         </div>
-        <a class="btn btn-outline-primary" th:href="@{/patients/{id}/edit(id=${patient.id})}">
-            <i class="bi bi-pencil" aria-hidden="true"></i><span th:text="#{patient.edit.action}">Edit</span>
+        <a class="btn btn-outline-primary" th:href="@{/patients/{id}/edit(id=${patient.id})}" th:title="#{patient.edit.action}">
+            <i class="bi bi-pencil" aria-hidden="true"></i><span class="visually-hidden" th:text="#{patient.edit.action}">Edit</span>
         </a>
     </div>
 
@@ -110,9 +110,9 @@
                     </dd>
 
                     <dt class="col-sm-4 col-lg-3" th:text="#{patient.meta.created}">Created</dt>
-                    <dd class="col-sm-8 col-lg-9 text-body-secondary" th:text="${#temporals.format(createdAt, 'dd/MM/yyyy HH:mm')}">date</dd>
+                    <dd class="col-sm-8 col-lg-9" th:text="${#temporals.format(createdAt, 'dd/MM/yyyy HH:mm')}">date</dd>
                     <dt class="col-sm-4 col-lg-3" th:text="#{patient.meta.updated}">Last changed</dt>
-                    <dd class="col-sm-8 col-lg-9 text-body-secondary mb-0" th:text="${#temporals.format(updatedAt, 'dd/MM/yyyy HH:mm')}">date</dd>
+                    <dd class="col-sm-8 col-lg-9 mb-0" th:text="${#temporals.format(updatedAt, 'dd/MM/yyyy HH:mm')}">date</dd>
                 </dl>
             </div>
         </div>

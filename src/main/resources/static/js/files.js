@@ -260,6 +260,45 @@
         redrawFailed();
     });
 
+    // ---- rename / move dialogs ---------------------------------------------------------------
+    // The "..." menu of a file or folder carries data-pv-action; one rename and one move dialog per panel are pointed
+    // at that item (form action + hx-post), so the server endpoints and the in-place refresh stay unchanged.
+
+    document.addEventListener('click', function (event) {
+        var trigger = event.target.closest ? event.target.closest('[data-pv-action]') : null;
+        if (!trigger || !window.bootstrap) { return; }
+        var action = trigger.getAttribute('data-pv-action');
+        var modal = document.getElementById(action === 'rename' ? 'pv-rename-modal' : 'pv-move-modal');
+        if (!modal) { return; }
+        var form = modal.querySelector('form');
+        var id = trigger.getAttribute('data-pv-id');
+        var url = form.getAttribute('data-pv-url') + (trigger.getAttribute('data-pv-kind') === 'folders' ? '/folders/' : '/')
+            + id + '/' + action;
+        form.setAttribute('action', url);
+        form.setAttribute('hx-post', url);
+        if (action === 'rename') {
+            modal.querySelector('[name="name"]').value = trigger.getAttribute('data-pv-name') || '';
+        } else {
+            var select = modal.querySelector('select');
+            select.value = form.getAttribute('data-pv-current') || '';
+            // a folder cannot be moved into itself
+            Array.prototype.forEach.call(select.options, function (option) { option.disabled = option.value === id; });
+        }
+        window.bootstrap.Modal.getOrCreateInstance(modal).show();
+    });
+
+    document.addEventListener('shown.bs.modal', function (event) {
+        var field = event.target.querySelector ? event.target.querySelector('[name="name"], select') : null;
+        if (field) { field.focus(); if (field.select) { field.select(); } }
+    });
+
+    // the dialogs live inside the panel that is replaced after a change: close them first so no backdrop stays behind
+    document.addEventListener('submit', function (event) {
+        var form = event.target.closest ? event.target.closest('[data-pv-action-form]') : null;
+        var modal = form ? form.closest('.modal') : null;
+        if (modal && window.bootstrap) { window.bootstrap.Modal.getOrCreateInstance(modal).hide(); }
+    });
+
     // ---- image preview ----------------------------------------------------------------------
 
     document.addEventListener('click', function (event) {
