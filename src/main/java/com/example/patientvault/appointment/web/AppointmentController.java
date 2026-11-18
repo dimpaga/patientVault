@@ -136,7 +136,9 @@ class AppointmentController {
     /** Agenda: today, the next 7 days, or the current month, grouped by day. */
     @GetMapping("/appointments")
     @PreAuthorize("hasAuthority('" + Permissions.PATIENT_READ + "')")
-    String agenda(@RequestParam(name = "range", defaultValue = "today") String range, Model model) {
+    String agenda(@RequestParam(name = "range", defaultValue = "today") String range,
+                  @RequestHeader(name = "HX-Request", required = false) String htmx,
+                  @RequestHeader(name = "HX-Boosted", required = false) String boosted, Model model) {
         LocalDate today = LocalDate.now(appointments.zone());
         String selected = "week".equals(range) || "month".equals(range) ? range : "today";
         LocalDate from = "month".equals(selected) ? today.withDayOfMonth(1) : today;
@@ -154,7 +156,9 @@ class AppointmentController {
         model.addAttribute("days", days);
         model.addAttribute("today", today);
         model.addAttribute("now", java.time.LocalDateTime.now(appointments.zone()));
-        return "pages/appointments";
+        // switching the time window asks for the list only (htmx); a normal or boosted navigation gets the whole page
+        boolean listOnly = isHtmx(htmx) && !isHtmx(boosted);
+        return listOnly ? "appointments/agenda :: agenda" : "pages/appointments";
     }
 
     // ---- helpers ------------------------------------------------------------------------------
