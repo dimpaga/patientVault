@@ -32,19 +32,26 @@
                 <span class="badge ms-1" th:classappend="${v.data.type.name() == 'SURGERY'} ? 'text-bg-success' : 'text-bg-secondary'"
                       th:text="#{${v.data.type.messageKey()}}">Doctor visit</span>
             </h3>
-            <div class="d-flex gap-2">
-                <a class="btn btn-outline-secondary btn-sm" th:href="@{/patients/{p}(p=${patient.id},tab='visits',edit=${v.id})}"
-                   th:hx-get="@{/patients/{p}/visits/{v}/edit(p=${patient.id},v=${v.id})}"
-                   th:hx-target="'#visit-' + ${v.id}" hx-swap="innerHTML" hx-boost="false">
-                    <i class="bi bi-pencil" aria-hidden="true"></i><span th:text="#{common.edit}">Edit</span>
-                </a>
-                <form method="post" th:action="@{/patients/{p}/visits/{v}/delete(p=${patient.id},v=${v.id})}"
-                      th:hx-post="@{/patients/{p}/visits/{v}/delete(p=${patient.id},v=${v.id})}"
-                      hx-target="#pv-tabs" hx-swap="outerHTML" th:attr="hx-confirm=#{visit.delete.confirm}">
-                    <button type="submit" class="btn btn-outline-danger btn-sm">
-                        <i class="bi bi-trash" aria-hidden="true"></i><span th:text="#{common.delete}">Delete</span>
-                    </button>
-                </form>
+            <div class="dropdown pv-manage">
+                <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false"
+                        data-bs-popper-config='{"strategy":"fixed"}' th:title="#{visit.actions}" th:aria-label="#{visit.actions}">
+                    <i class="bi bi-three-dots-vertical" aria-hidden="true"></i></button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li>
+                        <a class="dropdown-item" hx-boost="false" th:href="@{/patients/{p}(p=${patient.id},tab='visits',edit=${v.id})}"
+                           th:hx-get="@{/patients/{p}/visits/{v}/edit(p=${patient.id},v=${v.id})}"
+                           th:hx-target="'#visit-' + ${v.id}" hx-swap="innerHTML">
+                            <i class="bi bi-pencil me-2" aria-hidden="true"></i><span th:text="#{common.edit}">Edit</span></a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li>
+                        <form method="post" hx-swap="none" hx-boost="false"
+                              th:action="@{/patients/{p}/visits/{v}/delete(p=${patient.id},v=${v.id})}"
+                              th:hx-post="@{/patients/{p}/visits/{v}/delete(p=${patient.id},v=${v.id})}"
+                              hx-target="#pv-tabs" th:attr="hx-confirm=#{visit.delete.confirm}">
+                            <button type="submit" class="dropdown-item text-danger">
+                                <i class="bi bi-trash me-2" aria-hidden="true"></i><span th:text="#{common.delete}">Delete</span></button>
+                        </form></li>
+                </ul>
             </div>
         </div>
         <dl class="mb-0 pv-details">
