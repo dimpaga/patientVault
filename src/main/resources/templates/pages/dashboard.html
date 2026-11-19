@@ -13,7 +13,7 @@
     </a>
 
     <div class="row g-3">
-        <section class="col-12 col-xl-6" aria-labelledby="dash-appointments">
+        <section class="col-12 col-xl-4" aria-labelledby="dash-appointments">
             <div class="card pv-card h-100">
                 <div class="card-body">
                     <h2 class="h5" id="dash-appointments">
@@ -37,7 +37,33 @@
                 </div>
             </div>
         </section>
-        <section class="col-12 col-xl-6" aria-labelledby="dash-recent">
+        <section class="col-12 col-xl-4" aria-labelledby="dash-overview">
+            <div class="card pv-card h-100">
+                <div class="card-body">
+                    <h2 class="h5 mb-3" id="dash-overview">
+                        <i class="bi bi-bar-chart-line me-2 pv-accent" aria-hidden="true"></i>
+                        <span th:text="#{dashboard.overview}">Patients overview</span>
+                    </h2>
+                    <div class="d-grid gap-3">
+                        <a class="pv-stat" th:href="@{/patients}">
+                            <span class="pv-stat-icon" aria-hidden="true"><i class="bi bi-people"></i></span>
+                            <span>
+                                <span class="pv-stat-value d-block" th:text="${#numbers.formatInteger(patientCount, 1, 'DEFAULT')}">128</span>
+                                <span class="pv-stat-label" th:text="#{dashboard.overview.patients}">Patients stored</span>
+                            </span>
+                        </a>
+                        <div class="pv-stat">
+                            <span class="pv-stat-icon" aria-hidden="true"><i class="bi bi-cloud-check"></i></span>
+                            <span>
+                                <span class="pv-stat-value d-block" th:text="${#numbers.formatInteger(fileCount, 1, 'DEFAULT')}">2,431</span>
+                                <span class="pv-stat-label" th:text="#{dashboard.overview.files}">Files in storage</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="col-12 col-xl-4" aria-labelledby="dash-recent">
             <div class="card pv-card h-100">
                 <div class="card-body">
                     <h2 class="h5" id="dash-recent">

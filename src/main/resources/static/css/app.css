@@ -25,7 +25,7 @@
     --pv-cta-hover: #62b35b;
     --pv-on-cta: #0f2d14;
     --pv-search: #7f543a;
-    --pv-search-hover: #e25f0e;
+    --pv-search-hover: #ad7d5f;
     --pv-on-search: #ffffff;
     --pv-surgery-bg: #e3f1df;
     --pv-surgery-edge: #2b7a4b;
@@ -432,6 +432,24 @@ h1, .h1, h2, .h2, h3, .h3 { letter-spacing: -0.02em; }
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06), 0 12px 30px rgba(0, 0, 0, 0.28);
 }
 
+/* Dashboard "Patients overview": big numbers on outlined tiles */
+.pv-stat {
+    display: flex; align-items: center; gap: 1rem; padding: 1rem 1.15rem; border-radius: 1.1rem;
+    color: inherit; text-decoration: none;
+    background: transparent;
+    border: 1px solid var(--pv-hairline);
+    transition: transform 0.15s ease, border-color 0.15s ease;
+}
+a.pv-stat:hover { transform: translateY(-2px); border-color: var(--pv-accent); color: inherit; }
+.pv-stat-icon {
+    flex: none; display: grid; place-items: center; width: 3rem; height: 3rem; border-radius: 50%;
+    font-size: 1.35rem; color: var(--pv-accent);
+    background: color-mix(in srgb, var(--pv-accent) 16%, transparent);
+}
+.pv-stat-value { font-size: clamp(1.6rem, 1.3rem + 0.8vw, 2rem); font-weight: 700; line-height: 1.05; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; color: var(--bs-emphasis-color); }
+.pv-stat-label { color: var(--bs-secondary-color); font-size: 0.95rem; }
+@media (prefers-reduced-motion: reduce) { .pv-stat { transition: none; } a.pv-stat:hover { transform: none; } }
+
 /* Appointments time window: glass segmented control with a highlight that slides between the options.
    Without JavaScript the active pill keeps its own background (the rules below only apply once .pv-range-ready is set). */
 .pv-range { position: relative; display: inline-flex; padding: 0.3rem; border-radius: 980px; background-color: rgba(255, 255, 255, 0.5); background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0) 65%); -webkit-backdrop-filter: blur(16px) saturate(170%); backdrop-filter: blur(16px) saturate(170%); border: 1px solid rgba(255, 255, 255, 0.85); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.95), 0 0 0 1px rgba(70, 52, 20, 0.05), 0 8px 22px rgba(70, 52, 20, 0.08); }
@@ -478,6 +496,7 @@ h1, .h1, h2, .h2, h3, .h3 { letter-spacing: -0.02em; }
 
 /* Result card actions: same outline look, green on hover */
 .pv-result-action {
+    --bs-btn-border-color: color-mix(in srgb, var(--bs-secondary) 40%, transparent);   /* border 30% transparent */
     --bs-btn-hover-bg: var(--pv-accent);
     --bs-btn-hover-border-color: var(--pv-accent);
     --bs-btn-hover-color: var(--pv-on-accent);
@@ -488,7 +507,8 @@ h1, .h1, h2, .h2, h3, .h3 { letter-spacing: -0.02em; }
 /* dark theme: off-white text and border (the hover and active colours above still apply) */
 [data-bs-theme="dark"] .pv-result-action {
     --bs-btn-color: #f1eee6b2;
-    --bs-btn-border-color: #f1eee6b2;
+    --bs-btn-border-color: color-mix(in srgb, var(--bs-secondary) 40%, transparent);
+    
 }
 
 /* Search results: contact lines and diagnosis snippet on result cards */

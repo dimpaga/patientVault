@@ -18,6 +18,9 @@ public interface PatientApi {
     /** ACTIVE patients among the given ids, in one query. Unknown or erasing patients are absent. */
     Map<UUID, PatientSummary> findActive(Collection<UUID> patientIds);
 
+    /** Number of ACTIVE patients (those hidden while being erased are not counted). */
+    long countActive();
+
     /** Most recently touched patients (patient edited or visit added/changed), newest first. */
     List<PatientSummary> recent(int limit);
 

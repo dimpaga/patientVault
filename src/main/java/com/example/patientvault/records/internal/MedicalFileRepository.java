@@ -13,6 +13,8 @@ public interface MedicalFileRepository extends JpaRepository<MedicalFile, UUID> 
 
     Optional<MedicalFile> findByIdAndPatientId(UUID id, UUID patientId);
 
+    long countByStatus(String status);
+
     /** Files of a folder level (folderId null = root) in the given statuses. */
     @Query("select f from MedicalFile f where f.patientId = :patientId and f.status in :statuses and "
             + "((:folderId is null and f.folderId is null) or f.folderId = :folderId)")

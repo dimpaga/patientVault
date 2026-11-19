@@ -16,6 +16,8 @@ public interface PatientRepository extends JpaRepository<PatientEntity, UUID> {
 
     Optional<PatientEntity> findByIdAndStatus(UUID id, String status);
 
+    long countByStatus(String status);
+
     /** Most recently touched first: the later of the patient's own update and its newest visit change. */
     @Query("""
             select p from PatientEntity p

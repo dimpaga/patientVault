@@ -121,6 +121,13 @@ public class RecordsService implements RecordsApi {
     @Override
     @PreAuthorize("hasAuthority('" + Permissions.FILE_READ + "')")
     @Transactional(readOnly = true)
+    public long countAvailableFiles() {
+        return files.countByStatus(MedicalFile.AVAILABLE);
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('" + Permissions.FILE_READ + "')")
+    @Transactional(readOnly = true)
     public Map<UUID, Long> countFiles(Collection<UUID> patientIds) {
         if (patientIds.isEmpty()) {
             return Map.of();

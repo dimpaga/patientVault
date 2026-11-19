@@ -62,6 +62,13 @@ class DefaultPatientApi implements PatientApi {
     @Override
     @PreAuthorize("hasAuthority('" + Permissions.PATIENT_READ + "')")
     @Transactional(readOnly = true)
+    public long countActive() {
+        return patients.countByStatus(PatientEntity.ACTIVE);
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('" + Permissions.PATIENT_READ + "')")
+    @Transactional(readOnly = true)
     public List<PatientSummary> recent(int limit) {
         return patients.findRecent(PageRequest.of(0, limit)).stream().map(this::summary).toList();
     }

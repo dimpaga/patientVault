@@ -10,6 +10,9 @@ public interface RecordsApi {
     /** Lists one folder level (null = root). Throws if the patient is not active or the folder is not theirs. */
     FolderListing browse(UUID patientId, UUID folderId);
 
+    /** Number of stored files (status AVAILABLE) over all patients; the metadata in PostgreSQL is the source of truth for what the object store holds. */
+    long countAvailableFiles();
+
     /** Number of available files per patient, for result cards. Patients without files are absent from the map. */
     Map<UUID, Long> countFiles(Collection<UUID> patientIds);
 }
