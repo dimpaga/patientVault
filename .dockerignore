@@ -1,0 +1,17 @@
+.git
+.gitignore
+.DS_Store
+.env
+.dev-secrets.env
+.idea/
+*.iml
+.vscode/
+*.log
+target/
+*.md
+docker-compose.yml
+Dockerfile
+.dockerignore
+.mvn/wrapper/maven-wrapper.jar
+node_modules/
+.claude/

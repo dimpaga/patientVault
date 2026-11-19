@@ -1,0 +1,117 @@
+services:
+  - type: web
+    name: patientvault
+    runtime: docker
+    plan: standard
+
+    # Database configuration
+    databases:
+      - name: patientvault-db
+        databaseName: patientvault
+        user: patientvault
+        plan: standard
+
+    # Port configuration
+    ports:
+      - port: 8080
+        protocol: http
+
+    # Build and deploy
+    buildCommand: "docker build -t patientvault:latest ."
+    startCommand: "java -Dspring.profiles.active=prod -jar app.jar"
+
+    # Health check
+    healthCheckPath: /actuator/health/readiness
+
+    # Environment variables
+    envVars:
+      # Spring profile
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+
+      # Database configuration (automatically set by Render)
+      # DATABASE_URL is provided by Render; we parse it to individual vars
+      - key: DB_HOST
+        fromDatabase:
+          name: patientvault-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: patientvault-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: patientvault-db
+          property: name
+      - key: DB_USER
+        fromDatabase:
+          name: patientvault-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: patientvault-db
+          property: password
+
+      # Timezone
+      - key: app.timezone
+        value: Europe/Athens
+
+      # Session timeouts
+      - key: app.security.session.idle-timeout
+        value: 15m
+
+      # Mail configuration (SMTP_* variables)
+      # These must be set via Render dashboard for security
+      - key: SMTP_HOST
+        sync: false  # Must be configured in Render dashboard
+      - key: SMTP_PORT
+        sync: false
+      - key: SMTP_USERNAME
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: SMTP_AUTH
+        value: "true"
+      - key: MAIL_FROM
+        value: "PatientVault <noreply@patientvault.example.com>"
+
+      # S3 Storage configuration
+      # Must be configured in Render dashboard or use external S3
+      - key: S3_BUCKET
+        sync: false
+      - key: S3_REGION
+        value: eu-central-1
+      - key: S3_ACCESS_KEY_ID
+        sync: false
+      - key: S3_SECRET_ACCESS_KEY
+        sync: false
+
+      # Security and Cryptography (MUST be set in Render dashboard!)
+      # These are sensitive and should never be committed
+      - key: APP_MASTER_KEYS
+        sync: false  # Must be configured in Render dashboard
+      - key: APP_ACTIVE_KEY_ID
+        sync: false
+      - key: APP_BLIND_INDEX_KEY_ID
+        sync: false
+
+      # Bootstrap credentials for first user (optional)
+      # Remove these after creating the first user
+      - key: APP_BOOTSTRAP_USERNAME
+        sync: false
+      - key: APP_BOOTSTRAP_PASSWORD
+        sync: false
+
+      # Public URL for reminder links in emails
+      - key: APP_PUBLIC_BASE_URL
+        sync: false  # Will be automatically set to Render domain
+
+      # Optional: doctor notification email
+      - key: APP_DOCTOR_NOTIFICATION_EMAIL
+        sync: false
+
+# Recommended: Add cron job for daily reminder digest
+crons:
+  - id: reminder-digest
+    schedule: "0 7 * * *"
+    command: "curl -s https://your-app-url/actuator/reminders/digest || true"
