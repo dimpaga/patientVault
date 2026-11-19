@@ -3,6 +3,7 @@ package com.example.patientvault.appointment.internal;
 import java.time.Instant;
 import java.util.UUID;
 
+import com.example.patientvault.patient.internal.VisitType;
 import com.example.patientvault.shared.Ids;
 
 import jakarta.persistence.Column;
@@ -36,6 +37,9 @@ public class Appointment {
 
     @Column(nullable = false)
     private String status = SCHEDULED;
+
+    @Column(name = "appointment_type", nullable = false)
+    private String appointmentType = VisitType.DOCTOR_VISIT.name();
 
     @Column(name = "reason_enc")
     private byte[] reasonEnc;
@@ -99,6 +103,14 @@ public class Appointment {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getAppointmentType() {
+        return appointmentType;
+    }
+
+    public void setAppointmentType(String appointmentType) {
+        this.appointmentType = appointmentType;
     }
 
     public byte[] getReasonEnc() {

@@ -9,7 +9,7 @@ import java.util.UUID;
  */
 public record AppointmentView(UUID id, UUID patientId, String patientName, LocalDateTime scheduled,
                               int durationMinutes, String status, String reason, long version,
-                              int pendingReminders, int sentReminders, int failedReminders) {
+                              int pendingReminders, int sentReminders, int failedReminders, String appointmentType) {
 
     public LocalDateTime end() {
         return scheduled.plusMinutes(durationMinutes);

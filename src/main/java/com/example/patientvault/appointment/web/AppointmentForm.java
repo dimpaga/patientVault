@@ -4,23 +4,25 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
 import com.example.patientvault.appointment.internal.AppointmentView;
+import com.example.patientvault.patient.internal.VisitType;
 
 /**
  * Add/edit appointment form. The raw strings are kept so that an invalid value is shown again exactly as typed.
  * {@code version} (edit only) drives the concurrent-edit check. {@code toString()} prints nothing.
  */
-record AppointmentForm(Long version, String scheduledAt, String durationMinutes, String reason) {
+record AppointmentForm(Long version, String scheduledAt, String durationMinutes, String reason, String appointmentType) {
 
     static final int DEFAULT_DURATION = 30;
     private static final DateTimeFormatter INPUT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
 
     static AppointmentForm empty() {
-        return new AppointmentForm(null, "", String.valueOf(DEFAULT_DURATION), "");
+        return new AppointmentForm(null, "", String.valueOf(DEFAULT_DURATION), "", VisitType.DOCTOR_VISIT.name());
     }
 
     static AppointmentForm from(AppointmentView view) {
         return new AppointmentForm(view.version(), view.scheduled().format(INPUT),
-                String.valueOf(view.durationMinutes()), view.reason() == null ? "" : view.reason());
+                String.valueOf(view.durationMinutes()), view.reason() == null ? "" : view.reason(),
+                view.appointmentType());
     }
 
     /** Null when empty or not a valid date-time; the service then reports "required". */

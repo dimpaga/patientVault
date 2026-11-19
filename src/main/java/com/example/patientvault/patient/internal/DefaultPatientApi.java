@@ -55,8 +55,9 @@ class DefaultPatientApi implements PatientApi {
     }
 
     @Override
-    public UUID addVisit(UUID patientId, LocalDate date) {
-        return service.addVisit(patientId, new VisitData(date, VisitType.DOCTOR_VISIT, null, null, null));
+    public UUID addVisit(UUID patientId, LocalDate date, String visitType) {
+        VisitType type = visitType != null ? VisitType.valueOf(visitType) : VisitType.DOCTOR_VISIT;
+        return service.addVisit(patientId, new VisitData(date, type, null, null, null));
     }
 
     @Override

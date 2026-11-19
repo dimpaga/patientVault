@@ -31,6 +31,7 @@ import com.example.patientvault.crypto.CryptoService;
 import com.example.patientvault.crypto.DataKey;
 import com.example.patientvault.patient.PatientApi;
 import com.example.patientvault.patient.PatientSummary;
+import com.example.patientvault.patient.internal.VisitType;
 import com.example.patientvault.shared.PatientAccess;
 import com.example.patientvault.shared.Permissions;
 
@@ -80,7 +81,7 @@ public class AppointmentService implements AppointmentApi {
 
     @PreAuthorize("hasAuthority('" + Permissions.PATIENT_WRITE + "')")
     @Transactional
-    public UUID create(UUID patientId, LocalDateTime scheduledLocal, int durationMinutes, String reason) {
+    public UUID create(UUID patientId, LocalDateTime scheduledLocal, int durationMinutes, String reason, String appointmentType) {
         requireActive(patientId);
         Instant at = validate(scheduledLocal, durationMinutes, reason);
         DataKey key = access.dataKey(patientId);
@@ -88,6 +89,7 @@ public class AppointmentService implements AppointmentApi {
         appointment.setScheduledAt(at);
         appointment.setDurationMinutes(durationMinutes);
         appointment.setReasonEnc(encryptReason(key, appointment.getId(), reason));
+        appointment.setAppointmentType(appointmentType != null ? appointmentType : VisitType.DOCTOR_VISIT.name());
         appointments.saveAndFlush(appointment);
         int planned = regenerateReminders(appointment);
         audit.record(AuditEvent.success(AuditAction.APPOINTMENT_CREATED).onEntity("APPOINTMENT", appointment.getId())
@@ -141,7 +143,7 @@ public class AppointmentService implements AppointmentApi {
         Appointment appointment = scheduled(patientId, appointmentId);
         LocalDate visitDate = appointment.getScheduledAt().atZone(zone).toLocalDate();
         LocalDate today = LocalDate.now(clock.withZone(zone));
-        UUID visitId = patients.addVisit(patientId, visitDate.isAfter(today) ? today : visitDate);
+        UUID visitId = patients.addVisit(patientId, visitDate.isAfter(today) ? today : visitDate, appointment.getAppointmentType());
         appointment.setStatus(Appointment.COMPLETED);
         reminders.findByAppointmentIdOrderByRemindAt(appointmentId).stream()
                 .filter(r -> Reminder.PENDING.equals(r.getStatus())).forEach(r -> r.setStatus(Reminder.CANCELLED));
@@ -287,7 +289,7 @@ public class AppointmentService implements AppointmentApi {
             int[] c = counts.getOrDefault(a.getId(), new int[3]);
             views.add(new AppointmentView(a.getId(), a.getPatientId(), patient.fullName(),
                     LocalDateTime.ofInstant(a.getScheduledAt(), zone), a.getDurationMinutes(), a.getStatus(),
-                    decryptReason(key, a), a.getVersion(), c[0], c[1], c[2]));
+                    decryptReason(key, a), a.getVersion(), c[0], c[1], c[2], a.getAppointmentType()));
         }
         return views;
     }

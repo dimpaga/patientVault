@@ -78,7 +78,7 @@ class AppointmentController {
                   @RequestHeader(name = "HX-Request", required = false) String htmx, Model model,
                   HttpServletResponse response, RedirectAttributes redirect) {
         try {
-            appointments.create(patientId, form.parsedScheduledAt(), form.parsedDuration(), form.reason());
+            appointments.create(patientId, form.parsedScheduledAt(), form.parsedDuration(), form.reason(), form.appointmentType());
         } catch (AppointmentValidationException e) {
             TabState state = new TabState(form, e.errors(), null, null, Map.of(), false, true);
             return render(patientId, state, htmx, model);

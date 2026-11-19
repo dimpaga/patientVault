@@ -53,6 +53,10 @@
             </span>
         </div>
         <p class="pv-prewrap mb-1" th:if="${a.reason != null}" th:text="${a.reason}">reason</p>
+        <p class="small text-body-secondary mb-1" th:if="${a.appointmentType != null}">
+            <i class="bi bi-capsule me-1" aria-hidden="true"></i>
+            <span th:text="#{'visit.type.' + ${a.appointmentType}}">Doctor visit</span>
+        </p>
         <p class="small text-body-secondary mb-0" th:if="${a.scheduledStatus}">
             <i class="bi bi-bell me-1" aria-hidden="true"></i>
             <span th:if="${a.pendingReminders + a.sentReminders + a.failedReminders == 0}" th:text="#{appointment.reminders.none}">No reminders</span>
@@ -135,6 +139,13 @@
         <div class="form-text" th:id="${prefix} + '-reason-help'" th:text="#{appointment.reason.help}">Never included in e-mails.</div>
         <div class="invalid-feedback" th:if="${errors.get('reason') != null}"
              th:text="#{${errors.get('reason')}}"></div>
+    </div>
+    <div class="mb-3">
+        <label th:for="${prefix} + '-type'" class="form-label" th:text="#{appointment.type}">Appointment type</label>
+        <select class="form-select" th:id="${prefix} + '-type'" name="appointmentType" required>
+            <option value="DOCTOR_VISIT" th:selected="${form.appointmentType == 'DOCTOR_VISIT'}" th:text="#{visit.type.DOCTOR_VISIT}">Doctor visit</option>
+            <option value="SURGERY" th:selected="${form.appointmentType == 'SURGERY'}" th:text="#{visit.type.SURGERY}">Surgery</option>
+        </select>
     </div>
 </th:block>
 
