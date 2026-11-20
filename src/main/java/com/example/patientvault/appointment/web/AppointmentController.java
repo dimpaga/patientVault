@@ -58,6 +58,7 @@ class AppointmentController {
     @PreAuthorize("hasAuthority('" + Permissions.PATIENT_READ + "')")
     String tab(@PathVariable UUID patientId, @RequestParam(name = "edit", required = false) UUID editId,
                @RequestParam(name = "new", required = false) String openNew,
+               @RequestParam(name = "modal", required = false) String isModal,
                @RequestHeader(name = "HX-Request", required = false) String htmx, Model model) {
         TabState state = TabState.initial();
         if (editId != null) {
@@ -66,6 +67,16 @@ class AppointmentController {
                 throw new AppointmentNotFoundException();
             }
             state = new TabState(state.addForm(), Map.of(), editId, AppointmentForm.from(view), Map.of(), false, false);
+            if ("true".equals(isModal)) {
+                // Return the modal edit form fragment
+                PatientSummary patient = patients.findActive(patientId).orElseThrow(AppointmentNotFoundException::new);
+                model.addAttribute("patient", patient);
+                model.addAttribute("editId", editId);
+                model.addAttribute("editForm", state.editForm());
+                model.addAttribute("editErrors", state.editErrors());
+                model.addAttribute("editConflict", state.editConflict());
+                return "appointments/tab :: appointmentEditModal";
+            }
         } else if (openNew != null) {
             state = new TabState(state.addForm(), Map.of(), null, null, Map.of(), false, true);
         }
@@ -89,8 +100,9 @@ class AppointmentController {
     @PostMapping("/patients/{patientId}/appointments/{appointmentId}")
     @PreAuthorize("hasAuthority('" + Permissions.PATIENT_WRITE + "')")
     String update(@PathVariable UUID patientId, @PathVariable UUID appointmentId, AppointmentForm form,
-                  @RequestHeader(name = "HX-Request", required = false) String htmx, Model model,
-                  HttpServletResponse response, RedirectAttributes redirect) {
+                  @RequestHeader(name = "HX-Request", required = false) String htmx,
+                  @RequestParam(name = "from", required = false) String fromLocation,
+                  Model model, HttpServletResponse response, RedirectAttributes redirect) {
         if (form.version() == null) {
             throw new AppointmentNotFoundException();
         }
@@ -105,7 +117,7 @@ class AppointmentController {
             return render(patientId, new TabState(base.addForm(), Map.of(), appointmentId, form, Map.of(), true, false),
                     htmx, model);
         }
-        return done(patientId, "appointment.updated", htmx, null, model, response, redirect);
+        return done(patientId, "appointment.updated", htmx, fromLocation, model, response, redirect);
     }
 
     @PostMapping("/patients/{patientId}/appointments/{appointmentId}/cancel")
@@ -165,13 +177,13 @@ class AppointmentController {
 
     // ---- helpers ------------------------------------------------------------------------------
 
-    /** After a successful change: htmx from agenda gets the refreshed agenda, htmx from tabs gets the full tabs. */
+    /** After a successful change: responses vary based on context (agenda, modal, or tab). */
     private String done(UUID patientId, String messageKey, String htmx, String fromLocation, Model model, HttpServletResponse response,
                         RedirectAttributes redirect) {
         if (isHtmx(htmx)) {
             response.addHeader("HX-Trigger", toasts.success(messageKey));
-            if ("agenda".equals(fromLocation)) {
-                // Request came from agenda view: return just the updated agenda
+            if ("agenda".equals(fromLocation) || "modal".equals(fromLocation)) {
+                // Request came from agenda or modal: return just the updated agenda
                 LocalDate today = LocalDate.now(appointments.zone());
                 String selected = "today";
                 LocalDate from = today;
