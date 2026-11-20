@@ -91,6 +91,7 @@ class AppointmentController {
     String update(@PathVariable UUID patientId, @PathVariable UUID appointmentId, AppointmentForm form,
                   @RequestHeader(name = "HX-Request", required = false) String htmx,
                   @RequestParam(name = "from", required = false) String fromLocation,
+                  @RequestParam(name = "range", required = false) String rangeParam,
                   Model model, HttpServletResponse response, RedirectAttributes redirect) {
         if (form.version() == null) {
             throw new AppointmentNotFoundException();
@@ -102,9 +103,13 @@ class AppointmentController {
             if ("agenda".equals(fromLocation)) {
                 // Request came from agenda: return agenda with edit form and errors
                 LocalDate today = LocalDate.now(appointments.zone());
-                String selected = "today";
-                LocalDate from = today;
-                LocalDate to = today.plusDays(1);
+                String selected = "week".equals(rangeParam) || "month".equals(rangeParam) ? rangeParam : "today";
+                LocalDate from = "month".equals(selected) ? today.withDayOfMonth(1) : today;
+                LocalDate to = switch (selected) {
+                    case "week" -> today.plusDays(7);
+                    case "month" -> today.withDayOfMonth(1).plusMonths(1);
+                    default -> today.plusDays(1);
+                };
                 Map<LocalDate, List<AppointmentView>> days = new LinkedHashMap<>();
                 for (AppointmentView view : appointments.scheduledBetween(from, to)) {
                     days.computeIfAbsent(view.scheduled().toLocalDate(), d -> new java.util.ArrayList<>()).add(view);
@@ -126,9 +131,13 @@ class AppointmentController {
             if ("agenda".equals(fromLocation)) {
                 // Request came from agenda: return agenda with edit form and conflict flag
                 LocalDate today = LocalDate.now(appointments.zone());
-                String selected = "today";
-                LocalDate from = today;
-                LocalDate to = today.plusDays(1);
+                String selected = "week".equals(rangeParam) || "month".equals(rangeParam) ? rangeParam : "today";
+                LocalDate from = "month".equals(selected) ? today.withDayOfMonth(1) : today;
+                LocalDate to = switch (selected) {
+                    case "week" -> today.plusDays(7);
+                    case "month" -> today.withDayOfMonth(1).plusMonths(1);
+                    default -> today.plusDays(1);
+                };
                 Map<LocalDate, List<AppointmentView>> days = new LinkedHashMap<>();
                 for (AppointmentView view : appointments.scheduledBetween(from, to)) {
                     days.computeIfAbsent(view.scheduled().toLocalDate(), d -> new java.util.ArrayList<>()).add(view);

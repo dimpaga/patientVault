@@ -66,7 +66,7 @@
     <div class="card pv-card border-primary">
         <div class="card-body">
             <form method="post" th:action="@{/patients/{p}/appointments/{id}(p=${a.patientId},id=${a.id})}"
-                  th:hx-post="@{/patients/{p}/appointments/{id}(p=${a.patientId},id=${a.id},from=agenda)}"
+                  th:hx-post="@{/patients/{p}/appointments/{id}(p=${a.patientId},id=${a.id},from=agenda,range=${range})}"
                   hx-target="#pv-agenda" hx-swap="outerHTML" novalidate>
                 <input type="hidden" name="version" th:value="${editForm.version}">
                 <th:block th:replace="~{appointments/tab :: appointmentFields(form=${editForm}, errors=${editErrors}, prefix='agenda-edit', focus=false)}"></th:block>
