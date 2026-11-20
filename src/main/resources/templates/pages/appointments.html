@@ -39,22 +39,10 @@
     </div>
 
     <script>
-    document.addEventListener('openEditModal', function(e) {
-        const button = e.detail;
-        const appointmentId = button.getAttribute('data-appointment-id');
-        const patientId = button.getAttribute('data-patient-id');
-        const url = '/patients/' + patientId + '/appointments?edit=' + appointmentId + '&modal=true';
-
-        htmx.ajax('GET', url, {
-            target: '#pv-edit-form-container',
-            swap: 'innerHTML',
-            onComplete: function() {
-                const modalEl = document.getElementById('pv-edit-modal');
-                const modal = new bootstrap.Modal(modalEl);
-                modal.show();
-            }
-        });
-    });
+    function showEditModal() {
+        const modal = new bootstrap.Modal(document.getElementById('pv-edit-modal'));
+        modal.show();
+    }
     </script>
 </body>
 </html>
