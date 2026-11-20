@@ -112,20 +112,20 @@ class AppointmentController {
     @PreAuthorize("hasAuthority('" + Permissions.PATIENT_WRITE + "')")
     String cancel(@PathVariable UUID patientId, @PathVariable UUID appointmentId,
                   @RequestHeader(name = "HX-Request", required = false) String htmx,
-                  @RequestHeader(name = "HX-Agenda", required = false) String fromAgenda,
+                  @RequestParam(name = "from", required = false) String fromLocation,
                   Model model, HttpServletResponse response, RedirectAttributes redirect) {
         appointments.cancel(patientId, appointmentId);
-        return done(patientId, "appointment.cancelled", htmx, fromAgenda, model, response, redirect);
+        return done(patientId, "appointment.cancelled", htmx, fromLocation, model, response, redirect);
     }
 
     @PostMapping("/patients/{patientId}/appointments/{appointmentId}/complete")
     @PreAuthorize("hasAuthority('" + Permissions.PATIENT_WRITE + "')")
     String complete(@PathVariable UUID patientId, @PathVariable UUID appointmentId,
                     @RequestHeader(name = "HX-Request", required = false) String htmx,
-                    @RequestHeader(name = "HX-Agenda", required = false) String fromAgenda,
+                    @RequestParam(name = "from", required = false) String fromLocation,
                     Model model, HttpServletResponse response, RedirectAttributes redirect) {
         appointments.complete(patientId, appointmentId);
-        return done(patientId, "appointment.completed", htmx, fromAgenda, model, response, redirect);
+        return done(patientId, "appointment.completed", htmx, fromLocation, model, response, redirect);
     }
 
     /** Link in reminder e-mails: after login, opens the patient's Appointments tab. */
@@ -166,11 +166,11 @@ class AppointmentController {
     // ---- helpers ------------------------------------------------------------------------------
 
     /** After a successful change: htmx from agenda gets the refreshed agenda, htmx from tabs gets the full tabs. */
-    private String done(UUID patientId, String messageKey, String htmx, String fromAgenda, Model model, HttpServletResponse response,
+    private String done(UUID patientId, String messageKey, String htmx, String fromLocation, Model model, HttpServletResponse response,
                         RedirectAttributes redirect) {
         if (isHtmx(htmx)) {
             response.addHeader("HX-Trigger", toasts.success(messageKey));
-            if (isHtmx(fromAgenda)) {
+            if ("agenda".equals(fromLocation)) {
                 // Request came from agenda view: return just the updated agenda
                 LocalDate today = LocalDate.now(appointments.zone());
                 String selected = "today";

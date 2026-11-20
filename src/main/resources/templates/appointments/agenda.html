@@ -31,18 +31,16 @@
                        th:title="#{appointment.reschedule}">
                         <i class="bi bi-pencil" aria-hidden="true"></i>
                     </a>
-                    <form method="post" th:action="@{/patients/{p}/appointments/{a}/complete(p=${a.patientId},a=${a.id})}"
-                          th:hx-post="@{/patients/{p}/appointments/{a}/complete(p=${a.patientId},a=${a.id})}"
-                          hx-target="#pv-agenda" hx-swap="outerHTML swap:1s" th:attr="hx-confirm=#{appointment.complete.confirm}"
-                          hx-header="HX-Agenda: true">
+                    <form method="post" th:action="@{/patients/{p}/appointments/{a}/complete(p=${a.patientId},a=${a.id},from=agenda)}"
+                          th:hx-post="@{/patients/{p}/appointments/{a}/complete(p=${a.patientId},a=${a.id},from=agenda)}"
+                          hx-target="#pv-agenda" hx-swap="outerHTML swap:1s" th:attr="hx-confirm=#{appointment.complete.confirm}">
                         <button type="submit" class="btn btn-sm btn-icon-complete" th:title="#{appointment.complete}">
                             <i class="bi bi-check2-circle" aria-hidden="true"></i>
                         </button>
                     </form>
-                    <form method="post" th:action="@{/patients/{p}/appointments/{a}/cancel(p=${a.patientId},a=${a.id})}"
-                          th:hx-post="@{/patients/{p}/appointments/{a}/cancel(p=${a.patientId},a=${a.id})}"
-                          hx-target="#pv-agenda" hx-swap="outerHTML swap:1s" th:attr="hx-confirm=#{appointment.cancel.confirm}"
-                          hx-header="HX-Agenda: true">
+                    <form method="post" th:action="@{/patients/{p}/appointments/{a}/cancel(p=${a.patientId},a=${a.id},from=agenda)}"
+                          th:hx-post="@{/patients/{p}/appointments/{a}/cancel(p=${a.patientId},a=${a.id},from=agenda)}"
+                          hx-target="#pv-agenda" hx-swap="outerHTML swap:1s" th:attr="hx-confirm=#{appointment.cancel.confirm}">
                         <button type="submit" class="btn btn-sm btn-icon-cancel" th:title="#{appointment.cancel}">
                             <i class="bi bi-x-circle" aria-hidden="true"></i>
                         </button>
