@@ -690,7 +690,7 @@ a.pv-stat:hover { transform: translateY(-2px); border-color: var(--pv-accent); c
 /* Edit button: grey */
 .btn-icon-edit {
     --bs-btn-bg: transparent;
-    --bs-btn-border-color: #7d7463;
+    --bs-btn-border-color: #7d746300;
     --bs-btn-color: #7d7463;
     --bs-btn-hover-bg: color-mix(in srgb, #7d7463 12%, transparent);
     --bs-btn-hover-border-color: #7d7463;
@@ -700,7 +700,7 @@ a.pv-stat:hover { transform: translateY(-2px); border-color: var(--pv-accent); c
     --bs-btn-active-color: #7d7463;
 }
 [data-bs-theme="dark"] .btn-icon-edit {
-    --bs-btn-border-color: #8397b3;
+    --bs-btn-border-color: #8397b300;
     --bs-btn-color: #8397b3;
     --bs-btn-hover-bg: color-mix(in srgb, #8397b3 12%, transparent);
     --bs-btn-hover-border-color: #8397b3;
@@ -713,7 +713,7 @@ a.pv-stat:hover { transform: translateY(-2px); border-color: var(--pv-accent); c
 /* Complete button: green */
 .btn-icon-complete {
     --bs-btn-bg: transparent;
-    --bs-btn-border-color: #2b7a4b;
+    --bs-btn-border-color: #2b7a4a00;
     --bs-btn-color: #2b7a4b;
     --bs-btn-hover-bg: color-mix(in srgb, #2b7a4b 12%, transparent);
     --bs-btn-hover-border-color: #2b7a4b;
@@ -723,7 +723,7 @@ a.pv-stat:hover { transform: translateY(-2px); border-color: var(--pv-accent); c
     --bs-btn-active-color: #2b7a4b;
 }
 [data-bs-theme="dark"] .btn-icon-complete {
-    --bs-btn-border-color: #5fc3a2;
+    --bs-btn-border-color: #5fc3a200;
     --bs-btn-color: #5fc3a2;
     --bs-btn-hover-bg: color-mix(in srgb, #5fc3a2 12%, transparent);
     --bs-btn-hover-border-color: #5fc3a2;
@@ -736,7 +736,7 @@ a.pv-stat:hover { transform: translateY(-2px); border-color: var(--pv-accent); c
 /* Cancel button: red */
 .btn-icon-cancel {
     --bs-btn-bg: transparent;
-    --bs-btn-border-color: #b3412f;
+    --bs-btn-border-color: #b3412f00;
     --bs-btn-color: #b3412f;
     --bs-btn-hover-bg: color-mix(in srgb, #b3412f 12%, transparent);
     --bs-btn-hover-border-color: #b3412f;
@@ -746,7 +746,7 @@ a.pv-stat:hover { transform: translateY(-2px); border-color: var(--pv-accent); c
     --bs-btn-active-color: #b3412f;
 }
 [data-bs-theme="dark"] .btn-icon-cancel {
-    --bs-btn-border-color: #e57f76;
+    --bs-btn-border-color: #e57f7600;
     --bs-btn-color: #e57f76;
     --bs-btn-hover-bg: color-mix(in srgb, #e57f76 12%, transparent);
     --bs-btn-hover-border-color: #e57f76;

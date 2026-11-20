@@ -83,7 +83,7 @@ class AppointmentController {
             TabState state = new TabState(form, e.errors(), null, null, Map.of(), false, true);
             return render(patientId, state, htmx, model);
         }
-        return done(patientId, "appointment.created", htmx, model, response, redirect);
+        return done(patientId, "appointment.created", htmx, null, model, response, redirect);
     }
 
     @PostMapping("/patients/{patientId}/appointments/{appointmentId}")
@@ -105,25 +105,27 @@ class AppointmentController {
             return render(patientId, new TabState(base.addForm(), Map.of(), appointmentId, form, Map.of(), true, false),
                     htmx, model);
         }
-        return done(patientId, "appointment.updated", htmx, model, response, redirect);
+        return done(patientId, "appointment.updated", htmx, null, model, response, redirect);
     }
 
     @PostMapping("/patients/{patientId}/appointments/{appointmentId}/cancel")
     @PreAuthorize("hasAuthority('" + Permissions.PATIENT_WRITE + "')")
     String cancel(@PathVariable UUID patientId, @PathVariable UUID appointmentId,
-                  @RequestHeader(name = "HX-Request", required = false) String htmx, Model model,
-                  HttpServletResponse response, RedirectAttributes redirect) {
+                  @RequestHeader(name = "HX-Request", required = false) String htmx,
+                  @RequestHeader(name = "HX-Agenda", required = false) String fromAgenda,
+                  Model model, HttpServletResponse response, RedirectAttributes redirect) {
         appointments.cancel(patientId, appointmentId);
-        return done(patientId, "appointment.cancelled", htmx, model, response, redirect);
+        return done(patientId, "appointment.cancelled", htmx, fromAgenda, model, response, redirect);
     }
 
     @PostMapping("/patients/{patientId}/appointments/{appointmentId}/complete")
     @PreAuthorize("hasAuthority('" + Permissions.PATIENT_WRITE + "')")
     String complete(@PathVariable UUID patientId, @PathVariable UUID appointmentId,
-                    @RequestHeader(name = "HX-Request", required = false) String htmx, Model model,
-                    HttpServletResponse response, RedirectAttributes redirect) {
+                    @RequestHeader(name = "HX-Request", required = false) String htmx,
+                    @RequestHeader(name = "HX-Agenda", required = false) String fromAgenda,
+                    Model model, HttpServletResponse response, RedirectAttributes redirect) {
         appointments.complete(patientId, appointmentId);
-        return done(patientId, "appointment.completed", htmx, model, response, redirect);
+        return done(patientId, "appointment.completed", htmx, fromAgenda, model, response, redirect);
     }
 
     /** Link in reminder e-mails: after login, opens the patient's Appointments tab. */
@@ -163,12 +165,30 @@ class AppointmentController {
 
     // ---- helpers ------------------------------------------------------------------------------
 
-    /** After a successful change: htmx gets the refreshed tab plus a toast, others a redirect with a flash message. */
-    private String done(UUID patientId, String messageKey, String htmx, Model model, HttpServletResponse response,
+    /** After a successful change: htmx from agenda gets the refreshed agenda, htmx from tabs gets the full tabs. */
+    private String done(UUID patientId, String messageKey, String htmx, String fromAgenda, Model model, HttpServletResponse response,
                         RedirectAttributes redirect) {
         if (isHtmx(htmx)) {
             response.addHeader("HX-Trigger", toasts.success(messageKey));
-            return render(patientId, TabState.initial(), htmx, model);
+            if (isHtmx(fromAgenda)) {
+                // Request came from agenda view: return just the updated agenda
+                LocalDate today = LocalDate.now(appointments.zone());
+                String selected = "today";
+                LocalDate from = today;
+                LocalDate to = today.plusDays(1);
+                Map<LocalDate, List<AppointmentView>> days = new LinkedHashMap<>();
+                for (AppointmentView view : appointments.scheduledBetween(from, to)) {
+                    days.computeIfAbsent(view.scheduled().toLocalDate(), d -> new java.util.ArrayList<>()).add(view);
+                }
+                model.addAttribute("range", selected);
+                model.addAttribute("days", days);
+                model.addAttribute("today", today);
+                model.addAttribute("now", java.time.LocalDateTime.now(appointments.zone()));
+                return "appointments/agenda :: agenda";
+            } else {
+                // Request came from patient appointments tab: return the tabs
+                return render(patientId, TabState.initial(), htmx, model);
+            }
         }
         redirect.addFlashAttribute("flashSuccess", messageKey);
         return "redirect:/patients/" + patientId + "/appointments";
