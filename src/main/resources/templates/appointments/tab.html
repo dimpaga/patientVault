@@ -4,13 +4,28 @@
 
 <!-- Appointments tab: schedule form, upcoming appointments (card or inline edit form), then history. -->
 <th:block th:fragment="appointmentsTab">
-    <div class="card pv-card mb-3" id="appt-add">
+    <!-- New Appointment button (shown when form is not focused) -->
+    <div th:unless="${focusAdd}" class="mb-3">
+        <a class="btn btn-cta" th:href="@{/patients/{id}/appointments(id=${patient.id},new=true)}"
+           th:hx-get="@{/patients/{id}/appointments(id=${patient.id},new=true)}"
+           hx-target="#pv-tabs" hx-swap="outerHTML" hx-boost="false">
+            <i class="bi bi-plus-circle me-2" aria-hidden="true"></i><span th:text="#{appointment.add}">New Appointment</span>
+        </a>
+    </div>
+
+    <!-- Add appointment form (shown when new=true) -->
+    <div th:if="${focusAdd}" class="card pv-card mb-3" id="appt-add">
         <div class="card-body">
             <h2 class="h6" th:text="#{appointment.add}">Schedule an appointment</h2>
             <form method="post" th:action="@{/patients/{id}/appointments(id=${patient.id})}"
                   th:hx-post="@{/patients/{id}/appointments(id=${patient.id})}" hx-target="#pv-tabs" hx-swap="outerHTML" novalidate>
                 <th:block th:replace="~{appointments/tab :: appointmentFields(form=${addForm}, errors=${addErrors}, prefix='add', focus=${focusAdd})}"></th:block>
-                <button type="submit" class="btn btn-cta" th:text="#{appointment.save}">Schedule</button>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary" th:text="#{appointment.save}">Schedule</button>
+                    <a class="btn btn-outline-secondary" th:href="@{/patients/{id}/appointments(id=${patient.id})}"
+                       th:hx-get="@{/patients/{id}/appointments(id=${patient.id})}" hx-target="#pv-tabs" hx-swap="outerHTML"
+                       hx-boost="false" th:text="#{common.cancel}">Cancel</a>
+                </div>
             </form>
         </div>
     </div>
