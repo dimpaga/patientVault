@@ -641,23 +641,119 @@ a.pv-stat:hover { transform: translateY(-2px); border-color: var(--pv-accent); c
     flex-shrink: 0;
 }
 
-@media (min-width: 576px) and (max-width: 991.98px) {
-    .pv-range {
-        gap: 0.1rem;
-        padding: 0.28rem;
-    }
-    .pv-range-pills .nav-link {
-        padding-inline: 1rem;
-        font-size: 0.9rem;
-        min-height: 2.75rem;
-    }
-    .pv-agenda .list-group-item {
-        gap: 0.6rem;
-        padding: 0.8rem;
-    }
-    .pv-agenda-name {
-        font-size: 0.95rem;
-    }
+/* Agenda item with action buttons */
+.pv-agenda-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0 !important;
+}
+.pv-agenda-item.pv-agenda-item-past {
+    opacity: 0.75;
+}
+.pv-agenda-link {
+    display: flex;
+    align-items: center;
+    gap: clamp(0.5rem, 2vw, 0.75rem);
+    padding: clamp(0.75rem, 2vw, 1rem);
+    flex: 1;
+    min-width: 0;
+    color: inherit;
+    text-decoration: none;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+.pv-agenda-link:hover {
+    transform: translateY(-1px);
+}
+
+/* Action buttons in agenda */
+.pv-agenda-actions {
+    display: flex;
+    gap: 0.25rem;
+    padding-right: 0.5rem;
+    flex-shrink: 0;
+}
+.pv-agenda-actions .btn {
+    --bs-btn-border-radius: 50%;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+.pv-agenda-actions .btn .bi {
+    font-size: 1rem;
+}
+
+/* Edit button: grey */
+.btn-icon-edit {
+    --bs-btn-bg: transparent;
+    --bs-btn-border-color: #7d7463;
+    --bs-btn-color: #7d7463;
+    --bs-btn-hover-bg: color-mix(in srgb, #7d7463 12%, transparent);
+    --bs-btn-hover-border-color: #7d7463;
+    --bs-btn-hover-color: #7d7463;
+    --bs-btn-active-bg: color-mix(in srgb, #7d7463 20%, transparent);
+    --bs-btn-active-border-color: #7d7463;
+    --bs-btn-active-color: #7d7463;
+}
+[data-bs-theme="dark"] .btn-icon-edit {
+    --bs-btn-border-color: #8397b3;
+    --bs-btn-color: #8397b3;
+    --bs-btn-hover-bg: color-mix(in srgb, #8397b3 12%, transparent);
+    --bs-btn-hover-border-color: #8397b3;
+    --bs-btn-hover-color: #8397b3;
+    --bs-btn-active-bg: color-mix(in srgb, #8397b3 20%, transparent);
+    --bs-btn-active-border-color: #8397b3;
+    --bs-btn-active-color: #8397b3;
+}
+
+/* Complete button: green */
+.btn-icon-complete {
+    --bs-btn-bg: transparent;
+    --bs-btn-border-color: #2b7a4b;
+    --bs-btn-color: #2b7a4b;
+    --bs-btn-hover-bg: color-mix(in srgb, #2b7a4b 12%, transparent);
+    --bs-btn-hover-border-color: #2b7a4b;
+    --bs-btn-hover-color: #2b7a4b;
+    --bs-btn-active-bg: color-mix(in srgb, #2b7a4b 20%, transparent);
+    --bs-btn-active-border-color: #2b7a4b;
+    --bs-btn-active-color: #2b7a4b;
+}
+[data-bs-theme="dark"] .btn-icon-complete {
+    --bs-btn-border-color: #5fc3a2;
+    --bs-btn-color: #5fc3a2;
+    --bs-btn-hover-bg: color-mix(in srgb, #5fc3a2 12%, transparent);
+    --bs-btn-hover-border-color: #5fc3a2;
+    --bs-btn-hover-color: #5fc3a2;
+    --bs-btn-active-bg: color-mix(in srgb, #5fc3a2 20%, transparent);
+    --bs-btn-active-border-color: #5fc3a2;
+    --bs-btn-active-color: #5fc3a2;
+}
+
+/* Cancel button: red */
+.btn-icon-cancel {
+    --bs-btn-bg: transparent;
+    --bs-btn-border-color: #b3412f;
+    --bs-btn-color: #b3412f;
+    --bs-btn-hover-bg: color-mix(in srgb, #b3412f 12%, transparent);
+    --bs-btn-hover-border-color: #b3412f;
+    --bs-btn-hover-color: #b3412f;
+    --bs-btn-active-bg: color-mix(in srgb, #b3412f 20%, transparent);
+    --bs-btn-active-border-color: #b3412f;
+    --bs-btn-active-color: #b3412f;
+}
+[data-bs-theme="dark"] .btn-icon-cancel {
+    --bs-btn-border-color: #e57f76;
+    --bs-btn-color: #e57f76;
+    --bs-btn-hover-bg: color-mix(in srgb, #e57f76 12%, transparent);
+    --bs-btn-hover-border-color: #e57f76;
+    --bs-btn-hover-color: #e57f76;
+    --bs-btn-active-bg: color-mix(in srgb, #e57f76 20%, transparent);
+    --bs-btn-active-border-color: #e57f76;
+    --bs-btn-active-color: #e57f76;
 }
 
 @media (prefers-reduced-motion: reduce) {
