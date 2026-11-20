@@ -95,14 +95,55 @@ class AppointmentController {
         if (form.version() == null) {
             throw new AppointmentNotFoundException();
         }
-        TabState base = TabState.initial();
         try {
             appointments.reschedule(patientId, appointmentId, form.version(), form.parsedScheduledAt(),
                     form.parsedDuration(), form.reason());
         } catch (AppointmentValidationException e) {
+            if ("agenda".equals(fromLocation)) {
+                // Request came from agenda: return agenda with edit form and errors
+                LocalDate today = LocalDate.now(appointments.zone());
+                String selected = "today";
+                LocalDate from = today;
+                LocalDate to = today.plusDays(1);
+                Map<LocalDate, List<AppointmentView>> days = new LinkedHashMap<>();
+                for (AppointmentView view : appointments.scheduledBetween(from, to)) {
+                    days.computeIfAbsent(view.scheduled().toLocalDate(), d -> new java.util.ArrayList<>()).add(view);
+                }
+                model.addAttribute("range", selected);
+                model.addAttribute("days", days);
+                model.addAttribute("today", today);
+                model.addAttribute("now", java.time.LocalDateTime.now(appointments.zone()));
+                model.addAttribute("editId", appointmentId);
+                model.addAttribute("editForm", form);
+                model.addAttribute("editErrors", e.errors());
+                return "appointments/agenda :: agenda";
+            }
+            // Request came from patient appointments tab: return tab with errors
+            TabState base = TabState.initial();
             return render(patientId, new TabState(base.addForm(), Map.of(), appointmentId, form, e.errors(), false, false),
                     htmx, model);
         } catch (AppointmentConflictException e) {
+            if ("agenda".equals(fromLocation)) {
+                // Request came from agenda: return agenda with edit form and conflict flag
+                LocalDate today = LocalDate.now(appointments.zone());
+                String selected = "today";
+                LocalDate from = today;
+                LocalDate to = today.plusDays(1);
+                Map<LocalDate, List<AppointmentView>> days = new LinkedHashMap<>();
+                for (AppointmentView view : appointments.scheduledBetween(from, to)) {
+                    days.computeIfAbsent(view.scheduled().toLocalDate(), d -> new java.util.ArrayList<>()).add(view);
+                }
+                model.addAttribute("range", selected);
+                model.addAttribute("days", days);
+                model.addAttribute("today", today);
+                model.addAttribute("now", java.time.LocalDateTime.now(appointments.zone()));
+                model.addAttribute("editId", appointmentId);
+                model.addAttribute("editForm", form);
+                model.addAttribute("editErrors", Map.of());
+                return "appointments/agenda :: agenda";
+            }
+            // Request came from patient appointments tab: return tab with conflict flag
+            TabState base = TabState.initial();
             return render(patientId, new TabState(base.addForm(), Map.of(), appointmentId, form, Map.of(), true, false),
                     htmx, model);
         }
