@@ -9,7 +9,7 @@
     <div class="d-flex flex-wrap align-items-start justify-content-between gap-2 mb-3">
         <h1 class="h3 mb-1" th:text="${patient.fullName}">Name</h1>
         <a class="btn btn-outline-primary" th:href="@{/patients/{id}(id=${patient.id})}">
-            <i class="bi bi-person-vcard" aria-hidden="true"></i><span th:text="#{patient.record}">Patient record</span>
+            <i class="bi bi-person-vcard" aria-hidden="true"></i><span th:text="#{patient.record}"></span>
         </a>
     </div>
     <th:block th:replace="~{pages/patient-view :: tabs}"></th:block>
