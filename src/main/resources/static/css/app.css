@@ -681,7 +681,20 @@ a.pv-stat:hover { transform: translateY(-2px); border-color: var(--pv-accent); c
 [data-bs-theme="dark"] .pv-result-action {
     --bs-btn-color: #f1eee6b2;
     --bs-btn-border-color: color-mix(in srgb, var(--bs-secondary) 40%, transparent);
-    
+
+}
+
+/* Appointment action buttons: lighter colors in dark theme for better visibility */
+[data-bs-theme="dark"] .btn-outline-secondary,
+[data-bs-theme="dark"] .btn-outline-success,
+[data-bs-theme="dark"] .btn-outline-danger {
+    --bs-btn-color: #c5d6f0;
+    --bs-btn-border-color: #5a7a9f;
+}
+[data-bs-theme="dark"] .btn-outline-secondary:hover,
+[data-bs-theme="dark"] .btn-outline-success:hover,
+[data-bs-theme="dark"] .btn-outline-danger:hover {
+    --bs-btn-border-color: currentColor;
 }
 
 /* Search results: contact lines and diagnosis snippet on result cards */
