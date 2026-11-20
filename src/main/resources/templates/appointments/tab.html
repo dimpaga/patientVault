@@ -9,7 +9,7 @@
         <a class="btn btn-cta" th:href="@{/patients/{id}/appointments(id=${patient.id},new=true)}"
            th:hx-get="@{/patients/{id}/appointments(id=${patient.id},new=true)}"
            hx-target="#pv-tabs" hx-swap="outerHTML" hx-boost="false">
-            <i class="bi bi-plus-circle me-2" aria-hidden="true"></i><span th:text="#{appointment.add}">New Appointment</span>
+            <i class="bi bi-plus" aria-hidden="true"></i><span th:text="#{appointment.add}">New Appointment</span>
         </a>
     </div>
 
