@@ -685,14 +685,29 @@ a.pv-stat:hover { transform: translateY(-2px); border-color: var(--pv-accent); c
 }
 
 /* Appointment action buttons: lighter colors in dark theme for better visibility */
-[data-bs-theme="dark"] .btn-outline-secondary,
-[data-bs-theme="dark"] .btn-outline-success,
-[data-bs-theme="dark"] .btn-outline-danger {
+/* Edit button: lighter blue-gray */
+[data-bs-theme="dark"] .btn-outline-secondary {
     --bs-btn-color: #c5d6f0;
     --bs-btn-border-color: #5a7a9f;
 }
-[data-bs-theme="dark"] .btn-outline-secondary:hover,
-[data-bs-theme="dark"] .btn-outline-success:hover,
+[data-bs-theme="dark"] .btn-outline-secondary:hover {
+    --bs-btn-border-color: currentColor;
+}
+
+/* Complete button: light green */
+[data-bs-theme="dark"] .btn-outline-success {
+    --bs-btn-color: #8fdcc0;
+    --bs-btn-border-color: #5fc3a2;
+}
+[data-bs-theme="dark"] .btn-outline-success:hover {
+    --bs-btn-border-color: currentColor;
+}
+
+/* Cancel button: light red */
+[data-bs-theme="dark"] .btn-outline-danger {
+    --bs-btn-color: #f2a8a1;
+    --bs-btn-border-color: #e57f76;
+}
 [data-bs-theme="dark"] .btn-outline-danger:hover {
     --bs-btn-border-color: currentColor;
 }
