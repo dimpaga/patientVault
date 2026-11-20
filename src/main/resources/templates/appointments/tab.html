@@ -149,32 +149,5 @@
     </div>
 </th:block>
 
-<!-- Modal edit form for agenda appointments (uses HTMX to close modal and update agenda) -->
-<th:block th:fragment="appointmentEditModal">
-    <div class="alert alert-danger" role="alert" th:if="${editConflict}">
-        <strong th:text="#{patient.conflict.title}">This record has changed</strong>
-        <span th:text="#{appointment.conflict.text}">Reload and try again.</span>
-    </div>
-    <form method="post" th:action="@{/patients/{p}/appointments/{a}(p=${patient.id},a=${editId})}"
-          th:hx-post="@{/patients/{p}/appointments/{a}(p=${patient.id},a=${editId},from=modal)}"
-          hx-target="#pv-agenda" hx-swap="outerHTML swap:1s" hx-on="htmx:responseError: closeEditModal(); htmx:afterSwap: closeEditModal()" novalidate>
-        <input type="hidden" name="version" th:value="${editForm.version}">
-        <th:block th:replace="~{appointments/tab :: appointmentFields(form=${editForm}, errors=${editErrors}, prefix='edit', focus=false)}"></th:block>
-        <div class="d-flex gap-2">
-            <button type="submit" class="btn btn-primary" th:text="#{appointment.save.changes}">Save changes</button>
-            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" th:text="#{common.cancel}">Cancel</button>
-        </div>
-    </form>
-</th:block>
-
-<script>
-function closeEditModal() {
-    const modal = bootstrap.Modal.getInstance(document.getElementById('pv-edit-modal'));
-    if (modal) {
-        modal.hide();
-    }
-}
-</script>
-
 </body>
 </html>

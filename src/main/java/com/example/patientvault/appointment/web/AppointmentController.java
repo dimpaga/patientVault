@@ -58,7 +58,6 @@ class AppointmentController {
     @PreAuthorize("hasAuthority('" + Permissions.PATIENT_READ + "')")
     String tab(@PathVariable UUID patientId, @RequestParam(name = "edit", required = false) UUID editId,
                @RequestParam(name = "new", required = false) String openNew,
-               @RequestParam(name = "modal", required = false) String isModal,
                @RequestHeader(name = "HX-Request", required = false) String htmx, Model model) {
         TabState state = TabState.initial();
         if (editId != null) {
@@ -67,16 +66,6 @@ class AppointmentController {
                 throw new AppointmentNotFoundException();
             }
             state = new TabState(state.addForm(), Map.of(), editId, AppointmentForm.from(view), Map.of(), false, false);
-            if ("true".equals(isModal)) {
-                // Return the modal edit form fragment
-                PatientSummary patient = patients.findActive(patientId).orElseThrow(AppointmentNotFoundException::new);
-                model.addAttribute("patient", patient);
-                model.addAttribute("editId", editId);
-                model.addAttribute("editForm", state.editForm());
-                model.addAttribute("editErrors", state.editErrors());
-                model.addAttribute("editConflict", state.editConflict());
-                return "appointments/tab :: appointmentEditModal";
-            }
         } else if (openNew != null) {
             state = new TabState(state.addForm(), Map.of(), null, null, Map.of(), false, true);
         }
