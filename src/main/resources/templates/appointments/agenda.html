@@ -26,8 +26,6 @@
                 </a>
                 <div class="pv-agenda-actions" th:if="${a.scheduledStatus}">
                     <a class="btn btn-sm btn-icon-edit" th:href="@{/patients/{p}/appointments(p=${a.patientId},edit=${a.id})}"
-                       th:hx-get="@{/patients/{p}/appointments(p=${a.patientId},edit=${a.id})}"
-                       hx-target="#pv-tabs" hx-swap="outerHTML" hx-boost="false"
                        th:title="#{appointment.reschedule}">
                         <i class="bi bi-pencil" aria-hidden="true"></i>
                     </a>
