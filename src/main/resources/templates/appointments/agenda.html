@@ -27,7 +27,8 @@
                 <div class="pv-agenda-actions" th:if="${a.scheduledStatus}">
                     <button class="btn btn-sm btn-icon-edit" type="button"
                             th:attr="data-appointment-id=${a.id},data-patient-id=${a.patientId}"
-                            th:title="#{appointment.reschedule}" onclick="openEditModal(this)">
+                            th:title="#{appointment.reschedule}"
+                            onclick="document.dispatchEvent(new CustomEvent('openEditModal', {detail: this}))">
                         <i class="bi bi-pencil" aria-hidden="true"></i>
                     </button>
                     <form method="post" th:action="@{/patients/{p}/appointments/{a}/complete(p=${a.patientId},a=${a.id},from=agenda)}"
