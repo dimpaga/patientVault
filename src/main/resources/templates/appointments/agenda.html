@@ -4,7 +4,7 @@
 
 <!--
   The agenda list of the Appointments page (also the htmx response when the time window changes).
-  Model: range, days, today, now. data-range tells agenda.js which time window this list belongs to.
+  Model: range, days, today, now, editId, editForm, editErrors. data-range tells agenda.js which time window this list belongs to.
 -->
 <div id="pv-agenda" class="pv-agenda" th:fragment="agenda" th:attr="data-range=${range}" aria-live="polite">
     <div class="card pv-card pv-glass" th:if="${#maps.isEmpty(days)}">
@@ -15,43 +15,70 @@
         <h2 class="h6 text-body-secondary text-uppercase mb-2 pv-agenda-day" th:id="'day-' + ${day.key}"
             th:text="${#temporals.format(day.key, 'EEEE dd/MM/yyyy')} + (${day.key == today} ? ' · ' + #{appointments.today} : '')">Monday 01/01/2026</h2>
         <div class="list-group pv-glass">
-            <div class="list-group-item list-group-item-action pv-agenda-item"
-               th:each="a : ${day.value}" th:classappend="${!a.scheduledStatus} ? 'pv-agenda-item-past'">
-                <a class="pv-agenda-link" th:href="@{/patients/{p}/appointments(p=${a.patientId})}"
-                   th:attr="data-appointment-id=${a.id}, data-patient-id=${a.patientId}">
-                    <span class="fw-semibold pv-time" th:text="${#temporals.format(a.scheduled, 'HH:mm')}">10:00</span>
-                    <span class="flex-grow-1 pv-agenda-name" th:text="${a.patientName}">Name</span>
-                    <span class="text-body-secondary small pv-agenda-duration" th:text="#{appointment.minutes(${a.durationMinutes})}">30 min</span>
-                    <span class="badge text-bg-warning pv-agenda-status" th:if="${a.scheduled.isBefore(now)}" th:text="#{appointment.overdue}">Past</span>
-                </a>
-                <div class="pv-agenda-actions" th:if="${a.scheduledStatus}">
-                    <button class="btn btn-sm btn-icon-edit" type="button"
-                            th:attr="data-appointment-id=${a.id},data-patient-id=${a.patientId},data-patient-id-val=${a.patientId}"
-                            th:hx-get="@{/patients/{p}/appointments(p=${a.patientId},edit=${a.id},modal=true)}"
-                            hx-target="#pv-edit-form-container"
-                            hx-swap="innerHTML"
-                            hx-on:htmx:afterSwap="showEditModal()"
-                            th:title="#{appointment.reschedule}">
-                        <i class="bi bi-pencil" aria-hidden="true"></i>
-                    </button>
-                    <form method="post" th:action="@{/patients/{p}/appointments/{a}/complete(p=${a.patientId},a=${a.id},from=agenda)}"
-                          th:hx-post="@{/patients/{p}/appointments/{a}/complete(p=${a.patientId},a=${a.id},from=agenda)}"
-                          hx-target="#pv-agenda" hx-swap="outerHTML swap:1s" th:attr="hx-confirm=#{appointment.complete.confirm}">
-                        <button type="submit" class="btn btn-sm btn-icon-complete" th:title="#{appointment.complete}">
-                            <i class="bi bi-check2-circle" aria-hidden="true"></i>
-                        </button>
-                    </form>
-                    <form method="post" th:action="@{/patients/{p}/appointments/{a}/cancel(p=${a.patientId},a=${a.id},from=agenda)}"
-                          th:hx-post="@{/patients/{p}/appointments/{a}/cancel(p=${a.patientId},a=${a.id},from=agenda)}"
-                          hx-target="#pv-agenda" hx-swap="outerHTML swap:1s" th:attr="hx-confirm=#{appointment.cancel.confirm}">
-                        <button type="submit" class="btn btn-sm btn-icon-cancel" th:title="#{appointment.cancel}">
-                            <i class="bi bi-x-circle" aria-hidden="true"></i>
-                        </button>
-                    </form>
-                </div>
-            </div>
+            <th:block th:each="a : ${day.value}">
+                <!-- Edit form (shown when editing this appointment) -->
+                <th:block th:if="${editId == a.id}">
+                    <th:block th:replace="~{appointments/agenda :: appointmentEditForm(a=${a})}"></th:block>
+                </th:block>
+                <!-- Appointment card (shown when not editing) -->
+                <th:block th:unless="${editId == a.id}">
+                    <div class="list-group-item list-group-item-action pv-agenda-item"
+                       th:classappend="${!a.scheduledStatus} ? 'pv-agenda-item-past'">
+                        <a class="pv-agenda-link" th:href="@{/patients/{p}/appointments(p=${a.patientId})}"
+                           th:attr="data-appointment-id=${a.id}, data-patient-id=${a.patientId}">
+                            <span class="fw-semibold pv-time" th:text="${#temporals.format(a.scheduled, 'HH:mm')}">10:00</span>
+                            <span class="flex-grow-1 pv-agenda-name" th:text="${a.patientName}">Name</span>
+                            <span class="text-body-secondary small pv-agenda-duration" th:text="#{appointment.minutes(${a.durationMinutes})}">30 min</span>
+                            <span class="badge text-bg-warning pv-agenda-status" th:if="${a.scheduled.isBefore(now)}" th:text="#{appointment.overdue}">Past</span>
+                        </a>
+                        <div class="pv-agenda-actions" th:if="${a.scheduledStatus}">
+                            <a class="btn btn-sm btn-icon-edit"
+                               th:href="@{/appointments(range=${range},edit=${a.id})}"
+                               th:hx-get="@{/appointments(range=${range},edit=${a.id})}"
+                               hx-target="#pv-agenda" hx-swap="outerHTML"
+                               th:title="#{appointment.reschedule}">
+                                <i class="bi bi-pencil" aria-hidden="true"></i>
+                            </a>
+                            <form method="post" th:action="@{/patients/{p}/appointments/{a}/complete(p=${a.patientId},a=${a.id},from=agenda)}"
+                                  th:hx-post="@{/patients/{p}/appointments/{a}/complete(p=${a.patientId},a=${a.id},from=agenda)}"
+                                  hx-target="#pv-agenda" hx-swap="outerHTML swap:1s" th:attr="hx-confirm=#{appointment.complete.confirm}">
+                                <button type="submit" class="btn btn-sm btn-icon-complete" th:title="#{appointment.complete}">
+                                    <i class="bi bi-check2-circle" aria-hidden="true"></i>
+                                </button>
+                            </form>
+                            <form method="post" th:action="@{/patients/{p}/appointments/{a}/cancel(p=${a.patientId},a=${a.id},from=agenda)}"
+                                  th:hx-post="@{/patients/{p}/appointments/{a}/cancel(p=${a.patientId},a=${a.id},from=agenda)}"
+                                  hx-target="#pv-agenda" hx-swap="outerHTML swap:1s" th:attr="hx-confirm=#{appointment.cancel.confirm}">
+                                <button type="submit" class="btn btn-sm btn-icon-cancel" th:title="#{appointment.cancel}">
+                                    <i class="bi bi-x-circle" aria-hidden="true"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </th:block>
+            </th:block>
         </div>
     </section>
+</div>
+
+<!-- Inline edit form for agenda -->
+<div th:fragment="appointmentEditForm(a)" class="list-group-item pv-agenda-item border-primary">
+    <div class="card pv-card border-primary">
+        <div class="card-body">
+            <form method="post" th:action="@{/patients/{p}/appointments/{id}(p=${a.patientId},id=${a.id})}"
+                  th:hx-post="@{/patients/{p}/appointments/{id}(p=${a.patientId},id=${a.id},from=agenda)}"
+                  hx-target="#pv-agenda" hx-swap="outerHTML" novalidate>
+                <input type="hidden" name="version" th:value="${editForm.version}">
+                <th:block th:replace="~{appointments/tab :: appointmentFields(form=${editForm}, errors=${editErrors}, prefix='agenda-edit', focus=false)}"></th:block>
+                <div class="d-flex gap-2">
+                    <button type="submit" class="btn btn-primary" th:text="#{appointment.save.changes}">Save changes</button>
+                    <a class="btn btn-outline-secondary" th:href="@{/appointments(range=${range})}"
+                       th:hx-get="@{/appointments(range=${range})}" hx-target="#pv-agenda" hx-swap="outerHTML"
+                       hx-boost="false" th:text="#{common.cancel}">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
 </body>

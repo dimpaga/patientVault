@@ -22,27 +22,5 @@
     </div>
 
     <th:block th:replace="~{appointments/agenda :: agenda}"></th:block>
-
-    <!-- Edit Modal for Agenda -->
-    <div class="modal fade" id="pv-edit-modal" tabindex="-1" aria-labelledby="pv-edit-modal-label" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="pv-edit-modal-label" th:text="#{appointment.reschedule}">Edit Appointment</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body" id="pv-edit-form-container">
-                    <!-- Form will be loaded here via HTMX -->
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-    function showEditModal() {
-        const modal = new bootstrap.Modal(document.getElementById('pv-edit-modal'));
-        modal.show();
-    }
-    </script>
 </body>
 </html>

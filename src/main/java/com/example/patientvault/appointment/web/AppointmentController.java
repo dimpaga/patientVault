@@ -151,6 +151,7 @@ class AppointmentController {
     @GetMapping("/appointments")
     @PreAuthorize("hasAuthority('" + Permissions.PATIENT_READ + "')")
     String agenda(@RequestParam(name = "range", defaultValue = "today") String range,
+                  @RequestParam(name = "edit", required = false) UUID editId,
                   @RequestHeader(name = "HX-Request", required = false) String htmx,
                   @RequestHeader(name = "HX-Boosted", required = false) String boosted, Model model) {
         LocalDate today = LocalDate.now(appointments.zone());
@@ -170,6 +171,19 @@ class AppointmentController {
         model.addAttribute("days", days);
         model.addAttribute("today", today);
         model.addAttribute("now", java.time.LocalDateTime.now(appointments.zone()));
+
+        // If editing an appointment, load the edit form
+        if (editId != null) {
+            UUID patientId = appointments.patientIdOf(editId);
+            AppointmentView view = appointments.get(patientId, editId);
+            if (!view.scheduledStatus()) {
+                throw new AppointmentNotFoundException();
+            }
+            model.addAttribute("editId", editId);
+            model.addAttribute("editForm", AppointmentForm.from(view));
+            model.addAttribute("editErrors", Map.of());
+        }
+
         // switching the time window asks for the list only (htmx); a normal or boosted navigation gets the whole page
         boolean listOnly = isHtmx(htmx) && !isHtmx(boosted);
         return listOnly ? "appointments/agenda :: agenda" : "pages/appointments";
