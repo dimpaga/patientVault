@@ -14,6 +14,7 @@
 
         <form method="post" th:action="@{/login/mfa}">
             <div class="mb-3">
+
                 <label for="code" class="form-label" th:text="#{mfa.verify.label}">Code</label>
                 <input type="text" class="form-control form-control-lg text-center" id="code" name="code" required
                        maxlength="14" autocomplete="one-time-code" autocapitalize="characters" spellcheck="false"

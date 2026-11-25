@@ -83,7 +83,7 @@ public class AppointmentService implements AppointmentApi {
     @Transactional
     public UUID create(UUID patientId, LocalDateTime scheduledLocal, int durationMinutes, String reason, String appointmentType) {
         requireActive(patientId);
-        Instant at = validate(scheduledLocal, durationMinutes, reason);
+        Instant at = validate(scheduledLocal, durationMinutes, reason, null);
         DataKey key = access.dataKey(patientId);
         Appointment appointment = new Appointment(patientId);
         appointment.setScheduledAt(at);
@@ -106,7 +106,7 @@ public class AppointmentService implements AppointmentApi {
         if (appointment.getVersion() != expectedVersion) {
             throw new AppointmentConflictException();
         }
-        Instant at = validate(scheduledLocal, durationMinutes, reason);
+        Instant at = validate(scheduledLocal, durationMinutes, reason, appointment.getScheduledAt());
         DataKey key = access.dataKey(patientId);
         boolean timeChanged = !at.equals(appointment.getScheduledAt());
         appointment.setScheduledAt(at);
@@ -187,6 +187,13 @@ public class AppointmentService implements AppointmentApi {
                 List.of(Appointment.SCHEDULED)));
     }
 
+    /** SCHEDULED appointments whose time has already passed, i.e. neither completed nor cancelled (earliest first). */
+    @PreAuthorize("hasAuthority('" + Permissions.PATIENT_READ + "')")
+    @Transactional(readOnly = true)
+    public List<AppointmentView> pastOpen() {
+        return views(appointments.findInRange(Instant.EPOCH, clock.instant(), List.of(Appointment.SCHEDULED)));
+    }
+
     @Override
     @PreAuthorize("hasAuthority('" + Permissions.PATIENT_READ + "')")
     @Transactional(readOnly = true)
@@ -207,15 +214,19 @@ public class AppointmentService implements AppointmentApi {
 
     // ---- internals ----------------------------------------------------------------------------
 
-    /** Checks the form and converts the local date-time to an instant. Gap times (spring forward) move forward. */
-    private Instant validate(LocalDateTime scheduledLocal, int durationMinutes, String reason) {
+    /**
+     * Checks the form and converts the local date-time to an instant. Gap times (spring forward) move forward.
+     * A time in the past is rejected unless it equals {@code unchangedAt}, so an overdue appointment can still be
+     * edited (reason, duration) without moving it.
+     */
+    private Instant validate(LocalDateTime scheduledLocal, int durationMinutes, String reason, Instant unchangedAt) {
         Map<String, String> errors = new LinkedHashMap<>();
         Instant at = null;
         if (scheduledLocal == null) {
             errors.put("scheduledAt", "appointment.error.required");
         } else {
             at = ZonedDateTime.ofLocal(scheduledLocal, zone, null).toInstant();
-            if (!at.isAfter(clock.instant())) {
+            if (!at.isAfter(clock.instant()) && !at.equals(unchangedAt)) {
                 errors.put("scheduledAt", "appointment.error.past");
             }
         }

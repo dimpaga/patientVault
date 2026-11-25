@@ -5,7 +5,7 @@
 <!-- Appointments tab: schedule form, upcoming appointments (card or inline edit form), then history. -->
 <th:block th:fragment="appointmentsTab">
     <!-- New Appointment button (shown when form is not focused) -->
-    <a th:unless="${focusAdd}" class="btn btn-cta btn-sm mb-4" th:href="@{/patients/{id}/appointments(id=${patient.id},new=true)}"
+    <a th:unless="${focusAdd}" class="btn btn-cta btn-sm pv-new-btn mb-4" th:href="@{/patients/{id}/appointments(id=${patient.id},new=true)}"
        th:hx-get="@{/patients/{id}/appointments(id=${patient.id},new=true)}"
        hx-target="#pv-tabs" hx-swap="outerHTML" hx-boost="false">
         <i class="bi bi-plus" aria-hidden="true"></i><span th:text="#{appointment.add}">New Appointment</span>

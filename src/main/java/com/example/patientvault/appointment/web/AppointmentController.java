@@ -83,7 +83,7 @@ class AppointmentController {
             TabState state = new TabState(form, e.errors(), null, null, Map.of(), false, true);
             return render(patientId, state, htmx, model);
         }
-        return done(patientId, "appointment.created", htmx, null, model, response, redirect);
+        return done(patientId, "appointment.created", htmx, null, null, model, response, redirect);
     }
 
     @PostMapping("/patients/{patientId}/appointments/{appointmentId}")
@@ -101,23 +101,7 @@ class AppointmentController {
                     form.parsedDuration(), form.reason());
         } catch (AppointmentValidationException e) {
             if ("agenda".equals(fromLocation)) {
-                // Request came from agenda: return agenda with edit form and errors
-                LocalDate today = LocalDate.now(appointments.zone());
-                String selected = "week".equals(rangeParam) || "month".equals(rangeParam) ? rangeParam : "today";
-                LocalDate from = "month".equals(selected) ? today.withDayOfMonth(1) : today;
-                LocalDate to = switch (selected) {
-                    case "week" -> today.plusDays(7);
-                    case "month" -> today.withDayOfMonth(1).plusMonths(1);
-                    default -> today.plusDays(1);
-                };
-                Map<LocalDate, List<AppointmentView>> days = new LinkedHashMap<>();
-                for (AppointmentView view : appointments.scheduledBetween(from, to)) {
-                    days.computeIfAbsent(view.scheduled().toLocalDate(), d -> new java.util.ArrayList<>()).add(view);
-                }
-                model.addAttribute("range", selected);
-                model.addAttribute("days", days);
-                model.addAttribute("today", today);
-                model.addAttribute("now", java.time.LocalDateTime.now(appointments.zone()));
+                addAgendaModel(model, rangeParam);
                 model.addAttribute("editId", appointmentId);
                 model.addAttribute("editForm", form);
                 model.addAttribute("editErrors", e.errors());
@@ -129,23 +113,7 @@ class AppointmentController {
                     htmx, model);
         } catch (AppointmentConflictException e) {
             if ("agenda".equals(fromLocation)) {
-                // Request came from agenda: return agenda with edit form and conflict flag
-                LocalDate today = LocalDate.now(appointments.zone());
-                String selected = "week".equals(rangeParam) || "month".equals(rangeParam) ? rangeParam : "today";
-                LocalDate from = "month".equals(selected) ? today.withDayOfMonth(1) : today;
-                LocalDate to = switch (selected) {
-                    case "week" -> today.plusDays(7);
-                    case "month" -> today.withDayOfMonth(1).plusMonths(1);
-                    default -> today.plusDays(1);
-                };
-                Map<LocalDate, List<AppointmentView>> days = new LinkedHashMap<>();
-                for (AppointmentView view : appointments.scheduledBetween(from, to)) {
-                    days.computeIfAbsent(view.scheduled().toLocalDate(), d -> new java.util.ArrayList<>()).add(view);
-                }
-                model.addAttribute("range", selected);
-                model.addAttribute("days", days);
-                model.addAttribute("today", today);
-                model.addAttribute("now", java.time.LocalDateTime.now(appointments.zone()));
+                addAgendaModel(model, rangeParam);
                 model.addAttribute("editId", appointmentId);
                 model.addAttribute("editForm", form);
                 model.addAttribute("editErrors", Map.of());
@@ -156,7 +124,7 @@ class AppointmentController {
             return render(patientId, new TabState(base.addForm(), Map.of(), appointmentId, form, Map.of(), true, false),
                     htmx, model);
         }
-        return done(patientId, "appointment.updated", htmx, fromLocation, model, response, redirect);
+        return done(patientId, "appointment.updated", htmx, fromLocation, rangeParam, model, response, redirect);
     }
 
     @PostMapping("/patients/{patientId}/appointments/{appointmentId}/cancel")
@@ -164,9 +132,10 @@ class AppointmentController {
     String cancel(@PathVariable UUID patientId, @PathVariable UUID appointmentId,
                   @RequestHeader(name = "HX-Request", required = false) String htmx,
                   @RequestParam(name = "from", required = false) String fromLocation,
+                  @RequestParam(name = "range", required = false) String rangeParam,
                   Model model, HttpServletResponse response, RedirectAttributes redirect) {
         appointments.cancel(patientId, appointmentId);
-        return done(patientId, "appointment.cancelled", htmx, fromLocation, model, response, redirect);
+        return done(patientId, "appointment.cancelled", htmx, fromLocation, rangeParam, model, response, redirect);
     }
 
     @PostMapping("/patients/{patientId}/appointments/{appointmentId}/complete")
@@ -174,9 +143,10 @@ class AppointmentController {
     String complete(@PathVariable UUID patientId, @PathVariable UUID appointmentId,
                     @RequestHeader(name = "HX-Request", required = false) String htmx,
                     @RequestParam(name = "from", required = false) String fromLocation,
+                    @RequestParam(name = "range", required = false) String rangeParam,
                     Model model, HttpServletResponse response, RedirectAttributes redirect) {
         appointments.complete(patientId, appointmentId);
-        return done(patientId, "appointment.completed", htmx, fromLocation, model, response, redirect);
+        return done(patientId, "appointment.completed", htmx, fromLocation, rangeParam, model, response, redirect);
     }
 
     /** Link in reminder e-mails: after login, opens the patient's Appointments tab. */
@@ -186,30 +156,15 @@ class AppointmentController {
         return "redirect:/patients/" + appointments.patientIdOf(appointmentId) + "/appointments";
     }
 
-    /** Agenda: today, the next 7 days, or the current month, grouped by day. */
+    /** Agenda: today, the next 7 days, the current month, or past appointments still open; grouped by day. */
     @GetMapping("/appointments")
     @PreAuthorize("hasAuthority('" + Permissions.PATIENT_READ + "')")
     String agenda(@RequestParam(name = "range", defaultValue = "today") String range,
                   @RequestParam(name = "edit", required = false) UUID editId,
                   @RequestHeader(name = "HX-Request", required = false) String htmx,
                   @RequestHeader(name = "HX-Boosted", required = false) String boosted, Model model) {
-        LocalDate today = LocalDate.now(appointments.zone());
-        String selected = "week".equals(range) || "month".equals(range) ? range : "today";
-        LocalDate from = "month".equals(selected) ? today.withDayOfMonth(1) : today;
-        LocalDate to = switch (selected) {
-            case "week" -> today.plusDays(7);
-            case "month" -> today.withDayOfMonth(1).plusMonths(1);
-            default -> today.plusDays(1);
-        };
-        Map<LocalDate, List<AppointmentView>> days = new LinkedHashMap<>();
-        for (AppointmentView view : appointments.scheduledBetween(from, to)) {
-            days.computeIfAbsent(view.scheduled().toLocalDate(), d -> new java.util.ArrayList<>()).add(view);
-        }
+        addAgendaModel(model, range);
         model.addAttribute("nav", "appointments");
-        model.addAttribute("range", selected);
-        model.addAttribute("days", days);
-        model.addAttribute("today", today);
-        model.addAttribute("now", java.time.LocalDateTime.now(appointments.zone()));
 
         // If editing an appointment, load the edit form
         if (editId != null) {
@@ -230,25 +185,39 @@ class AppointmentController {
 
     // ---- helpers ------------------------------------------------------------------------------
 
-    /** After a successful change: responses vary based on context (agenda, modal, or tab). */
-    private String done(UUID patientId, String messageKey, String htmx, String fromLocation, Model model, HttpServletResponse response,
-                        RedirectAttributes redirect) {
+    /** Fills the model for the agenda list of the given window: week, month, past (overdue and still open); anything else is today. */
+    private void addAgendaModel(Model model, String range) {
+        LocalDate today = LocalDate.now(appointments.zone());
+        String selected = "week".equals(range) || "month".equals(range) || "past".equals(range) ? range : "today";
+        List<AppointmentView> views;
+        if ("past".equals(selected)) {
+            views = appointments.pastOpen();
+        } else {
+            LocalDate from = "month".equals(selected) ? today.withDayOfMonth(1) : today;
+            LocalDate to = switch (selected) {
+                case "week" -> today.plusDays(7);
+                case "month" -> today.withDayOfMonth(1).plusMonths(1);
+                default -> today.plusDays(1);
+            };
+            views = appointments.scheduledBetween(from, to);
+        }
+        Map<LocalDate, List<AppointmentView>> days = new LinkedHashMap<>();
+        for (AppointmentView view : views) {
+            days.computeIfAbsent(view.scheduled().toLocalDate(), d -> new java.util.ArrayList<>()).add(view);
+        }
+        model.addAttribute("range", selected);
+        model.addAttribute("days", days);
+        model.addAttribute("today", today);
+        model.addAttribute("now", java.time.LocalDateTime.now(appointments.zone()));
+    }
+
+    /** After a successful change: responses vary based on context (agenda or patient tab). */
+    private String done(UUID patientId, String messageKey, String htmx, String fromLocation, String range, Model model,
+                        HttpServletResponse response, RedirectAttributes redirect) {
         if (isHtmx(htmx)) {
             response.addHeader("HX-Trigger", toasts.success(messageKey));
-            if ("agenda".equals(fromLocation) || "modal".equals(fromLocation)) {
-                // Request came from agenda or modal: return just the updated agenda
-                LocalDate today = LocalDate.now(appointments.zone());
-                String selected = "today";
-                LocalDate from = today;
-                LocalDate to = today.plusDays(1);
-                Map<LocalDate, List<AppointmentView>> days = new LinkedHashMap<>();
-                for (AppointmentView view : appointments.scheduledBetween(from, to)) {
-                    days.computeIfAbsent(view.scheduled().toLocalDate(), d -> new java.util.ArrayList<>()).add(view);
-                }
-                model.addAttribute("range", selected);
-                model.addAttribute("days", days);
-                model.addAttribute("today", today);
-                model.addAttribute("now", java.time.LocalDateTime.now(appointments.zone()));
+            if ("agenda".equals(fromLocation)) {
+                addAgendaModel(model, range);
                 return "appointments/agenda :: agenda";
             } else {
                 // Request came from patient appointments tab: return the tabs

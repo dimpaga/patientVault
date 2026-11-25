@@ -35,10 +35,6 @@
                         <h2 class="h4 fw-semibold mb-0" th:id="'pn-' + ${c.id}">
                             <a class="text-decoration-none" th:href="@{/patients/{id}(id=${c.id})}" th:text="${c.fullName}">Name</a>
                         </h2>
-                        <span class="badge text-bg-success flex-shrink-0" th:if="${c.consentGiven}">
-                            <i class="bi bi-check-circle me-1" aria-hidden="true"></i><span th:text="#{patient.consent.given}">Consent given</span>
-                        </span>
-                        <span class="badge text-bg-secondary flex-shrink-0" th:unless="${c.consentGiven}" th:text="#{patient.consent.notGiven}">No consent recorded</span>
                     </div>
                     <div class="d-flex flex-wrap justify-content-between gap-3 pv-card-details">
                     <ul class="list-unstyled pv-contact mb-0">

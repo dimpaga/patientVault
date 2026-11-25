@@ -11,7 +11,7 @@
     <div class="pv-range mb-3 mb-md-4" data-pv-range>
         <span class="pv-range-thumb" aria-hidden="true"></span>
         <ul class="nav nav-pills pv-range-pills" id="pv-range-list" th:aria-label="#{appointments.range}">
-            <li class="nav-item" th:each="r : ${ {'today','week','month'} }">
+            <li class="nav-item" th:each="r : ${ {'today','week','month','past'} }">
                 <a class="nav-link" th:classappend="${range == r} ? 'active'" th:href="@{/appointments(range=${r})}"
                    th:hx-get="@{/appointments(range=${r})}" hx-target="#pv-agenda" hx-swap="outerHTML"
                    hx-push-url="true" hx-boost="false" hx-sync="#pv-range-list:replace"

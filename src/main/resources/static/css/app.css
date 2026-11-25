@@ -539,10 +539,23 @@ a.pv-stat:hover { transform: translateY(-2px); border-color: var(--pv-accent); c
     }
     .pv-range .pv-range-pills {
         gap: 0.08rem;
-        justify-content: space-between;
+        flex-wrap: nowrap;
     }
-    .pv-range-pills .nav-link {
-        padding-inline: 0.6rem;
+    /* four options share the width equally; a long label wraps inside its pill instead of pushing the pill onto a second row */
+    .pv-range .pv-range-pills .nav-item {
+        display: flex;
+        flex: 1 1 0;
+        min-width: 0;
+    }
+    .pv-range .pv-range-pills .nav-link {
+        flex: 1 1 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        white-space: normal;
+        line-height: 1.15;
+        padding-inline: 0.3rem;
         font-size: 0.8rem;
         min-height: 2.75rem;
     }
@@ -859,6 +872,7 @@ a.pv-stat:hover { transform: translateY(-2px); border-color: var(--pv-accent); c
 @media (pointer: coarse) { .pv-filebtn.pv-touch-only { display: inline-block; } }
 .min-w-0 { min-width: 0; }
 .pv-manage .btn { min-width: 2.25rem; }
+.pv-new-btn { font-size: 0.95rem; }
 .breadcrumb { --bs-breadcrumb-divider: '›'; }
 
 /* toasts sit below the top bar so they never cover its buttons */
